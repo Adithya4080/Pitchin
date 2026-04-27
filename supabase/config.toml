@@ -1,0 +1,13 @@
+project_id = "lrvjfnjueurvoiwfyzwd"
+
+[functions.send-interest]
+verify_jwt = false
+
+[functions.create-notification]
+verify_jwt = false
+
+[functions.send-follow-request]
+verify_jwt = false
+
+[functions.send-partner-interest]
+verify_jwt = false
