@@ -18,6 +18,7 @@ export default function Auth() {
   const [loginPassword, setLoginPassword] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
+  const [regConfirmPassword, setRegConfirmPassword] = useState('');
   const [regName, setRegName] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -35,8 +36,12 @@ export default function Auth() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (regPassword !== regConfirmPassword) {
+      toast({ title: 'Passwords do not match', variant: 'destructive' });
+      return;
+    }
     setLoading(true);
-    const { error } = await signUpWithEmail(regEmail, regPassword, regName);
+    const { error } = await signUpWithEmail(regEmail, regPassword, regConfirmPassword, regName);
     setLoading(false);
     if (error) {
       toast({ title: 'Registration failed', description: error.message, variant: 'destructive' });
@@ -145,6 +150,18 @@ export default function Auth() {
                       placeholder="At least 8 characters"
                       value={regPassword}
                       onChange={(e) => setRegPassword(e.target.value)}
+                      required
+                      minLength={8}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="reg-confirm-password">Confirm Password</Label>
+                    <Input
+                      id="reg-confirm-password"
+                      type="password"
+                      placeholder="Repeat your password"
+                      value={regConfirmPassword}
+                      onChange={(e) => setRegConfirmPassword(e.target.value)}
                       required
                       minLength={8}
                     />

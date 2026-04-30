@@ -15,13 +15,11 @@ interface AuthContextType {
   isOnboardingChecked: boolean;
   setIsOnboarded: (value: boolean) => void;
   signInWithEmail: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUpWithEmail: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
+  signUpWithEmail: (email: string, password: string, password2: string, fullName: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshUser: () => Promise<void>;
-  /** Legacy: kept so existing components don't break — always resolves false */
   signInWithGoogle: () => Promise<{ error: Error | null }>;
   signInWithLinkedIn: () => Promise<{ error: Error | null }>;
-  /** Compat shim: in Supabase era this returned a session; now returns { user } */
   session: { user: AuthUser } | null;
 }
 
@@ -39,7 +37,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsOnboardingChecked(true);
       return;
     }
-    // A user is "onboarded" when they have a role AND a complete profile
     const onboarded = Boolean(u.role && u.is_profile_complete);
     setIsOnboarded(onboarded);
     setIsOnboardingChecked(true);
@@ -66,11 +63,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [checkOnboarding]);
 
-  // Bootstrap: load user from persisted token
   useEffect(() => {
     refreshUser();
 
-    // Listen for forced logout (token refresh failure)
     const handleLogout = () => {
       setUser(null);
       setIsOnboarded(null);
@@ -91,9 +86,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const signUpWithEmail = async (email: string, password: string, fullName: string) => {
+  const signUpWithEmail = async (email: string, password: string, password2: string, fullName: string) => {
     try {
-      const data = await apiRegister({ email, password, full_name: fullName });
+      const data = await apiRegister({ email, password, password2, full_name: fullName });
       setUser(data.user);
       checkOnboarding(data.user);
       return { error: null };
@@ -104,13 +99,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     const refresh = getRefreshToken() ?? '';
-    await apiLogout(refresh).catch(() => {});
+    await apiLogout(refresh).catch(() => { });
     setUser(null);
     setIsOnboarded(null);
     setIsOnboardingChecked(false);
   };
 
-  // These won't work without OAuth setup — kept for API compat
   const signInWithGoogle = async () => ({
     error: new Error('Google sign-in is not configured for this backend.'),
   });

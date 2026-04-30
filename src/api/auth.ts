@@ -18,6 +18,7 @@ export interface AuthResponse {
 export async function register(params: {
   email: string;
   password: string;
+  password2: string;
   full_name: string;
 }): Promise<AuthResponse> {
   const data = await apiFetch<AuthResponse>('/auth/register/', {
