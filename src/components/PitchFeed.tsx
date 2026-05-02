@@ -136,7 +136,7 @@ export function PitchFeed() {
       </div>
 
       {/* Feed Card Container */}
-      <Card className="bg-card border-border/40 rounded-lg overflow-hidden">
+      <div>
 
         {/* Feed */}
         {isLoading ? (
@@ -162,14 +162,16 @@ export function PitchFeed() {
           </ContentTransition>
         ) : (
           <StaggeredList className="divide-y divide-border/40">
-            {pitches?.map((pitch, index) => (
-              <StaggeredItem key={pitch.id} className="bg-card">
-                <PitchCard pitch={pitch} hideBorder />
-              </StaggeredItem>
-            ))}
+            <div className="space-y-3">
+              {pitches?.map((pitch, index) => (
+                <StaggeredItem key={pitch.id}>
+                  <PitchCard pitch={pitch} />
+                </StaggeredItem>
+              ))}
+            </div>
           </StaggeredList>
         )}
-      </Card>
+      </div>
 
       {/* Create Pitch Modal */}
       <CreatePitchModal 

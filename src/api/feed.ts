@@ -2,21 +2,22 @@ import { apiFetch } from './client';
 
 export interface Post {
   id: number;
-  author: number;
+  author_id: number;
   author_name: string;
-  author_avatar: string | null;
+  author_avatar?: string | null;  // not always returned by backend
   author_role: string;
-  title: string;
-  content: string;
+  title: string;                  // backend field (mapped to post_title in adaptPost)
+  content: string;                // backend field (mapped to pitch_statement in adaptPost)
   post_type: string;
-  tags: string;
-  image_url: string | null;
+  tags: string[] | string;
+  image: string | null;           // backend uses "image", not "image_url"
+  link: string;
   is_published: boolean;
   like_count: number;
   comment_count: number;
+  liked_by_me: boolean;
   created_at: string;
   updated_at: string;
-  user_has_liked?: boolean;
 }
 
 export interface PostComment {
