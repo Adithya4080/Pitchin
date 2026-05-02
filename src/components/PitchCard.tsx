@@ -218,10 +218,10 @@ export function PitchCard({ pitch, hideBorder = false }: PitchCardProps) {
     });
   };
 
-  const shouldTruncate = pitch.pitch_statement.length > 200 && !expanded;
+  const shouldTruncate = (pitch.pitch_statement?.length ?? 0) > 200 && !expanded;
   const displayText = shouldTruncate
-    ? pitch.pitch_statement.slice(0, 200) + '…'
-    : pitch.pitch_statement;
+    ? (pitch.pitch_statement ?? '').slice(0, 200) + '…'
+    : (pitch.pitch_statement ?? '');
 
   return (
     <>
@@ -229,7 +229,7 @@ export function PitchCard({ pitch, hideBorder = false }: PitchCardProps) {
         initial={{ opacity: 0, y: 5 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2 }}
-        className={cn("py-4 px-4 bg-card", !hideBorder && "rounded-lg border border-border")}
+        className={cn("py-4 px-4", !hideBorder && "rounded-lg border border-border bg-card")}
       >
         {/* ── Header ───────────────────────────────────────────── */}
         <div className="flex items-start justify-between mb-3">
@@ -330,10 +330,10 @@ export function PitchCard({ pitch, hideBorder = false }: PitchCardProps) {
         </div>
 
         {/* ── Media ────────────────────────────────────────────── */}
-        {pitch.image_url && (
+        {(p.image || pitch.image) && (
           <div className="w-[calc(100%+2rem)] -mx-4 mb-3 overflow-hidden bg-muted/30">
             <img
-              src={pitch.image_url}
+              src={p.image || pitch.image}
               alt="Post attachment"
               className="w-full h-auto object-cover max-h-[70vh]"
             />

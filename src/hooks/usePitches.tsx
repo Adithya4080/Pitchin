@@ -1,7 +1,3 @@
-/**
- * usePitches — wraps the Django /api/feed/ endpoints.
- * Naming kept consistent with old Supabase version so components need minimal changes.
- */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from './useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -26,12 +22,19 @@ export type PitchWithProfile = Post & {
 };
 
 function adaptPost(p: Post): PitchWithProfile {
+  const raw = p as any;
   return {
     ...p,
-    profiles: { full_name: p.author_name, avatar_url: p.author_avatar },
+    pitch_statement: p.content,            // backend "content"  → "pitch_statement"
+    post_title: raw.title ?? null,         // backend "title"    → "post_title"
+    author_avatar: raw.author_avatar ?? null,
+    profiles: {
+      full_name: p.author_name ?? null,
+      avatar_url: raw.author_avatar ?? null,
+    },
     user_has_saved: false,
     user_reaction: null,
-  };
+  } as any;
 }
 
 export function usePitches(
@@ -82,16 +85,17 @@ export function useCreatePitch() {
   const { toast } = useToast();
   return useMutation({
     mutationFn: (data: {
-      pitch_statement: string;
+      pitch_statement: string;   // maps to → content (description textarea)
+      post_title?: string;       // maps to → title (title input)
       supporting_line?: string;
       category?: string;
       description?: string;
       image_url?: string;
     }) =>
       createPost({
-        title: data.pitch_statement,
-        content: data.description || data.supporting_line || '',
-        post_type: data.category || 'general',
+        title: data.post_title || '',
+        content: data.pitch_statement,
+        post_type: data.category || 'other',
         image_url: data.image_url,
       }),
     onSuccess: () => {
