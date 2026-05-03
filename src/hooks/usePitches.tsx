@@ -90,13 +90,13 @@ export function useCreatePitch() {
       supporting_line?: string;
       category?: string;
       description?: string;
-      image_url?: string;
+      image?: File | null;
     }) =>
       createPost({
         title: data.post_title || '',
         content: data.pitch_statement,
         post_type: data.category || 'other',
-        image_url: data.image_url,
+        image: data.image,
       }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['pitches'] });

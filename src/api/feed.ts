@@ -49,16 +49,38 @@ export async function getFeed(filters?: FeedFilters): Promise<Post[]> {
   return apiFetch<Post[]>(`/feed/${query}`);
 }
 
+// export async function createPost(data: {
+//   title: string;
+//   content: string;
+//   post_type?: string;
+//   tags?: string;
+//   image_url?: string;
+// }): Promise<Post> {
+//   return apiFetch<Post>('/feed/create/', {
+//     method: 'POST',
+//     body: JSON.stringify(data),
+//   });
+// }
+
+// After
 export async function createPost(data: {
   title: string;
   content: string;
   post_type?: string;
   tags?: string;
-  image_url?: string;
+  image?: File | null;
 }): Promise<Post> {
+  const form = new FormData();
+  form.append('title', data.title);
+  form.append('content', data.content);
+  if (data.post_type) form.append('post_type', data.post_type);
+  if (data.tags) form.append('tags', data.tags);
+  if (data.image) form.append('image', data.image);
+  form.append('is_published', 'true');
+
   return apiFetch<Post>('/feed/create/', {
     method: 'POST',
-    body: JSON.stringify(data),
+    body: form,
   });
 }
 

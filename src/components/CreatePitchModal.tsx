@@ -812,7 +812,7 @@ function PitchComposer({ onOpenChange }: { onOpenChange: (open: boolean) => void
     await createPitch.mutateAsync({
       pitch_statement: pitchStatement.trim(),
       category,
-      image_url: imageUrl,
+      image: imageFile ?? undefined,
       post_title: postTitle.trim() || undefined,
       external_link_url: sanitizedLinkUrl || undefined,
       external_link_title: linkEnabled ? (linkTitle.trim() || undefined) : undefined,
