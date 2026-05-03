@@ -79,21 +79,37 @@ export function FeedLeftSidebar() {
     enabled: !!user?.id
   });
 
+  // After
   const { data: userStats } = useQuery({
     queryKey: ['userStats', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      // TODO: connect to backend API
-      // const totalReactions = pitches?.reduce((sum, p) => sum + (p.reaction_count || 0), 0) || 0;
-      // const totalSaves = pitches?.reduce((sum, p) => sum + (p.save_count || 0), 0) || 0;
+      const { getMyPosts } = await import('@/api/feed');
+      const posts = await getMyPosts();
       return {
-        totalReactions : 0,
-        totalSaves : 0,
-        pitchCount:  0,
+        totalReactions: posts.reduce((sum: number, p: any) => sum + (p.like_count || 0), 0),
+        totalSaves: 0,
+        pitchCount: posts.length,
       };
     },
     enabled: !!user?.id
   });
+
+  // const { data: userStats } = useQuery({
+  //   queryKey: ['userStats', user?.id],
+  //   queryFn: async () => {
+  //     if (!user?.id) return null;
+  //     // TODO: connect to backend API
+  //     // const totalReactions = pitches?.reduce((sum, p) => sum + (p.reaction_count || 0), 0) || 0;
+  //     // const totalSaves = pitches?.reduce((sum, p) => sum + (p.save_count || 0), 0) || 0;
+  //     return {
+  //       totalReactions : 0,
+  //       totalSaves : 0,
+  //       pitchCount:  0,
+  //     };
+  //   },
+  //   enabled: !!user?.id
+  // });
 
   const handleProfileClick = () => {
     if (user?.email === 'pitchin.admn@gmail.com') {
@@ -155,7 +171,7 @@ export function FeedLeftSidebar() {
               className="font-bold text-lg leading-tight cursor-pointer hover:text-primary transition-colors"
               onClick={handleProfileClick}
             >
-              {profile?.full_name || 'Anonymous User'}
+              {profile?.user_name || 'Anonymous User'}
             </h3>
             <p className="text-xs text-muted-foreground mt-0.5 truncate">
               {user?.email}

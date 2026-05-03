@@ -25,8 +25,9 @@ function adaptPost(p: Post): PitchWithProfile {
   const raw = p as any;
   return {
     ...p,
-    pitch_statement: p.content,            // backend "content"  → "pitch_statement"
-    post_title: raw.title ?? null,         // backend "title"    → "post_title"
+    pitch_statement: p.content,
+    post_title: raw.title ?? null,
+    user_id: String(raw.author_id),
     author_avatar: raw.author_avatar ?? null,
     profiles: {
       full_name: p.author_name ?? null,

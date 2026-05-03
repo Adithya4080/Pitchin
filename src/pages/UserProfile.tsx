@@ -44,7 +44,7 @@ export default function UserProfile() {
   const isMobile = useIsMobile();
   
   // Validate userId parameter
-  const validUserId = isValidUuid(userId);
+  const validUserId = !!userId && userId !== 'undefined';
 
   // Redirect owner to dashboard (Owner Profile view)
   useEffect(() => {
@@ -301,7 +301,7 @@ export default function UserProfile() {
         <AppLayout showBottomNav={true}>
           <MobileRestrictedProfile
             userId={userId || ''}
-            fullName={profile?.full_name || 'Anonymous User'}
+            fullName={profile?.user_name || 'Anonymous User'}
             avatarUrl={profile?.avatar_url || null}
             bannerUrl={(profile as any)?.banner_url || null}
             bio={profile?.bio}
@@ -325,7 +325,7 @@ export default function UserProfile() {
 
             <RestrictedProfilePreview
               userId={userId || ''}
-              fullName={profile?.full_name || 'Anonymous User'}
+              fullName={profile?.user_name || 'Anonymous Userrr'}
               avatarUrl={profile?.avatar_url || null}
               bannerUrl={(profile as any)?.banner_url || null}
               bio={profile?.bio}
