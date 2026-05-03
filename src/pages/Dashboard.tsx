@@ -505,7 +505,7 @@ export default function Dashboard() {
     return (
       <AppLayout showBottomNav={true}>
         <MobileProfileView
-          fullName={fullName || 'Your Name'}
+          fullName={user?.full_name || 'Your Name'}
           email={user?.email}
           avatarUrl={avatarPreview}
           bannerUrl={bannerPreview}
@@ -645,7 +645,7 @@ export default function Dashboard() {
           {/* Profile Header */}
           <ProfileHeader
             userId={String(user?.id) || ''}
-            fullName={fullName || 'Your Name'}
+            fullName={user?.full_name || 'Your Name'}
             email={user?.email}
             avatarUrl={avatarPreview}
             bannerUrl={bannerPreview}

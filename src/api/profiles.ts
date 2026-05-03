@@ -5,6 +5,7 @@ export type UserRole = 'innovator' | 'startup' | 'investor' | 'consultant' | 'ec
 export interface BaseProfile {
   id: number;
   user: number;
+  user_name: string;
   user_email?: string;
   user_full_name?: string;
   full_name: string | null;

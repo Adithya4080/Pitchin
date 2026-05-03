@@ -166,7 +166,7 @@ export function PitchCard({ pitch, hideBorder = false }: PitchCardProps) {
 
   const handleProfileClick = () => {
     if (isAdminAuthor) navigate('/admin');
-    else navigate(`/profile/${pitch.user_id}`);
+    else navigate(`/profile/${(pitch as any).author_id ?? pitch.user_id}`);
   };
 
   const handleReaction = (reactionType: ReactionType) => {
@@ -233,7 +233,7 @@ export function PitchCard({ pitch, hideBorder = false }: PitchCardProps) {
       >
         {/* ── Header ───────────────────────────────────────────── */}
         <div className="flex items-start justify-between mb-3">
-          <div className="flex items-start gap-3">
+          <div className="flex items-center justify-center gap-3">
             <Avatar
               className={cn(
                 "h-11 w-11 shrink-0 cursor-pointer hover:opacity-80 transition-opacity",
@@ -250,7 +250,7 @@ export function PitchCard({ pitch, hideBorder = false }: PitchCardProps) {
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex justify-center items-center gap-2 flex-wrap">
                 <span
                   className="font-semibold text-foreground text-[15px] cursor-pointer hover:text-primary hover:underline transition-colors"
                   onClick={handleProfileClick}

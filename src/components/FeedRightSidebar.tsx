@@ -15,7 +15,7 @@ function PersonRow({
   currentUserId,
   onDismiss,
 }: {
-  user: { id: string; full_name: string | null; avatar_url: string | null; bio?: string | null };
+  user: { id: string; user_name: string | null; avatar_url: string | null; bio?: string | null };
   currentUserId: string | undefined;
   onDismiss: (id: string) => void;
 }) {
@@ -23,7 +23,7 @@ function PersonRow({
   const followRequest = useFollowRequest();
 
   const initials =
-    user.full_name
+    user.user_name
       ?.split(' ')
       .map((n) => n[0])
       .join('')
@@ -51,7 +51,7 @@ function PersonRow({
           className="block text-left w-full"
         >
           <p className="text-sm font-semibold text-foreground truncate leading-tight">
-            {user.full_name || 'Anonymous User'}
+            {user.user_name || 'Anonymous User'}
           </p>
           <p className="text-xs text-muted-foreground truncate mt-0.5">
             {user.bio || 'Member of Pitch In'}
@@ -236,7 +236,7 @@ export function FeedRightSidebar() {
           <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
           <a href="#" className="hover:text-foreground transition-colors">Terms</a>
         </div>
-        <p>© 2024 Pitch In</p>
+        <p>© {new Date().getFullYear()} Pitch In</p>
       </div>
     </aside>
   );
