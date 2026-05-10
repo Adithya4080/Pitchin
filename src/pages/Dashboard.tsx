@@ -169,7 +169,7 @@ export default function Dashboard() {
       const profileData = await (await import('@/api/profiles')).getMyProfile();
       return posts.map(post => ({
         ...post,
-        profiles: { full_name: String((profileData as any).bio ? profileData.user : post.author_name), avatar_url: profileData.avatar_url },
+        profiles: { full_name: String((profileData as any).bio ? profileData.user_name : post.author_name), avatar_url: profileData.avatar_url },
         is_active: true,
         expires_at: new Date(Date.now() + 86400000 * 30).toISOString(),
         reaction_count: post.like_count,
@@ -229,18 +229,40 @@ export default function Dashboard() {
   };
 
   // Populate form when profile loads
+  // useEffect(() => {
+  //   if (profile) {
+  //     setFullName(profile.full_name || '');
+  //     setBio((profile as any).bio || '');
+  //     setLocation((profile as any).location || '');
+  //     setContactEmail((profile as any).contact_email || '');
+  //     setLinkedinUrl(profile.linkedin_url || '');
+  //     setTwitterUrl((profile as any).twitter_url || '');
+  //     setWebsiteUrl((profile as any).website_url || '');
+  //     setPortfolioUrl((profile as any).portfolio_url || '');
+  //     setAvatarPreview(profile.avatar_url || null);
+  //     setBannerPreview((profile as any).banner_url || null);
+  //   }
+  // }, [profile]);
+
   useEffect(() => {
     if (profile) {
-      setFullName(profile.full_name || '');
+      setFullName((profile as any).user_name || profile.full_name || '');
       setBio((profile as any).bio || '');
       setLocation((profile as any).location || '');
       setContactEmail((profile as any).contact_email || '');
-      setLinkedinUrl(profile.linkedin_url || '');
-      setTwitterUrl((profile as any).twitter_url || '');
-      setWebsiteUrl((profile as any).website_url || '');
+      setLinkedinUrl((profile as any).linkedin || profile.linkedin_url || '');
+      setTwitterUrl((profile as any).twitter || (profile as any).twitter_url || '');
+      setWebsiteUrl((profile as any).website || (profile as any).website_url || '');
       setPortfolioUrl((profile as any).portfolio_url || '');
-      setAvatarPreview(profile.avatar_url || null);
-      setBannerPreview((profile as any).banner_url || null);
+      const avatarPath = (profile as any).avatar || profile.avatar_url || null;
+        setAvatarPreview(avatarPath ? 
+          (avatarPath.startsWith('http') ? avatarPath : `https://pitchin-backend-production.up.railway.app${avatarPath}`) 
+        : null);
+      const bannerPath = (profile as any).banner || (profile as any).banner_url || null;
+        setBannerPreview(
+          bannerPath ? 
+          (bannerPath.startsWith('http') ? bannerPath : `https://pitchin-backend-production.up.railway.app${bannerPath}`) 
+          : null);
     }
   }, [profile]);
 
@@ -258,12 +280,17 @@ export default function Dashboard() {
       setBio((profile as any).bio || '');
       setLocation((profile as any).location || '');
       setContactEmail((profile as any).contact_email || '');
-      setLinkedinUrl(profile.linkedin_url || '');
-      setTwitterUrl((profile as any).twitter_url || '');
-      setWebsiteUrl((profile as any).website_url || '');
       setPortfolioUrl((profile as any).portfolio_url || '');
-      setAvatarPreview(profile.avatar_url || null);
-      setBannerPreview((profile as any).banner_url || null);
+      // setLinkedinUrl(profile.linkedin_url || '');
+      // setTwitterUrl((profile as any).twitter_url || '');
+      // setWebsiteUrl((profile as any).website_url || '');
+      // setAvatarPreview(profile.avatar_url || null);
+      // setBannerPreview((profile as any).banner_url || null);
+      setLinkedinUrl((profile as any).linkedin || profile.linkedin_url || '');
+      setTwitterUrl((profile as any).twitter || (profile as any).twitter_url || '');
+      setWebsiteUrl((profile as any).website || (profile as any).website_url || '');
+      setAvatarPreview((profile as any).avatar || profile.avatar_url || null);
+      setBannerPreview((profile as any).banner || (profile as any).banner_url || null);
     }
     if (roleProfile) {
       setRoleProfileData(roleProfile);
@@ -309,44 +336,82 @@ export default function Dashboard() {
     setBannerPreview(null);
   };
 
+  // const handleSave = async () => {
+  //   if (!user?.id) return;
+    
+  //   setIsSaving(true);
+  //   try {
+  //     let avatarUrl = profile?.avatar_url || null;
+  //     let bannerUrl = (profile as any)?.banner_url || null;
+
+  //     // Upload new avatar if selected
+  //     if (avatarFile) {
+  //       const fileExt = avatarFile.name.split('.').pop();
+  //       const filePath = `${user.id}/avatar-${Date.now()}.${fileExt}`;
+        
+  //       const formData = new FormData();
+  //       formData.append('avatar', avatarFile);
+  //       const { updateMyProfile: _updateAvatar } = await import('@/api/profiles');
+  //       // Store base64 preview as avatar_url until backend supports file upload
+  //       avatarUrl = avatarPreview;
+  //     } else if (avatarPreview === null && profile?.avatar_url) {
+  //       avatarUrl = null;
+  //     }
+
+  //     // Upload new banner if selected
+  //     if (bannerFile) {
+  //       const fileExt = bannerFile.name.split('.').pop();
+  //       const filePath = `${user.id}/banner-${Date.now()}.${fileExt}`;
+        
+  //       // Store base64 preview as banner_url until backend supports file upload
+  //       bannerUrl = bannerPreview;
+  //     } else if (bannerPreview === null && (profile as any)?.banner_url) {
+  //       bannerUrl = null;
+  //     }
+
+  //     const { updateMyProfile } = await import('@/api/profiles');
+  //     await updateMyProfile({
+  //       bio: bio || null,
+  //       linkedin_url: linkedinUrl || null,
+  //       avatar_url: avatarUrl,
+  //     } as any);
+
+  //     // Save role-specific profile if data exists
+  //     if (roleProfileData && role) {
+  //       await saveRoleProfile.mutateAsync(roleProfileData);
+  //     }
+
+  //     queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+  //     toast.success('Profile updated successfully!');
+  //     setAvatarFile(null);
+  //     setBannerFile(null);
+  //     setIsEditing(false); // Exit edit mode after successful save
+  //   } catch (error: any) {
+  //     toast.error(error.message || 'Failed to update profile');
+  //   } finally {
+  //     setIsSaving(false);
+  //   }
+  // };
+
+  // Get role-specific tab label
+  
   const handleSave = async () => {
     if (!user?.id) return;
     
     setIsSaving(true);
     try {
-      let avatarUrl = profile?.avatar_url || null;
-      let bannerUrl = (profile as any)?.banner_url || null;
-
-      // Upload new avatar if selected
-      if (avatarFile) {
-        const fileExt = avatarFile.name.split('.').pop();
-        const filePath = `${user.id}/avatar-${Date.now()}.${fileExt}`;
-        
-        const formData = new FormData();
-        formData.append('avatar', avatarFile);
-        const { updateMyProfile: _updateAvatar } = await import('@/api/profiles');
-        // Store base64 preview as avatar_url until backend supports file upload
-        avatarUrl = avatarPreview;
-      } else if (avatarPreview === null && profile?.avatar_url) {
-        avatarUrl = null;
-      }
-
-      // Upload new banner if selected
-      if (bannerFile) {
-        const fileExt = bannerFile.name.split('.').pop();
-        const filePath = `${user.id}/banner-${Date.now()}.${fileExt}`;
-        
-        // Store base64 preview as banner_url until backend supports file upload
-        bannerUrl = bannerPreview;
-      } else if (bannerPreview === null && (profile as any)?.banner_url) {
-        bannerUrl = null;
-      }
-
       const { updateMyProfile } = await import('@/api/profiles');
       await updateMyProfile({
-        bio: bio || null,
-        linkedin_url: linkedinUrl || null,
-        avatar_url: avatarUrl,
+        user_name: fullName || undefined,
+        bio: bio || '',
+        location: location || '',
+        linkedin: linkedinUrl || '',
+        twitter: twitterUrl || '',
+        website: websiteUrl || '',
+        avatarFile: avatarFile ?? undefined,
+        bannerFile: bannerFile ?? undefined,
+        ...(!avatarFile && avatarPreview === null ? { avatar: null } : {}),
+        ...(!bannerFile && bannerPreview === null ? { banner: null } : {}),
       } as any);
 
       // Save role-specific profile if data exists
@@ -358,15 +423,14 @@ export default function Dashboard() {
       toast.success('Profile updated successfully!');
       setAvatarFile(null);
       setBannerFile(null);
-      setIsEditing(false); // Exit edit mode after successful save
+      setIsEditing(false);
     } catch (error: any) {
       toast.error(error.message || 'Failed to update profile');
     } finally {
       setIsSaving(false);
     }
   };
-
-  // Get role-specific tab label
+  
   const getRoleTabLabel = () => {
     switch (role) {
       case 'innovator': return 'Skills & Portfolio';
