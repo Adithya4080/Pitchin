@@ -283,16 +283,26 @@ export interface InvestorProfile extends BaseProfile {
   ticket_size_max: number | null;
   portfolio_companies: string[];
   total_investments: number;
+  investor_type: string | null;
+  investment_range: string | null;
+  preferred_sectors: string[];
+  region_focus: string | null;
+  investment_criteria: string | null; 
 }
 
 export interface ConsultantProfile extends BaseProfile {
   expertise: string[];
-  services_offered: string[];
+  services_offered: string | null;
   years_of_experience: number | null;
   availability: string;
-  hourly_rate: number | null;
+  hourly_rate: string | null;
   industries_served: string[];
   certifications: string[];
+  experience_summary: string | null;
+  expertise_areas: string[];
+  services_description: string | null;
+  services_pricing: string | null;
+  services_availability: string | null;
 }
 
 export interface EcosystemPartnerProfile extends BaseProfile {
