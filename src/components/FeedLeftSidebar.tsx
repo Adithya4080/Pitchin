@@ -158,9 +158,10 @@ export function FeedLeftSidebar() {
               className="h-16 w-16 border-4 border-card cursor-pointer hover:opacity-80 transition-opacity"
               onClick={handleProfileClick}
             >
-              <AvatarImage src={profile?.avatar_url || ''} />
+              <AvatarImage src={profile?.avatar ?? user?.avatar_url} />
+
               <AvatarFallback className="bg-primary/10 text-primary text-lg">
-                {profile?.full_name?.charAt(0) || user?.email?.charAt(0) || '?'}
+                {profile?.user_name?.charAt(0) || user?.email?.charAt(0) || '?'}
               </AvatarFallback>
             </Avatar>
           </div>

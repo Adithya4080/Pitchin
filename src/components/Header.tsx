@@ -46,8 +46,8 @@ export function Header() {
     staleTime: 0,
   });
 
-  const displayName = profile?.user_full_name || user?.full_name || user?.email || '?';
-  const avatarUrl = profile?.avatar_url || user?.avatar_url;
+  const displayName = profile?.full_name || user?.full_name || user?.email || '?';
+  const avatarUrl = profile?.avatar || user?.avatar_url || undefined; 
   const initials = displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
   const handleSignOut = async () => {
     await signOut();
