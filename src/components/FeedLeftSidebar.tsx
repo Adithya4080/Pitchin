@@ -148,7 +148,7 @@ export function FeedLeftSidebar() {
         {/* Banner */}
         <div 
           className="h-20 bg-gradient-to-r from-primary/20 to-primary/5 bg-cover bg-center"
-          style={profile?.banner_url ? { backgroundImage: `url(${profile.banner_url})` } : undefined}
+          style={profile?.banner ? { backgroundImage: `url(${profile.banner})` } : undefined}
         />
 
         <div className="px-5 pb-5">
@@ -159,7 +159,6 @@ export function FeedLeftSidebar() {
               onClick={handleProfileClick}
             >
               <AvatarImage src={profile?.avatar ?? user?.avatar_url} />
-
               <AvatarFallback className="bg-primary/10 text-primary text-lg">
                 {profile?.user_name?.charAt(0) || user?.email?.charAt(0) || '?'}
               </AvatarFallback>
