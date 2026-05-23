@@ -1908,20 +1908,20 @@ export default function Dashboard() {
               )} */}
 
               {activePitch && (
-  <ActivePitchCard
-    pitch={{
-      id: String(activePitch.id),
-      pitch_statement: activePitch.content ?? activePitch.title ?? '',
-      image_url: activePitch.image ?? undefined,
-      expires_at: activePitch.expires_at,
-      reaction_count: activePitch.reaction_count,
-      save_count: activePitch.save_count,
-    }}
-    isEditable={true}
-    isDeleting={isDeleting}
-    onDelete={handleDeletePitch}
-  />
-)}
+                <ActivePitchCard
+                  pitch={{
+                    id: String(activePitch.id),
+                    pitch_statement: activePitch.content ?? activePitch.title ?? '',
+                    image_url: activePitch.image ?? undefined,
+                    expires_at: activePitch.expires_at,
+                    reaction_count: activePitch.reaction_count,
+                    save_count: activePitch.save_count,
+                  }}
+                  isEditable={true}
+                  isDeleting={isDeleting}
+                  onDelete={handleDeletePitch}
+                />
+              )}
 
               {/* Introduction Video Section - All roles */}
               <div className="relative">

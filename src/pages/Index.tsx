@@ -7,7 +7,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { MobileLandingPage } from '@/components/mobile';
 import { OnboardingTutorial } from '@/components/OnboardingTutorial';
-import heroIllustration from '@/assets/hero-illustration.png';
+
+
 const TUTORIAL_COMPLETED_KEY = 'pitchnet_tutorial_completed';
 export default function Index() {
   const navigate = useNavigate();
@@ -94,45 +95,23 @@ function DesktopLanding({
       <Header />
 
       {/* Hero Section with Auth */}
-      <section className="relative py-12 lg:py-20 overflow-hidden">
+      <section className="relative overflow-hidden min-h-screen flex items-center">
         {/* Background decoration */}
         <div className="absolute inset-0 -z-10">
           <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
           <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
         </div>
 
-        <div className="container">
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center px-4 sm:px-8 lg:px-16 xl:px-24">
+        <div className="w-full">
+          <div className="relative flex items-center justify-between min-h-[calc(100vh-80px)] w-full overflow-hidden">
 
             {/* Left side - Auth Form */}
-            <div className="w-full max-w-full sm:max-w-2xl lg:max-w-3xl mx-auto lg:mx-0">
-
+            <div className="relative z-10 w-full max-w-[700px] px-6 sm:px-10 lg:px-16 xl:px-24 py-16 lg:py-0">
               <div className="space-y-8 w-full">
-
                 {/* Header */}
                 <div className="relative w-full max-w-full">
-
-                  {/* Anti Gravity Glow */}
-                  <div className="absolute inset-0 -z-10 flex items-center justify-center">
-                    <div className="w-[400px] h-[400px] bg-primary/20 blur-3xl rounded-full animate-pulse" />
-                  </div>
-
-                  {/* Floating Particles */}
-                  <div className="absolute top-10 left-10 w-3 h-3 bg-primary rounded-full animate-bounce opacity-40" />
-
-                  <div className="absolute top-32 right-20 w-2 h-2 bg-primary rounded-full animate-ping opacity-40" />
-
-                  <div className="absolute bottom-16 left-1/4 w-4 h-4 bg-primary rounded-full animate-pulse opacity-30" />
-
-                  {/* Badge */}
-                  <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 backdrop-blur-md px-4 py-1.5 text-sm font-medium text-primary mb-6 animate-fade-in">
-                    <Sparkles className="h-4 w-4 animate-pulse" />
-                    Building the future of innovation
-                  </div>
-
                   {/* Heading */}
-                  <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6 leading-tight">
-
+                  <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-6xl font-medium tracking-tight mb-6 leading-[1]">
                     <div className="overflow-hidden">
                       <span className="typing-animation typing-animation-1 block">
                         A Smarter
@@ -150,11 +129,10 @@ function DesktopLanding({
                         People, and Growth.
                       </span>
                     </div>
-
                   </h1>
 
                   {/* Description */}
-                  <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed animate-fade-in [animation-delay:200ms]">
+                  <p className="text-sm sm:text-sm  text-muted-foreground max-w-xl leading-relaxed animate-fade-in [animation-delay:200ms]">
                     Pitch connects innovators, investors, and experts to turn ideas into real-world startups.
                   </p>
 
@@ -213,12 +191,25 @@ function DesktopLanding({
             </div>
 
             {/* Right side - Illustration */}
-            <div className="hidden lg:flex items-center justify-center animate-fade-in [animation-delay:400ms]">
+            <div className="absolute right-[-8%] top-0 w-[65%] lg:w-[58%] xl:w-[55%] h-full flex items-start justify-end pointer-events-none">
+
               <img
                 alt="Team collaborating on ideas"
-                className="w-full max-w-lg xl:max-w-xl object-contain"
-                src="/lovable-uploads/44b5b22b-8a8a-4494-bb2a-0d65d694f330.png"
+                className="
+                  w-full
+                  h-auto
+                  object-contain
+                  max-w-none
+                  opacity-100
+                  min-w-[500px]
+                  sm:min-w-[650px]
+                  md:min-w-[750px]
+                  lg:min-w-[900px]
+                  xl:min-w-[1050px]
+                "
+                src="https://fymxcszzdpennpmgnstb.supabase.co/storage/v1/object/public/post-images/platform-official-image/hero-illustration.png"
               />
+
             </div>
 
           </div>

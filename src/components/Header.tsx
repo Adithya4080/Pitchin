@@ -149,7 +149,7 @@ export function Header() {
                 {isFeedPage ? (
                   <span className="font-display font-bold text-2xl tracking-tight text-sky-400">Pitchin</span>
                 ) : (
-                  <img src={pitchinLogo} alt="PitchIn" className="h-12" />
+                  <img src="https://fymxcszzdpennpmgnstb.supabase.co/storage/v1/object/public/post-images/platform-official-image/logo-full.png" alt="PitchIn" width="120" height="48" />
                 )}
               </Link>
             </div>

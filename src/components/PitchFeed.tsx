@@ -137,7 +137,6 @@ export function PitchFeed() {
 
       {/* Feed Card Container */}
       <div>
-
         {/* Feed */}
         {isLoading ? (
           <FeedSkeleton count={3} />
