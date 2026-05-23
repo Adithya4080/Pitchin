@@ -210,7 +210,55 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Hide scrollbar for suggested profiles */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* TYPING TEXT ANIMATION */
+
+@keyframes typing {
+  from {  
+    width: 0;
+  }
+
+  to {
+    width: 100%;
+  }
+}
+
+.typing-animation {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 0;
+  max-width: 100%;
+}
+
+.typing-animation-1 {
+  animation:
+    typing 1.5s steps(50, end) forwards;
+}
+
+.typing-animation-2 {
+  animation:
+    typing 1.5s steps(50, end) forwards;
+  animation-delay: 1.5s;
+}
+
+.typing-animation-3 {
+  animation:
+    typing 1.5s steps(50, end) forwards;
+  animation-delay: 3s;
 }
