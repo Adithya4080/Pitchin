@@ -3,7 +3,7 @@
  * Replaces all Supabase calls with Django backend API calls
  */
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://127.0.0.1:8080/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api';
 
 // ─── Token Management ──────────────────────────────────────────────────────────
 
