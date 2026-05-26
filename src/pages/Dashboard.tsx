@@ -1450,6 +1450,9 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (profile) {
+      const API_BASE_URL =
+        import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+
       setFullName((profile as any).user_name || profile.full_name || '');
       setBio((profile as any).bio || '');
       setLocation((profile as any).location || '');
@@ -1458,15 +1461,28 @@ export default function Dashboard() {
       setTwitterUrl((profile as any).twitter || (profile as any).twitter_url || '');
       setWebsiteUrl((profile as any).website || (profile as any).website_url || '');
       setPortfolioUrl((profile as any).portfolio_url || '');
-      const avatarPath = (profile as any).avatar || profile.avatar_url || null;
-        setAvatarPreview(avatarPath ? 
-          (avatarPath.startsWith('http') ? avatarPath : `https://pitchin-backend-production.up.railway.app${avatarPath}`) 
-        : null);
-      const bannerPath = (profile as any).banner || (profile as any).banner_url || null;
-        setBannerPreview(
-          bannerPath ? 
-          (bannerPath.startsWith('http') ? bannerPath : `https://pitchin-backend-production.up.railway.app${bannerPath}`) 
-          : null);
+
+      const avatarPath =
+        (profile as any).avatar || profile.avatar_url || null;
+
+      setAvatarPreview(
+        avatarPath
+          ? avatarPath.startsWith('http')
+            ? avatarPath
+            : `${API_BASE_URL}${avatarPath}`
+          : null
+      );
+
+      const bannerPath =
+        (profile as any).banner || (profile as any).banner_url || null;
+
+      setBannerPreview(
+        bannerPath
+          ? bannerPath.startsWith('http')
+            ? bannerPath
+            : `${API_BASE_URL}${bannerPath}`
+          : null
+      );
     }
   }, [profile]);
 
@@ -1866,7 +1882,7 @@ export default function Dashboard() {
           {isEditing && (
             <div className="bg-primary/10 border border-primary/20 rounded-lg px-4 py-3 flex items-center justify-between">
               <span className="text-sm text-primary font-medium">
-                ✏️ You are editing your profile
+                You are editing your profile
               </span>
               <Button variant="ghost" size="sm" onClick={handleCancel} className="text-muted-foreground hover:text-foreground">
                 <X className="h-4 w-4 mr-1" />
@@ -1930,20 +1946,20 @@ export default function Dashboard() {
               )} */}
 
               {activePitch && (
-  <ActivePitchCard
-    pitch={{
-      id: String(activePitch.id),
-      pitch_statement: activePitch.content ?? activePitch.title ?? '',
-      image_url: activePitch.image ?? undefined,
-      expires_at: activePitch.expires_at,
-      reaction_count: activePitch.reaction_count,
-      save_count: activePitch.save_count,
-    }}
-    isEditable={true}
-    isDeleting={isDeleting}
-    onDelete={handleDeletePitch}
-  />
-)}
+                <ActivePitchCard
+                  pitch={{
+                    id: String(activePitch.id),
+                    pitch_statement: activePitch.content ?? activePitch.title ?? '',
+                    image_url: activePitch.image ?? undefined,
+                    expires_at: activePitch.expires_at,
+                    reaction_count: activePitch.reaction_count,
+                    save_count: activePitch.save_count,
+                  }}
+                  isEditable={true}
+                  isDeleting={isDeleting}
+                  onDelete={handleDeletePitch}
+                />
+              )}
 
               {/* Introduction Video Section - All roles */}
               <div className="relative">

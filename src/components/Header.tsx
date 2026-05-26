@@ -15,6 +15,7 @@ import { OnboardingTutorial } from './OnboardingTutorial';
 import { useAuth } from '@/hooks/useAuth';
 import { useUnreadCount } from '@/hooks/useNotifications';
 import { useUserActivePitch } from '@/hooks/usePitches';
+import { getMediaUrl } from '@/lib/media';
 
 
 export function Header() {
@@ -47,7 +48,7 @@ export function Header() {
   });
 
   const displayName = profile?.full_name || user?.full_name || user?.email || '?';
-  const avatarUrl = profile?.avatar || user?.avatar_url || undefined; 
+  const avatarUrl = profile?.avatar || user?.avatar_url;
   const initials = displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
   const handleSignOut = async () => {
     await signOut();
@@ -149,7 +150,7 @@ export function Header() {
                 {isFeedPage ? (
                   <span className="font-display font-bold text-2xl tracking-tight text-sky-400">Pitchin</span>
                 ) : (
-                  <img src={pitchinLogo} alt="PitchIn" className="h-12" />
+                  <img src={getMediaUrl("https://fymxcszzdpennpmgnstb.supabase.co/storage/v1/object/public/post-images/platform-official-image/logo-full.png")} alt="PitchIn" width="120" height="48" />
                 )}
               </Link>
             </div>
@@ -159,7 +160,7 @@ export function Header() {
               {isFeedPage ? (
                 <span className="font-display font-bold text-2xl tracking-tight text-sky-400">Pitchin</span>
               ) : (
-                <img src={pitchinLogo} alt="PitchIn" className="h-12" />
+                <img src={getMediaUrl(pitchinLogo)} alt="PitchIn" className="h-12" />
               )}
             </Link>
 
