@@ -6,13 +6,14 @@
 // import { useRoleProfile } from '@/hooks/useRoleProfile';
 // import { InnovatorProfile, StartupProfile, EcosystemPartnerProfile } from '@/api/profiles';
 // import { useIsMobile } from '@/hooks/use-mobile';
-// import { IntroductionVideoSection, PortfolioSection, StartupPortfolioSection, TeamSection } from '@/components/profile';
+// import { IntroductionVideoSection, PortfolioSection, StartupPortfolioSection, TeamSection, FundingEditSection, TractionEditSection, TrustPressEditSection, ThePitchEditSection } from '@/components/profile';
+// import type { FundingData, TractionData, TrustPressData, PitchNarrativeData } from '@/components/profile';
 // import { TeamMember } from '@/components/profile/team';
 // import { ProgramsEditSection, OrganizationOverviewEditSection, AlumniEditSection, HighlightsEditSection, VoicesEditSection, SupportedStartupsEditSection, FocusAreasEditSection, OfferingsEditSection } from '@/components/profile/ecosystem-partner';
 // import type { ProgramEntry, AlumniStartupEntry, HighlightEntry, VoiceEntry, SupportedStartupEntry } from '@/components/profile/ecosystem-partner';
 // import { toast } from 'sonner';
 
-// type SectionType = 'introduction' | 'portfolio' | 'team' | 'programs' | 'organization-overview' | 'alumni' | 'highlights' | 'voices' | 'supported-startups' | 'focus-areas' | 'offerings';
+// type SectionType = 'introduction' | 'portfolio' | 'team' | 'funding' | 'traction' | 'trust' | 'the-pitch' | 'programs' | 'organization-overview' | 'alumni' | 'highlights' | 'voices' | 'supported-startups' | 'focus-areas' | 'offerings';
 
 // export default function EditSection() {
 //   const navigate = useNavigate();
@@ -50,7 +51,7 @@
 
 //   // Redirect if invalid section type
 //   useEffect(() => {
-//     if (!sectionType || !['introduction', 'portfolio', 'team', 'programs', 'organization-overview', 'alumni', 'highlights', 'voices', 'supported-startups', 'focus-areas', 'offerings'].includes(sectionType)) {
+//     if (!sectionType || !['introduction', 'portfolio', 'team', 'funding', 'traction', 'trust', 'the-pitch', 'programs', 'organization-overview', 'alumni', 'highlights', 'voices', 'supported-startups', 'focus-areas', 'offerings'].includes(sectionType)) {
 //       navigate('/dashboard');
 //     }
 //   }, [sectionType, navigate]);
@@ -113,6 +114,14 @@
 //         return 'Edit Focus Areas & Stages';
 //       case 'offerings':
 //         return 'Edit Offerings';
+//       case 'funding':
+//         return 'Edit Funding';
+//       case 'traction':
+//         return 'Edit Traction & Metrics';
+//       case 'trust':
+//         return 'Edit Trust & Press';
+//       case 'the-pitch':
+//         return 'The Pitch';
 //       default:
 //         return 'Edit Section';
 //     }
@@ -379,6 +388,72 @@
 //             }}
 //           />
 //         );
+//       case 'funding': {
+//         const fundingData: FundingData = (roleProfileData as any)?.funding_data || {};
+//         return (
+//           <FundingEditSection
+//             data={fundingData}
+//             onChange={(updated) =>
+//               setRoleProfileData((prev: any) => ({ ...prev, funding_data: updated }))
+//             }
+//             isMobile={isMobile}
+//           />
+//         );
+//       }
+//       case 'traction': {
+//         const tractionData: TractionData = (roleProfileData as any)?.traction_data || {};
+//         return (
+//           <TractionEditSection
+//             data={tractionData}
+//             onChange={(updated) =>
+//               setRoleProfileData((prev: any) => ({ ...prev, traction_data: updated }))
+//             }
+//             isMobile={isMobile}
+//           />
+//         );
+//       }
+//       case 'trust': {
+//         const trustData: TrustPressData = (roleProfileData as any)?.trust_press_data || {};
+//         return (
+//           <TrustPressEditSection
+//             data={trustData}
+//             onChange={(updated) =>
+//               setRoleProfileData((prev: any) => ({ ...prev, trust_press_data: updated }))
+//             }
+//             isMobile={isMobile}
+//           />
+//         );
+//       }
+//       case 'the-pitch': {
+//         const pitchNarrative: PitchNarrativeData = {
+//           problem: (roleProfileData as any)?.problem_statement || (roleProfileData as any)?.pitch_narrative?.problem || '',
+//           solution: (roleProfileData as any)?.solution || (roleProfileData as any)?.pitch_narrative?.solution || '',
+//           why_now: (roleProfileData as any)?.pitch_narrative?.why_now || '',
+//           why_us: (roleProfileData as any)?.pitch_narrative?.why_us || '',
+//         };
+//         return (
+//           <ThePitchEditSection
+//             data={pitchNarrative}
+//             onChange={(updated) => {
+//               setRoleProfileData((prev: any) => ({
+//                 ...prev,
+//                 // Map back to existing DB fields where they exist
+//                 problem_statement: updated.problem,
+//                 solution: updated.solution,
+//                 // Store why_now / why_us inside pitch_narrative JSON
+//                 pitch_narrative: {
+//                   ...(prev?.pitch_narrative || {}),
+//                   problem: updated.problem,
+//                   solution: updated.solution,
+//                   why_now: updated.why_now,
+//                   why_us: updated.why_us,
+//                 },
+//               }));
+//             }}
+//             isMobile={isMobile}
+//           />
+//         );
+//       }
 //       default:
 //         return null;
 //     }
@@ -604,7 +679,9 @@ export default function EditSection() {
             <StartupPortfolioSection
               profile={roleProfileData as Partial<StartupProfile>}
               isEditable={true}
-              onChange={setRoleProfileData}
+              onChange={(updatedPortfolio) =>
+                setRoleProfileData((prev: any) => ({ ...prev, ...updatedPortfolio }))
+              }
               isMobile={isMobile}
             />
           );
@@ -613,7 +690,9 @@ export default function EditSection() {
           <PortfolioSection
             profile={roleProfileData as Partial<InnovatorProfile>}
             isEditable={true}
-            onChange={setRoleProfileData}
+            onChange={(updatedPortfolio) =>
+              setRoleProfileData((prev: any) => ({ ...prev, ...updatedPortfolio }))
+            }
             isMobile={isMobile}
           />
         );
@@ -867,10 +946,10 @@ export default function EditSection() {
       }
       case 'the-pitch': {
         const pitchNarrative: PitchNarrativeData = {
-          problem: (roleProfileData as any)?.problem_statement || (roleProfileData as any)?.pitch_narrative?.problem || '',
-          solution: (roleProfileData as any)?.solution || (roleProfileData as any)?.pitch_narrative?.solution || '',
-          why_now: (roleProfileData as any)?.pitch_narrative?.why_now || '',
-          why_us: (roleProfileData as any)?.pitch_narrative?.why_us || '',
+          problem: (roleProfileData as any)?.problem_statement || '',
+          solution: (roleProfileData as any)?.solution || '',
+          why_now: (roleProfileData as any)?.why_now || '',
+          why_us: (roleProfileData as any)?.why_us || '',
         };
         return (
           <ThePitchEditSection
@@ -878,17 +957,10 @@ export default function EditSection() {
             onChange={(updated) => {
               setRoleProfileData((prev: any) => ({
                 ...prev,
-                // Map back to existing DB fields where they exist
                 problem_statement: updated.problem,
                 solution: updated.solution,
-                // Store why_now / why_us inside pitch_narrative JSON
-                pitch_narrative: {
-                  ...(prev?.pitch_narrative || {}),
-                  problem: updated.problem,
-                  solution: updated.solution,
-                  why_now: updated.why_now,
-                  why_us: updated.why_us,
-                },
+                why_now: updated.why_now,
+                why_us: updated.why_us,
               }));
             }}
             isMobile={isMobile}

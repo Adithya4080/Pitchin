@@ -9,7 +9,8 @@
 // import { Separator } from '@/components/ui/separator';
 // import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 // import { AppLayout } from '@/components/layouts/AppLayout';
-// import { ProfileHeader, ReactionStatsCard, ActivePitchCard, SocialLinksCard, RoleAboutCard, IntroductionVideoSection, PortfolioSection, StartupPortfolioSection, ProfilePitchSection, TeamSection } from '@/components/profile';
+// import { ProfileHeader, ReactionStatsCard, ActivePitchCard, SocialLinksCard, RoleAboutCard, IntroductionVideoSection, StartupPortfolioSection, ProfilePitchSection, TeamSection, ProfileStrengthCard, FundingSection, TractionMetricsSection, TrustPressSection, ThePitchSection } from '@/components/profile';
+// import type { FundingData, TractionData, TrustPressData } from '@/components/profile';
 // import { TeamMember } from '@/components/profile/team';
 // import { MobileProfilePitchSection } from '@/components/profile/pitches';
 // import { ProfileRightSidebar } from '@/components/profile/ProfileRightSidebar';
@@ -133,8 +134,14 @@
 //   const [isSaving, setIsSaving] = useState(false);
 //   const [isDeleting, setIsDeleting] = useState(false);
 
+//   // New dashboard sections state (funding, traction, trust/press)
+//   // These are stored in roleProfileData.funding_data / traction_data / trust_press_data
+//   // and loaded from the profile API. Local state mirrors them for immediate UI updates.
+
 //   // Role profile state
-//   const { role, roleProfile, saveRoleProfile } = useRoleProfile(user?.id);
+//   const { role: hookRole, roleProfile, saveRoleProfile } = useRoleProfile(user?.id);
+//   // Fall back to user.role from auth context so sections show immediately on load
+//   const role = hookRole || (user as any)?.role || null;
 //   const [roleProfileData, setRoleProfileData] = useState<any>(null);
 
 //   // Update role profile data when loaded - ensure team_members is always an array
@@ -519,15 +526,7 @@
 //             thumbnailUrl: roleProfileData?.intro_video_thumbnail_url,
 //           } : undefined}
 //           roleSection={role !== 'ecosystem_partner' ? renderRoleSection(false, true) : undefined}
-//           portfolioSection={role === 'innovator' ? (
-//             <PortfolioSection
-//               profile={roleProfileData as Partial<InnovatorProfile>}
-//               isEditable={false}
-//               isOwner={true}
-//               onChange={setRoleProfileData}
-//               isMobile={true}
-//             />
-//           ) : role === 'startup' ? (
+//           portfolioSection={(role === 'startup' || role === 'innovator') ? (
 //             <StartupPortfolioSection
 //               profile={roleProfileData as Partial<StartupProfile>}
 //               isEditable={false}
@@ -546,13 +545,50 @@
 //             />
 //           ) : undefined}
 //           pitchSection={(role === 'innovator' || role === 'startup') ? (
-//             <ProfilePitchSectionWrapper
-//               userId={String(user?.id)}
+//             <ThePitchSection
+//               data={{
+//                 problem: (roleProfileData as any)?.problem_statement || (roleProfileData as any)?.pitch_narrative?.problem || '',
+//                 solution: (roleProfileData as any)?.solution || (roleProfileData as any)?.pitch_narrative?.solution || '',
+//                 why_now: (roleProfileData as any)?.pitch_narrative?.why_now || '',
+//                 why_us: (roleProfileData as any)?.pitch_narrative?.why_us || '',
+//               }}
 //               isOwner={true}
-//               roleLabel={role === 'startup' ? 'Product' : 'Pitches'}
 //               isMobile={true}
 //             />
 //           ) : undefined}
+//           profileStrengthSection={
+//             <ProfileStrengthCard
+//               bio={bio}
+//               hasIntroVideo={!!roleProfileData?.intro_video_url}
+//               hasFunding={!!(roleProfileData as any)?.funding_data?.stage || !!(roleProfileData as any)?.funding_data?.amount_raised}
+//               hasTraction={!!(roleProfileData as any)?.traction_data?.metrics?.length}
+//               hasTrustPress={!!(roleProfileData as any)?.trust_press_data?.proofs?.length}
+//               hasTeam={!!((roleProfileData?.team_members as any[])?.length)}
+//               hasCompanyPortfolio={!!((roleProfileData as any)?.ecosystem_support?.length)}
+//               hasPitch={!!(userPitches && userPitches.length > 0)}
+//             />
+//           }
+//           fundingSection={
+//             <FundingSection
+//               funding={(roleProfileData as any)?.funding_data || null}
+//               isOwner={true}
+//               isMobile={true}
+//             />
+//           }
+//           tractionSection={
+//             <TractionMetricsSection
+//               traction={(roleProfileData as any)?.traction_data || null}
+//               isOwner={true}
+//               isMobile={true}
+//             />
+//           }
+//           trustPressSection={
+//             <TrustPressSection
+//               trustPress={(roleProfileData as any)?.trust_press_data || null}
+//               isOwner={true}
+//               isMobile={true}
+//             />
+//           }
 //           ecosystemPartnerSections={role === 'ecosystem_partner' ? renderEcosystemPartnerSections(true, true) : undefined}
 //           pitchFeed={
 //             userPitches && userPitches.length > 0 ? (
@@ -739,39 +775,51 @@
 //                 </div>
 //               )}
 
-//               {/* Portfolio Section - For Innovators */}
-//               <div className="relative">
-//                 {(roleProfileData as any)?.work_experience?.length > 0 && (
-//                   <Button
-//                     variant="ghost"
-//                     size="sm"
-//                     onClick={() => navigate('/edit-section?section=portfolio')}
-//                     className="absolute top-4 right-4 h-8 w-8 p-0 z-10 bg-background/80 hover:bg-background border border-border/50"
-//                   >
-//                     <Edit2 className="h-4 w-4" />
-//                   </Button>
-//                 )}
-//                 <PortfolioSection
-//                   profile={roleProfileData as Partial<InnovatorProfile>}
-//                   isEditable={false}
-//                   isOwner={true}
-//                   onChange={setRoleProfileData}
-//                   isMobile={false}
-//                 />
-//               </div>
+//               {/* Profile Strength Card - only for owner */}
+//               <ProfileStrengthCard
+//                 bio={bio}
+//                 hasIntroVideo={!!roleProfileData?.intro_video_url}
+//                 hasFunding={!!(roleProfileData as any)?.funding_data?.stage || !!(roleProfileData as any)?.funding_data?.amount_raised}
+//                 hasTraction={!!(roleProfileData as any)?.traction_data?.metrics?.length}
+//                 hasTrustPress={!!(roleProfileData as any)?.trust_press_data?.proofs?.length}
+//                 hasTeam={!!((roleProfileData?.team_members as any[])?.length)}
+//                 hasCompanyPortfolio={!!((roleProfileData as any)?.ecosystem_support?.length)}
+//                 hasPitch={!!(userPitches && userPitches.length > 0)}
+//               />
 
-//               {/* Portfolio Section - For Startups */}
-//               <div className="relative">
-//                 {(roleProfileData as any)?.ecosystem_support?.length > 0 && (
-//                   <Button
-//                     variant="ghost"
-//                     size="sm"
-//                     onClick={() => navigate('/edit-section?section=portfolio')}
-//                     className="absolute top-4 right-4 h-8 w-8 p-0 z-10 bg-background/80 hover:bg-background border border-border/50"
-//                   >
-//                     <Edit2 className="h-4 w-4" />
-//                   </Button>
-//                 )}
+//               {/* The Pitch — Problem / Solution / Why Now / Why Us narrative */}
+//               {(role === 'startup' || role === 'innovator') && (
+//                 <ThePitchSection
+//                   data={{
+//                     problem: (roleProfileData as any)?.problem_statement || (roleProfileData as any)?.pitch_narrative?.problem || '',
+//                     solution: (roleProfileData as any)?.solution || (roleProfileData as any)?.pitch_narrative?.solution || '',
+//                     why_now: (roleProfileData as any)?.pitch_narrative?.why_now || '',
+//                     why_us: (roleProfileData as any)?.pitch_narrative?.why_us || '',
+//                   }}
+//                   isOwner={true}
+//                 />
+//               )}
+
+//               {/* Funding Section */}
+//               <FundingSection
+//                 funding={(roleProfileData as any)?.funding_data || null}
+//                 isOwner={true}
+//               />
+
+//               {/* Traction & Metrics Section */}
+//               <TractionMetricsSection
+//                 traction={(roleProfileData as any)?.traction_data || null}
+//                 isOwner={true}
+//               />
+
+//               {/* Trust & Press Section */}
+//               <TrustPressSection
+//                 trustPress={(roleProfileData as any)?.trust_press_data || null}
+//                 isOwner={true}
+//               />
+
+//               {/* Company Portfolio - For Startups and Innovators */}
+//               {(role === 'startup' || role === 'innovator') && (
 //                 <StartupPortfolioSection
 //                   profile={roleProfileData as Partial<StartupProfile>}
 //                   isEditable={false}
@@ -779,14 +827,7 @@
 //                   onChange={setRoleProfileData}
 //                   isMobile={false}
 //                 />
-//               </div>
-
-//               {/* Pitches/Product Section - All roles */}
-//               <ProfilePitchSectionWrapper
-//                 userId={String(user?.id)}
-//                 isOwner={true}
-//                 roleLabel={role === 'startup' ? 'Product' : 'Pitches'}
-//               />
+//               )}
 
 //               {/* Team Section - All roles */}
 //               <div className="relative">
@@ -1719,10 +1760,10 @@ export default function Dashboard() {
           pitchSection={(role === 'innovator' || role === 'startup') ? (
             <ThePitchSection
               data={{
-                problem: (roleProfileData as any)?.problem_statement || (roleProfileData as any)?.pitch_narrative?.problem || '',
-                solution: (roleProfileData as any)?.solution || (roleProfileData as any)?.pitch_narrative?.solution || '',
-                why_now: (roleProfileData as any)?.pitch_narrative?.why_now || '',
-                why_us: (roleProfileData as any)?.pitch_narrative?.why_us || '',
+                problem: (roleProfileData as any)?.problem_statement || '',
+                solution: (roleProfileData as any)?.solution || '',
+                why_now: (roleProfileData as any)?.why_now || '',
+                why_us: (roleProfileData as any)?.why_us || '',
               }}
               isOwner={true}
               isMobile={true}
@@ -1963,10 +2004,10 @@ export default function Dashboard() {
               {(role === 'startup' || role === 'innovator') && (
                 <ThePitchSection
                   data={{
-                    problem: (roleProfileData as any)?.problem_statement || (roleProfileData as any)?.pitch_narrative?.problem || '',
-                    solution: (roleProfileData as any)?.solution || (roleProfileData as any)?.pitch_narrative?.solution || '',
-                    why_now: (roleProfileData as any)?.pitch_narrative?.why_now || '',
-                    why_us: (roleProfileData as any)?.pitch_narrative?.why_us || '',
+                    problem: (roleProfileData as any)?.problem_statement || '',
+                    solution: (roleProfileData as any)?.solution || '',
+                    why_now: (roleProfileData as any)?.why_now || '',
+                    why_us: (roleProfileData as any)?.why_us || '',
                   }}
                   isOwner={true}
                 />
@@ -2021,6 +2062,39 @@ export default function Dashboard() {
                   isOwner={true}
                 />
               </div>
+
+              {/* Pitches list — desktop */}
+              {(role === 'startup' || role === 'innovator') && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-base font-bold text-foreground">Pitches</h3>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Select and reposition stories from this profile
+                      </p>
+                    </div>
+                    <Button size="sm" onClick={() => navigate('/pitches/new')} className="gap-1.5">
+                      {/* <Plus className="h-4 w-4" /> */}
+                      New Pitch
+                    </Button>
+                  </div>
+                  {pitchLoading ? (
+                    <div className="text-sm text-muted-foreground py-4 text-center">Loading…</div>
+                  ) : userPitches && userPitches.length > 0 ? (
+                    <div className="space-y-3">
+                      {userPitches.map((pitch) => (
+                        <PitchCard key={pitch.id} pitch={pitch} hideBorder={false} />
+                      ))}
+                    </div>
+                  ) : (
+                    <Card className="border-2 border-dashed border-border/50">
+                      <CardContent className="py-8 text-center text-sm text-muted-foreground">
+                        No pitches yet. Create your first pitch!
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              )}
 
               {/* Ecosystem Partner Sections - always rendered for ep role */}
               {role === 'ecosystem_partner' && (
