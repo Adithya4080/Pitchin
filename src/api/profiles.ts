@@ -411,43 +411,66 @@ export async function getPublicProfiles(role?: UserRole): Promise<AnyProfile[]> 
   return apiFetch<AnyProfile[]>(`/profiles/public/${query}`);
 }
 
-/**
- * Update the current user's profile.
- * Accepts an optional avatarFile and bannerFile for image uploads.
- * All other fields are sent as JSON via the base64 path (Base64ImageField on backend).
- */
 export async function updateMyProfile(
-  data: Partial<AnyProfile> & { avatarFile?: File | null; bannerFile?: File | null }
+  data: Partial<AnyProfile> & {
+    avatarFile?: File | null;
+    bannerFile?: File | null;
+  }
 ): Promise<AnyProfile> {
-  const { avatarFile, bannerFile, ...rest } = data;
 
-  // If there are actual File objects, use FormData (multipart)
-  if (avatarFile || bannerFile) {
-    const formData = new FormData();
+  const formData = new FormData();
 
-    // Append all scalar/JSON fields
-    for (const [key, value] of Object.entries(rest)) {
-      if (value === null || value === undefined) continue;
-      if (typeof value === 'object') {
-        formData.append(key, JSON.stringify(value));
-      } else {
-        formData.append(key, String(value));
-      }
+  const {
+    avatarFile,
+    bannerFile,
+    avatar,
+    banner,
+    ...rest
+  } = data;
+
+  // Append normal fields
+  for (const [key, value] of Object.entries(rest)) {
+
+    // Skip undefined values
+    if (value === undefined) continue;
+
+    // Handle arrays / objects
+    if (
+      typeof value === 'object' &&
+      value !== null &&
+      !(value instanceof File)
+    ) {
+      formData.append(key, JSON.stringify(value));
     }
 
-    if (avatarFile) formData.append('avatar', avatarFile);
-    if (bannerFile) formData.append('banner', bannerFile);
-
-    return apiFetch<AnyProfile>('/profiles/me/', {
-      method: 'PATCH',
-      body: formData,
-      // Don't set Content-Type — browser sets multipart boundary automatically
-    });
+    // Handle primitive values
+    else if (value !== null) {
+      formData.append(key, String(value));
+    }
   }
 
-  // No files — send as JSON (base64 strings for avatar/banner are fine here too)
+  // Upload avatar file
+  if (avatarFile instanceof File) {
+    formData.append('avatar', avatarFile);
+  }
+
+  // Upload banner file
+  if (bannerFile instanceof File) {
+    formData.append('banner', bannerFile);
+  }
+
+  // Remove avatar
+  if (avatar === null) {
+    formData.append('avatar', '');
+  }
+
+  // Remove banner
+  if (banner === null) {
+    formData.append('banner', '');
+  }
+
   return apiFetch<AnyProfile>('/profiles/me/', {
     method: 'PATCH',
-    body: JSON.stringify(rest),
+    body: formData,
   });
 }

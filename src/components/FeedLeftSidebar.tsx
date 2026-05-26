@@ -21,7 +21,7 @@ import {
   BarChart3,
   FolderOpen
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { getMediaUrl } from "@/lib/media";  
 
 interface NavItem {
   label: string;
@@ -145,11 +145,11 @@ export function FeedLeftSidebar() {
     <aside className="w-[22rem] shrink-0 space-y-4 sticky top-20 h-fit">
       {/* Profile Section */}
       <div className="bg-card rounded-2xl overflow-hidden">
-        {/* Banner */}
-        <div 
-          className="h-20 bg-gradient-to-r from-primary/20 to-primary/5 bg-cover bg-center"
-          style={profile?.banner ? { backgroundImage: `url(${profile.banner})` } : undefined}
-        />
+          {/* Banner */}
+          <div 
+            className="h-20 bg-gradient-to-r from-primary/20 to-primary/5 bg-cover bg-center"
+            style={profile?.banner ? { backgroundImage: `url(${getMediaUrl(profile.banner)})` } : undefined}
+          />
 
         <div className="px-5 pb-5">
           {/* Avatar - left aligned, overlapping banner */}
@@ -158,7 +158,7 @@ export function FeedLeftSidebar() {
               className="h-16 w-16 border-4 border-card cursor-pointer hover:opacity-80 transition-opacity"
               onClick={handleProfileClick}
             >
-              <AvatarImage src={profile?.avatar ?? user?.avatar_url} />
+              <AvatarImage src={getMediaUrl(profile?.avatar) || user?.avatar_url} />
               <AvatarFallback className="bg-primary/10 text-primary text-lg">
                 {profile?.user_name?.charAt(0) || user?.email?.charAt(0) || '?'}
               </AvatarFallback>
