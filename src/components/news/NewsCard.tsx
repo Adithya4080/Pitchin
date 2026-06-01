@@ -1,4 +1,4 @@
-import { ExternalLink, Clock } from 'lucide-react';
+ import { ExternalLink, Clock } from 'lucide-react';
 import { NewsItem, formatRelativeTime } from '@/data/newsItems';
 
 interface NewsCardProps {
