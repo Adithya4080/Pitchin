@@ -547,10 +547,10 @@
 //           pitchSection={(role === 'innovator' || role === 'startup') ? (
 //             <ThePitchSection
 //               data={{
-//                 problem: (roleProfileData as any)?.problem_statement || (roleProfileData as any)?.pitch_narrative?.problem || '',
-//                 solution: (roleProfileData as any)?.solution || (roleProfileData as any)?.pitch_narrative?.solution || '',
-//                 why_now: (roleProfileData as any)?.pitch_narrative?.why_now || '',
-//                 why_us: (roleProfileData as any)?.pitch_narrative?.why_us || '',
+//                 problem: (roleProfileData as any)?.problem_statement || '',
+//                 solution: (roleProfileData as any)?.solution || '',
+//                 why_now: (roleProfileData as any)?.why_now || '',
+//                 why_us: (roleProfileData as any)?.why_us || '',
 //               }}
 //               isOwner={true}
 //               isMobile={true}
@@ -791,10 +791,10 @@
 //               {(role === 'startup' || role === 'innovator') && (
 //                 <ThePitchSection
 //                   data={{
-//                     problem: (roleProfileData as any)?.problem_statement || (roleProfileData as any)?.pitch_narrative?.problem || '',
-//                     solution: (roleProfileData as any)?.solution || (roleProfileData as any)?.pitch_narrative?.solution || '',
-//                     why_now: (roleProfileData as any)?.pitch_narrative?.why_now || '',
-//                     why_us: (roleProfileData as any)?.pitch_narrative?.why_us || '',
+//                     problem: (roleProfileData as any)?.problem_statement || '',
+//                     solution: (roleProfileData as any)?.solution || '',
+//                     why_now: (roleProfileData as any)?.why_now || '',
+//                     why_us: (roleProfileData as any)?.why_us || '',
 //                   }}
 //                   isOwner={true}
 //                 />
@@ -849,6 +849,39 @@
 //                   isOwner={true}
 //                 />
 //               </div>
+
+//               {/* Pitches list — desktop */}
+//               {(role === 'startup' || role === 'innovator') && (
+//                 <div className="space-y-3">
+//                   <div className="flex items-center justify-between">
+//                     <div>
+//                       <h3 className="text-base font-bold text-foreground">Pitches</h3>
+//                       <p className="text-xs text-muted-foreground mt-0.5">
+//                         Select and reposition stories from this profile
+//                       </p>
+//                     </div>
+//                     <Button size="sm" onClick={() => navigate('/pitches/new')} className="gap-1.5">
+//                       {/* <Plus className="h-4 w-4" /> */}
+//                       New Pitch
+//                     </Button>
+//                   </div>
+//                   {pitchLoading ? (
+//                     <div className="text-sm text-muted-foreground py-4 text-center">Loading…</div>
+//                   ) : userPitches && userPitches.length > 0 ? (
+//                     <div className="space-y-3">
+//                       {userPitches.map((pitch) => (
+//                         <PitchCard key={pitch.id} pitch={pitch} hideBorder={false} />
+//                       ))}
+//                     </div>
+//                   ) : (
+//                     <Card className="border-2 border-dashed border-border/50">
+//                       <CardContent className="py-8 text-center text-sm text-muted-foreground">
+//                         No pitches yet. Create your first pitch!
+//                       </CardContent>
+//                     </Card>
+//                   )}
+//                 </div>
+//               )}
 
 //               {/* Ecosystem Partner Sections - always rendered for ep role */}
 //               {role === 'ecosystem_partner' && (
@@ -1356,6 +1389,20 @@ export default function Dashboard() {
   // Fall back to user.role from auth context so sections show immediately on load
   const role = hookRole || (user as any)?.role || null;
   const [roleProfileData, setRoleProfileData] = useState<any>(null);
+
+  // Derived: whether the Company Portfolio section has any content
+  const hasPortfolioContent = !!(
+    roleProfileData?.company_snapshot ||
+    roleProfileData?.market_type ||
+    roleProfileData?.founded_year ||
+    roleProfileData?.operating_status ||
+    roleProfileData?.company_background ||
+    roleProfileData?.vision_direction ||
+    roleProfileData?.current_focus ||
+    (roleProfileData?.progress_highlights && (roleProfileData.progress_highlights as any[]).length > 0) ||
+    (roleProfileData?.ecosystem_support && (roleProfileData.ecosystem_support as any[]).length > 0) ||
+    (roleProfileData?.company_journey_timeline && (roleProfileData.company_journey_timeline as any[]).length > 0)
+  );
 
   // Update role profile data when loaded - ensure team_members is always an array
   useEffect(() => {
@@ -2049,13 +2096,25 @@ export default function Dashboard() {
 
               {/* Company Portfolio - For Startups and Innovators */}
               {(role === 'startup' || role === 'innovator') && (
-                <StartupPortfolioSection
-                  profile={roleProfileData as Partial<StartupProfile>}
-                  isEditable={false}
-                  isOwner={true}
-                  onChange={setRoleProfileData}
-                  isMobile={false}
-                />
+                <div className="relative">
+                  {hasPortfolioContent && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => navigate('/edit-section?section=portfolio')}
+                      className="absolute top-4 right-4 h-8 w-8 p-0 z-10 bg-background/80 hover:bg-background border border-border/50"
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                  <StartupPortfolioSection
+                    profile={roleProfileData as Partial<StartupProfile>}
+                    isEditable={false}
+                    isOwner={true}
+                    onChange={setRoleProfileData}
+                    isMobile={false}
+                  />
+                </div>
               )}
 
               {/* Team Section - All roles */}
