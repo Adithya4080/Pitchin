@@ -275,6 +275,14 @@ interface StartupSectionProps {
   isMobile?: boolean;
 }
 
+function toArray(value: any): any[] {
+  if (Array.isArray(value)) return value;
+  if (typeof value === 'string') {
+    try { return JSON.parse(value); } catch { return []; }
+  }
+  return [];
+}
+
 export function StartupSection({
   profile,
   isEditable = false,
@@ -283,16 +291,11 @@ export function StartupSection({
 }: StartupSectionProps) {
   const companyName = profile?.company_name || "";
   const companyOverview = profile?.company_overview || "";
-  const industryTags = profile?.industry_tags || [];
+  const industryTags = toArray(profile?.industry_tags);
   const stage = profile?.stage || "";
   const lookingFor = profile?.looking_for || "";
 
   const hasContent = companyName || companyOverview || industryTags.length > 0 || stage || lookingFor;
-
-  // Always render for owner empty state
-  if (false && !isEditable && !hasContent) {
-    return null;
-  }
 
   const getStageLabel = (stageValue: string) => {
     return STAGES.find((s) => s.value === stageValue)?.label || stageValue;
@@ -379,7 +382,6 @@ export function StartupSection({
     );
   }
 
-  // View mode - Mobile: full-width with white background
   if (isMobile) {
     return (
       <div className="bg-card px-4 py-4 space-y-4">
@@ -435,20 +437,17 @@ export function StartupSection({
     );
   }
 
-
-  // View mode - Desktop: show empty placeholder when no content
   if (!isEditable && !hasContent) {
     return (
       <Card className="border-2 border-dashed border-border/50 bg-muted/5">
         <CardContent className="py-8 text-center">
           <h3 className="text-sm font-bold text-foreground mb-1.5">Company Details</h3>
-          <p className="text-xs text-muted-foreground">Add your company name, overview, industry, and what you\'re looking for.</p>
+          <p className="text-xs text-muted-foreground">Add your company name, overview, industry, and what you're looking for.</p>
         </CardContent>
       </Card>
     );
   }
 
-  // View mode - Desktop
   return (
     <Card className="border-border/50">
       <CardContent className="p-5 space-y-5">

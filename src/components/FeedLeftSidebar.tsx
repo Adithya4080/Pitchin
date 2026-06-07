@@ -79,7 +79,6 @@ export function FeedLeftSidebar() {
     enabled: !!user?.id
   });
 
-  // After
   const { data: userStats } = useQuery({
     queryKey: ['userStats', user?.id],
     queryFn: async () => {
@@ -94,22 +93,6 @@ export function FeedLeftSidebar() {
     },
     enabled: !!user?.id
   });
-
-  // const { data: userStats } = useQuery({
-  //   queryKey: ['userStats', user?.id],
-  //   queryFn: async () => {
-  //     if (!user?.id) return null;
-  //     // TODO: connect to backend API
-  //     // const totalReactions = pitches?.reduce((sum, p) => sum + (p.reaction_count || 0), 0) || 0;
-  //     // const totalSaves = pitches?.reduce((sum, p) => sum + (p.save_count || 0), 0) || 0;
-  //     return {
-  //       totalReactions : 0,
-  //       totalSaves : 0,
-  //       pitchCount:  0,
-  //     };
-  //   },
-  //   enabled: !!user?.id
-  // });
 
   const handleProfileClick = () => {
     if (user?.email === 'pitchin.admn@gmail.com') {
@@ -142,17 +125,17 @@ export function FeedLeftSidebar() {
   };
 
   return (
-    <aside className="w-[22rem] shrink-0 space-y-4 sticky top-20 h-fit">
+    <aside className="w-[22rem] shrink-0 space-y-4 sticky top-20 max-h-[calc(100vh-5rem)] overflow-y-auto self-start">
       {/* Profile Section */}
       <div className="bg-card rounded-2xl overflow-hidden">
-          {/* Banner */}
-          <div 
-            className="h-20 bg-gradient-to-r from-primary/20 to-primary/5 bg-cover bg-center"
-            style={profile?.banner ? { backgroundImage: `url(${getMediaUrl(profile.banner)})` } : undefined}
-          />
+        {/* Banner */}
+        <div 
+          className="h-20 bg-gradient-to-r from-primary/20 to-primary/5 bg-cover bg-center"
+          style={profile?.banner ? { backgroundImage: `url(${getMediaUrl(profile.banner)})` } : undefined}
+        />
 
         <div className="px-5 pb-5">
-          {/* Avatar - left aligned, overlapping banner */}
+          {/* Avatar */}
           <div className="-mt-8 mb-3">
             <Avatar 
               className="h-16 w-16 border-4 border-card cursor-pointer hover:opacity-80 transition-opacity"
@@ -165,7 +148,7 @@ export function FeedLeftSidebar() {
             </Avatar>
           </div>
 
-          {/* Name + email - left aligned */}
+          {/* Name + email */}
           <div className="text-left">
             <h3 
               className="font-bold text-lg leading-tight cursor-pointer hover:text-primary transition-colors"
@@ -178,7 +161,7 @@ export function FeedLeftSidebar() {
             </p>
           </div>
 
-          {/* Stats - left aligned, inline */}
+          {/* Stats */}
           <div className="mt-5 flex items-center gap-6">
             <div>
               <p className="font-bold text-base text-primary">{userStats?.pitchCount || 0}</p>
@@ -196,7 +179,7 @@ export function FeedLeftSidebar() {
 
           <Separator className="my-4" />
 
-          {/* Navigation Options - simple left-aligned list */}
+          {/* Navigation */}
           <nav className="space-y-0.5">
             {generalNavItems.map((item) => (
               <div

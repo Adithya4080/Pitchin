@@ -30,7 +30,7 @@ export function AppLayout({
       {showMobileHeader && <MobileHeader title={title} />}
 
       {/* Main Content */}
-      <main className={showBottomNav ? "pb-20 md:pb-0" : ""}>
+      <main className={`md:pt-16 min-h-screen ${showBottomNav ? "pb-20 md:pb-0" : ""}`}>
         {children}
       </main>
 

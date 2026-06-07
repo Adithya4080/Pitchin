@@ -176,7 +176,7 @@ export default function Dashboard() {
     queryKey: ['profile', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      const data = await (await import('@/api/profiles')).getUserProfile(user.id);
+      const data = await (await import('@/api/profiles')).getMyProfile();
       return data;
     },
     enabled: !!user?.id,
@@ -253,9 +253,6 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (profile) {
-      const API_BASE_URL =
-        import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
-
       setFullName((profile as any).user_name || profile.full_name || '');
       setBio((profile as any).bio || '');
       setLocation((profile as any).location || '');
@@ -264,28 +261,8 @@ export default function Dashboard() {
       setTwitterUrl((profile as any).twitter || (profile as any).twitter_url || '');
       setWebsiteUrl((profile as any).website || (profile as any).website_url || '');
       setPortfolioUrl((profile as any).portfolio_url || '');
-
-      const avatarPath =
-        (profile as any).avatar || profile.avatar_url || null;
-
-      setAvatarPreview(
-        avatarPath
-          ? avatarPath.startsWith('http')
-            ? avatarPath
-            : `${API_BASE_URL}${avatarPath}`
-          : null
-      );
-
-      const bannerPath =
-        (profile as any).banner || (profile as any).banner_url || null;
-
-      setBannerPreview(
-        bannerPath
-          ? bannerPath.startsWith('http')
-            ? bannerPath
-            : `${API_BASE_URL}${bannerPath}`
-          : null
-      );
+      setAvatarPreview((profile as any).avatar || null);
+      setBannerPreview((profile as any).banner || null);
     }
   }, [profile]);
 
@@ -307,8 +284,8 @@ export default function Dashboard() {
       setLinkedinUrl((profile as any).linkedin || profile.linkedin_url || '');
       setTwitterUrl((profile as any).twitter || (profile as any).twitter_url || '');
       setWebsiteUrl((profile as any).website || (profile as any).website_url || '');
-      setAvatarPreview((profile as any).avatar || profile.avatar_url || null);
-      setBannerPreview((profile as any).banner || (profile as any).banner_url || null);
+      setAvatarPreview((profile as any).avatar || null);
+      setBannerPreview((profile as any).banner || null);
     }
     if (roleProfile) {
       setRoleProfileData(roleProfile);

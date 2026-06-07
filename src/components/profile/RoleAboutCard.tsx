@@ -26,6 +26,14 @@ const ROLE_TITLES = {
   consultant: "Consultant",
 };
 
+function toArray(value: any): any[] {
+  if (Array.isArray(value)) return value;
+  if (typeof value === 'string') {
+    try { return JSON.parse(value); } catch { return []; }
+  }
+  return [];
+}
+
 export function RoleAboutCard({ role, roleProfile, isMobile = false }: RoleAboutCardProps) {
   if (!role || !roleProfile) {
     return null;
@@ -34,15 +42,14 @@ export function RoleAboutCard({ role, roleProfile, isMobile = false }: RoleAbout
   const Icon = ROLE_ICONS[role] || User;
   const title = ROLE_TITLES[role] || "About";
 
-  // Get role-specific summary content
   const getSummaryContent = () => {
     switch (role) {
       case "innovator": {
         const profile = roleProfile as Partial<InnovatorProfile>;
-        const skills = profile.skills || [];
+        const skills = toArray(profile.skills);
         const hasContent = skills.length > 0 || profile.achievements || profile.featured_project_title;
         if (!hasContent) return null;
-        
+
         return (
           <div className="space-y-4">
             {skills.length > 0 && (
@@ -69,9 +76,10 @@ export function RoleAboutCard({ role, roleProfile, isMobile = false }: RoleAbout
       }
       case "startup": {
         const profile = roleProfile as Partial<StartupProfile>;
-        const hasContent = profile.company_name || profile.company_overview || profile.industry_tags?.length;
+        const industryTags = toArray(profile.industry_tags);
+        const hasContent = profile.company_name || profile.company_overview || industryTags.length > 0;
         if (!hasContent) return null;
-        
+
         return (
           <div className="space-y-4">
             {profile.company_name && (
@@ -82,9 +90,9 @@ export function RoleAboutCard({ role, roleProfile, isMobile = false }: RoleAbout
                 {profile.company_overview}
               </p>
             )}
-            {profile.industry_tags && profile.industry_tags.length > 0 && (
+            {industryTags.length > 0 && (
               <div className="flex flex-wrap gap-2.5">
-                {profile.industry_tags.slice(0, 4).map((tag, index) => (
+                {industryTags.slice(0, 4).map((tag, index) => (
                   <Badge key={index} variant="secondary" className="text-sm py-1.5 px-3">
                     {tag}
                   </Badge>
@@ -96,9 +104,10 @@ export function RoleAboutCard({ role, roleProfile, isMobile = false }: RoleAbout
       }
       case "investor": {
         const profile = roleProfile as Partial<InvestorProfile>;
-        const hasContent = profile.investor_type || profile.investment_range || profile.preferred_sectors?.length || profile.investment_criteria;
+        const preferredSectors = toArray(profile.preferred_sectors);
+        const hasContent = profile.investor_type || profile.investment_range || preferredSectors.length > 0 || profile.investment_criteria;
         if (!hasContent) return null;
-        
+
         return (
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-3">
@@ -121,21 +130,22 @@ export function RoleAboutCard({ role, roleProfile, isMobile = false }: RoleAbout
       }
       case "consultant": {
         const profile = roleProfile as Partial<ConsultantProfile>;
-        const hasContent = profile.expertise_areas?.length || profile.experience_summary || profile.services_offered;
+        const expertiseAreas = toArray(profile.expertise_areas);
+        const hasContent = expertiseAreas.length > 0 || profile.experience_summary || profile.services_offered;
         if (!hasContent) return null;
-        
+
         return (
           <div className="space-y-4">
-            {profile.expertise_areas && profile.expertise_areas.length > 0 && (
+            {expertiseAreas.length > 0 && (
               <div className="flex flex-wrap gap-2.5">
-                {profile.expertise_areas.slice(0, 5).map((area, index) => (
+                {expertiseAreas.slice(0, 5).map((area, index) => (
                   <Badge key={index} variant="secondary" className="text-sm py-1.5 px-3">
                     {area}
                   </Badge>
                 ))}
-                {profile.expertise_areas.length > 5 && (
+                {expertiseAreas.length > 5 && (
                   <Badge variant="outline" className="text-sm py-1.5 px-3">
-                    +{profile.expertise_areas.length - 5} more
+                    +{expertiseAreas.length - 5} more
                   </Badge>
                 )}
               </div>
@@ -156,7 +166,6 @@ export function RoleAboutCard({ role, roleProfile, isMobile = false }: RoleAbout
   const content = getSummaryContent();
   if (!content) return null;
 
-  // Mobile: full-width with white background and no rounded corners
   if (isMobile) {
     return (
       <div className="bg-card px-5 py-5">

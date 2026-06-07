@@ -22,6 +22,7 @@ import NotFound from "./pages/NotFound";
 import Admin from "./pages/Admin";
 import News from "./pages/News";
 import Messages from "./pages/Messages";
+import ResetPassword from '@/pages/ResetPassword';
 
 const queryClient = new QueryClient();
 
@@ -50,6 +51,7 @@ const App = () => (
             <Route path="/admin" element={<Admin />} />
             <Route path="/news" element={<News />} />
             <Route path="/messages" element={<Messages />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

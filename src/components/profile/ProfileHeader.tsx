@@ -168,7 +168,6 @@ export function ProfileHeader({
       </Button>
     );
   };
-
   return (
     <Card className="overflow-hidden border-border/50">
       {/* Banner */}
@@ -240,7 +239,7 @@ export function ProfileHeader({
               )}
             </div>
           </>
-        )}
+        )}  
       </div>
       
       {/* Profile Identity */}
