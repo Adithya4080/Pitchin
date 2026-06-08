@@ -19,6 +19,10 @@ export function ShareDashboardButton() {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  const shareUrl = share?.share_id && share?.access_token
+    ? `${window.location.origin}/shared/${share.share_id}?access=${share.access_token}`
+    : null;
+
   const handleOpen = () => {
     if (!isPro) {
       openCheckout();
@@ -32,8 +36,8 @@ export function ShareDashboardButton() {
   };
 
   const handleCopy = () => {
-    if (!share?.share_url) return;
-    navigator.clipboard.writeText(share.share_url).then(() => {
+    if (!shareUrl) return;
+    navigator.clipboard.writeText(shareUrl).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
       toast.success("Link copied!");
@@ -83,13 +87,13 @@ export function ShareDashboardButton() {
               <p className="text-sm text-muted-foreground text-center py-4">
                 Generating your share link…
               </p>
-            ) : share?.share_url ? (
+            ) : shareUrl ? (
               <>
                 {/* Link preview */}
                 <div className="flex gap-2">
                   <Input
                     readOnly
-                    value={share.share_url}
+                    value={shareUrl}
                     className="text-xs font-mono"
                   />
                   <Button size="icon" variant="outline" onClick={handleCopy}>
@@ -102,7 +106,7 @@ export function ShareDashboardButton() {
                   <Button
                     size="icon"
                     variant="outline"
-                    onClick={() => window.open(share.share_url, "_blank")}
+                    onClick={() => window.open(shareUrl, "_blank")}
                   >
                     <ExternalLink className="h-4 w-4" />
                   </Button>

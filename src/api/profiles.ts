@@ -18,6 +18,12 @@
 //   created_at: string;
 //   updated_at: string;
 //   role?: UserRole;
+//   // Subscription / payment tier fields
+//   subscription_tier?: 'free' | 'pro' | 'enterprise';
+//   subscription_expires_at?: string | null;
+//   is_pro?: boolean;
+//   // Computed by backend
+//   profile_strength?: number;
 //   // Legacy aliases used in some components — kept for compatibility
 //   avatar_url?: string | null;
 //   banner_url?: string | null;
@@ -66,6 +72,10 @@
 //   skills_capabilities: string[];
 //   mentors_backers: MentorBackerEntry[];
 //   journey_timeline: JourneyTimelineEntry[];
+//   // Dashboard sections
+//   funding_data?: import('@/components/profile').FundingData | null;
+//   traction_data?: import('@/components/profile').TractionData | null;
+//   trust_press_data?: import('@/components/profile').TrustPressData | null;
 // }
 
 // export interface EcosystemSupportEntry {
@@ -97,6 +107,10 @@
 //   ecosystem_support: EcosystemSupportEntry[];
 //   company_journey_timeline: CompanyJourneyEntry[];
 //   looking_for: string | null;
+//   // Dashboard sections
+//   funding_data?: import('@/components/profile').FundingData | null;
+//   traction_data?: import('@/components/profile').TractionData | null;
+//   trust_press_data?: import('@/components/profile').TrustPressData | null;
 // }
 
 // export interface InvestorProfile extends BaseProfile {
@@ -177,44 +191,67 @@
 //   return apiFetch<AnyProfile[]>(`/profiles/public/${query}`);
 // }
 
-// /**
-//  * Update the current user's profile.
-//  * Accepts an optional avatarFile and bannerFile for image uploads.
-//  * All other fields are sent as JSON via the base64 path (Base64ImageField on backend).
-//  */
 // export async function updateMyProfile(
-//   data: Partial<AnyProfile> & { avatarFile?: File | null; bannerFile?: File | null }
+//   data: Partial<AnyProfile> & {
+//     avatarFile?: File | null;
+//     bannerFile?: File | null;
+//   }
 // ): Promise<AnyProfile> {
-//   const { avatarFile, bannerFile, ...rest } = data;
 
-//   // If there are actual File objects, use FormData (multipart)
-//   if (avatarFile || bannerFile) {
-//     const formData = new FormData();
+//   const formData = new FormData();
 
-//     // Append all scalar/JSON fields
-//     for (const [key, value] of Object.entries(rest)) {
-//       if (value === null || value === undefined) continue;
-//       if (typeof value === 'object') {
-//         formData.append(key, JSON.stringify(value));
-//       } else {
-//         formData.append(key, String(value));
-//       }
+//   const {
+//     avatarFile,
+//     bannerFile,
+//     avatar,
+//     banner,
+//     ...rest
+//   } = data;
+
+//   // Append normal fields
+//   for (const [key, value] of Object.entries(rest)) {
+
+//     // Skip undefined values
+//     if (value === undefined) continue;
+
+//     // Handle arrays / objects
+//     if (
+//       typeof value === 'object' &&
+//       value !== null &&
+//       !(value instanceof File)
+//     ) {
+//       formData.append(key, JSON.stringify(value));
 //     }
 
-//     if (avatarFile) formData.append('avatar', avatarFile);
-//     if (bannerFile) formData.append('banner', bannerFile);
-
-//     return apiFetch<AnyProfile>('/profiles/me/', {
-//       method: 'PATCH',
-//       body: formData,
-//       // Don't set Content-Type — browser sets multipart boundary automatically
-//     });
+//     // Handle primitive values
+//     else if (value !== null) {
+//       formData.append(key, String(value));
+//     }
 //   }
 
-//   // No files — send as JSON (base64 strings for avatar/banner are fine here too)
+//   // Upload avatar file
+//   if (avatarFile instanceof File) {
+//     formData.append('avatar', avatarFile);
+//   }
+
+//   // Upload banner file
+//   if (bannerFile instanceof File) {
+//     formData.append('banner', bannerFile);
+//   }
+
+//   // Remove avatar
+//   if (avatar === null) {
+//     formData.append('avatar', '');
+//   }
+
+//   // Remove banner
+//   if (banner === null) {
+//     formData.append('banner', '');
+//   }
+
 //   return apiFetch<AnyProfile>('/profiles/me/', {
 //     method: 'PATCH',
-//     body: JSON.stringify(rest),
+//     body: formData,
 //   });
 // }
 
@@ -398,12 +435,66 @@ export type AnyProfile =
   | ConsultantProfile
   | EcosystemPartnerProfile;
 
+/**
+ * The Django backend sometimes returns JSON fields as raw strings (or as
+ * corrupted objects where keys are character indices, e.g. {"0":"{","1":"}","amount_raised":"…"}).
+ * This helper safely parses them back into proper objects / arrays.
+ */
+function parseJsonField<T>(value: unknown, fallback: T): T {
+  if (value === null || value === undefined || value === '') return fallback;
+  // Already a proper object / array — but check for the corrupted {0:"{", 1:"}"} shape
+  if (typeof value === 'object' && !Array.isArray(value)) {
+    const obj = value as Record<string, unknown>;
+    // Corrupted: keys "0" and "1" are individual characters of "{" and "}"
+    if (obj['0'] === '{' && obj['1'] === '}') {
+      // Reconstruct: drop the char-index keys and keep the real fields
+      const clean: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(obj)) {
+        if (isNaN(Number(k))) clean[k] = v;
+      }
+      return clean as unknown as T;
+    }
+    return value as T;
+  }
+  if (Array.isArray(value)) return value as unknown as T;
+  if (typeof value === 'string') {
+    try {
+      return JSON.parse(value) as T;
+    } catch {
+      return fallback;
+    }
+  }
+  return fallback;
+}
+
+/** Normalise profile fields that may arrive as strings or corrupted objects */
+function normaliseProfile<T extends AnyProfile>(raw: T): T {
+  const JSON_OBJECT_FIELDS = ['funding_data', 'traction_data', 'trust_press_data'] as const;
+  const JSON_ARRAY_FIELDS  = [
+    'looking_for', 'progress_highlights', 'ecosystem_support',
+    'company_journey_timeline', 'team_members', 'industry_tags',
+  ] as const;
+
+  const out = { ...raw } as any;
+
+  for (const field of JSON_OBJECT_FIELDS) {
+    if (field in out) out[field] = parseJsonField(out[field], null);
+  }
+  for (const field of JSON_ARRAY_FIELDS) {
+    if (field in out) out[field] = parseJsonField(out[field], []);
+  }
+
+  return out as T;
+}
+
 export async function getMyProfile(): Promise<AnyProfile> {
-  return apiFetch<AnyProfile>('/profiles/me/');
+  const raw = await apiFetch<AnyProfile>('/profiles/me/');
+  return normaliseProfile(raw);
 }
 
 export async function getUserProfile(userId: number | string): Promise<AnyProfile> {
-  return apiFetch<AnyProfile>(`/profiles/${userId}/`);
+  const raw = await apiFetch<AnyProfile>(`/profiles/${userId}/`);
+  return normaliseProfile(raw);
 }
 
 export async function getPublicProfiles(role?: UserRole): Promise<AnyProfile[]> {
