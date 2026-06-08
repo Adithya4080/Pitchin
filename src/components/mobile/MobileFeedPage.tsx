@@ -76,7 +76,7 @@ export function MobileFeedPage() {
             className="touch-manipulation"
           >
             <Avatar className="h-8 w-8 ring-2 ring-primary/20">
-              <AvatarImage src={profile?.avatar_url || undefined} />
+              <AvatarImage src={profile?.avatar ?? user?.avatar_url} />
               <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
                 {initials}
               </AvatarFallback>

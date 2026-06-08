@@ -3,7 +3,7 @@
  * Replaces all Supabase calls with Django backend API calls
  */
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://pitchin-backend-production.up.railway.app/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://pitchin-backend-production-79da.up.railway.app/api';
 
 // ─── Token Management ──────────────────────────────────────────────────────────
 
@@ -55,17 +55,14 @@ export async function apiFetch<T = any>(
   const url = `${API_BASE}${path}`;
   const token = getAccessToken();
 
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...(options.headers as Record<string, string>),
-  };
+  const isFormData = options.body instanceof FormData;
 
-  if (token) headers['Authorization'] = `Bearer ${token}`;
+const headers: Record<string, string> = {
+  ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
+  ...(options.headers as Record<string, string>),
+};
 
-  // Remove Content-Type for FormData
-  if (options.body instanceof FormData) {
-    delete headers['Content-Type'];
-  }
+if (token) headers['Authorization'] = `Bearer ${token}`;
 
   const res = await fetch(url, { ...options, headers });
 

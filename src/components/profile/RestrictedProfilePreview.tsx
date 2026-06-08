@@ -69,18 +69,18 @@ export function RestrictedProfilePreview({
         message: "You're connected! Full profile access granted.",
       };
     }
-    
+
     // I follow them, they don't follow me yet
     if (myFollowStatus === 'accepted' && theirFollowStatus !== 'accepted') {
       return {
         icon: UserCheck,
         title: 'Following',
-        message: theirFollowStatus === 'pending' 
+        message: theirFollowStatus === 'pending'
           ? "You're following this user. They've sent you a follow request - check your notifications!"
           : "You're following this user. Once they follow you back, you'll have full access.",
       };
     }
-    
+
     // My follow is pending
     if (myFollowStatus === 'pending') {
       return {
@@ -91,7 +91,7 @@ export function RestrictedProfilePreview({
           : "Your follow request is pending approval.",
       };
     }
-    
+
     // They follow me, I don't follow them
     if (theirFollowStatus === 'accepted' && myFollowStatus !== 'accepted') {
       return {
@@ -100,7 +100,7 @@ export function RestrictedProfilePreview({
         message: "This user follows you. Follow them back to unlock full profile access!",
       };
     }
-    
+
     // They have pending request to me
     if (theirFollowStatus === 'pending') {
       return {
@@ -109,7 +109,7 @@ export function RestrictedProfilePreview({
         message: "This user wants to follow you! Check your notifications to respond.",
       };
     }
-    
+
     // Default - no connection
     return {
       icon: Lock,
@@ -134,9 +134,9 @@ export function RestrictedProfilePreview({
     switch (myFollowStatus) {
       case 'accepted':
         return (
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             className="shrink-0"
             onClick={handleUnfollow}
             disabled={isFollowLoading}
@@ -160,9 +160,9 @@ export function RestrictedProfilePreview({
       case 'none':
       default:
         return (
-          <Button 
-            variant="default" 
-            size="sm" 
+          <Button
+            variant="default"
+            size="sm"
             className="shrink-0"
             onClick={handleFollow}
             disabled={isFollowLoading}
@@ -190,15 +190,15 @@ export function RestrictedProfilePreview({
       {/* Profile Header Card - Same as public profile */}
       <Card className="overflow-hidden border-border/50">
         {/* Banner */}
-        <div 
+        <div
           className="h-28 sm:h-36 relative bg-gradient-to-r from-primary/20 via-primary/10 to-accent/10"
-          style={bannerUrl ? { 
+          style={bannerUrl ? {
             backgroundImage: `url(${bannerUrl})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           } : undefined}
         />
-        
+
         {/* Profile Identity */}
         <CardContent className="pt-4 pb-5">
           <div className="flex flex-col gap-4">
@@ -214,7 +214,7 @@ export function RestrictedProfilePreview({
                     </AvatarFallback>
                   </Avatar>
                 </div>
-                
+
                 {/* Name, role, location */}
                 <div className="pt-2 min-w-0 flex-1">
                   <h1 className="font-display text-xl sm:text-2xl font-bold text-foreground truncate">

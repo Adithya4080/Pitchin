@@ -9,7 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AppLayout } from '@/components/layouts/AppLayout';
-import { ProfileHeader, ReactionStatsCard, ActivePitchCard, SocialLinksCard, RoleAboutCard, IntroductionVideoSection, PortfolioSection, StartupPortfolioSection, ProfilePitchSection, TeamSection } from '@/components/profile';
+import { ProfileHeader, ReactionStatsCard, ActivePitchCard, SocialLinksCard, RoleAboutCard, IntroductionVideoSection, StartupPortfolioSection, ProfilePitchSection, TeamSection, ProfileStrengthCard, FundingSection, TractionMetricsSection, TrustPressSection, ThePitchSection } from '@/components/profile';
+import type { FundingData, TractionData, TrustPressData } from '@/components/profile';
 import { TeamMember } from '@/components/profile/team';
 import { MobileProfilePitchSection } from '@/components/profile/pitches';
 import { ProfileRightSidebar } from '@/components/profile/ProfileRightSidebar';
@@ -39,6 +40,8 @@ import { useProfilePitches, useCreateProfilePitch, useUpdateProfilePitch, useDel
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { PaywallGate } from '@/components/PaywallGate';
+import { ShareDashboardButton } from '@/components/ShareDashboardButton';
 
 // Wrapper component for ProfilePitchSection with hooks
 function ProfilePitchSectionWrapper({ 
@@ -133,9 +136,29 @@ export default function Dashboard() {
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // New dashboard sections state (funding, traction, trust/press)
+  // These are stored in roleProfileData.funding_data / traction_data / trust_press_data
+  // and loaded from the profile API. Local state mirrors them for immediate UI updates.
+
   // Role profile state
-  const { role, roleProfile, saveRoleProfile } = useRoleProfile(user?.id);
+  const { role: hookRole, roleProfile, saveRoleProfile } = useRoleProfile(user?.id);
+  // Fall back to user.role from auth context so sections show immediately on load
+  const role = hookRole || (user as any)?.role || null;
   const [roleProfileData, setRoleProfileData] = useState<any>(null);
+
+  // Derived: whether the Company Portfolio section has any content
+  const hasPortfolioContent = !!(
+    roleProfileData?.company_snapshot ||
+    roleProfileData?.market_type ||
+    roleProfileData?.founded_year ||
+    roleProfileData?.operating_status ||
+    roleProfileData?.company_background ||
+    roleProfileData?.vision_direction ||
+    roleProfileData?.current_focus ||
+    (roleProfileData?.progress_highlights && (roleProfileData.progress_highlights as any[]).length > 0) ||
+    (roleProfileData?.ecosystem_support && (roleProfileData.ecosystem_support as any[]).length > 0) ||
+    (roleProfileData?.company_journey_timeline && (roleProfileData.company_journey_timeline as any[]).length > 0)
+  );
 
   // Update role profile data when loaded - ensure team_members is always an array
   useEffect(() => {
@@ -153,7 +176,7 @@ export default function Dashboard() {
     queryKey: ['profile', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      const data = await (await import('@/api/profiles')).getUserProfile(user.id);
+      const data = await (await import('@/api/profiles')).getMyProfile();
       return data;
     },
     enabled: !!user?.id,
@@ -169,7 +192,7 @@ export default function Dashboard() {
       const profileData = await (await import('@/api/profiles')).getMyProfile();
       return posts.map(post => ({
         ...post,
-        profiles: { full_name: String((profileData as any).bio ? profileData.user : post.author_name), avatar_url: profileData.avatar_url },
+        profiles: { full_name: String((profileData as any).bio ? profileData.user_name : post.author_name), avatar_url: profileData.avatar_url },
         is_active: true,
         expires_at: new Date(Date.now() + 86400000 * 30).toISOString(),
         reaction_count: post.like_count,
@@ -228,19 +251,18 @@ export default function Dashboard() {
     }
   };
 
-  // Populate form when profile loads
   useEffect(() => {
     if (profile) {
-      setFullName(profile.full_name || '');
+      setFullName((profile as any).user_name || profile.full_name || '');
       setBio((profile as any).bio || '');
       setLocation((profile as any).location || '');
       setContactEmail((profile as any).contact_email || '');
-      setLinkedinUrl(profile.linkedin_url || '');
-      setTwitterUrl((profile as any).twitter_url || '');
-      setWebsiteUrl((profile as any).website_url || '');
+      setLinkedinUrl((profile as any).linkedin || profile.linkedin_url || '');
+      setTwitterUrl((profile as any).twitter || (profile as any).twitter_url || '');
+      setWebsiteUrl((profile as any).website || (profile as any).website_url || '');
       setPortfolioUrl((profile as any).portfolio_url || '');
-      setAvatarPreview(profile.avatar_url || null);
-      setBannerPreview((profile as any).banner_url || null);
+      setAvatarPreview((profile as any).avatar || null);
+      setBannerPreview((profile as any).banner || null);
     }
   }, [profile]);
 
@@ -258,12 +280,12 @@ export default function Dashboard() {
       setBio((profile as any).bio || '');
       setLocation((profile as any).location || '');
       setContactEmail((profile as any).contact_email || '');
-      setLinkedinUrl(profile.linkedin_url || '');
-      setTwitterUrl((profile as any).twitter_url || '');
-      setWebsiteUrl((profile as any).website_url || '');
       setPortfolioUrl((profile as any).portfolio_url || '');
-      setAvatarPreview(profile.avatar_url || null);
-      setBannerPreview((profile as any).banner_url || null);
+      setLinkedinUrl((profile as any).linkedin || profile.linkedin_url || '');
+      setTwitterUrl((profile as any).twitter || (profile as any).twitter_url || '');
+      setWebsiteUrl((profile as any).website || (profile as any).website_url || '');
+      setAvatarPreview((profile as any).avatar || null);
+      setBannerPreview((profile as any).banner || null);
     }
     if (roleProfile) {
       setRoleProfileData(roleProfile);
@@ -308,45 +330,24 @@ export default function Dashboard() {
     setBannerFile(null);
     setBannerPreview(null);
   };
-
+  
   const handleSave = async () => {
     if (!user?.id) return;
     
     setIsSaving(true);
     try {
-      let avatarUrl = profile?.avatar_url || null;
-      let bannerUrl = (profile as any)?.banner_url || null;
-
-      // Upload new avatar if selected
-      if (avatarFile) {
-        const fileExt = avatarFile.name.split('.').pop();
-        const filePath = `${user.id}/avatar-${Date.now()}.${fileExt}`;
-        
-        const formData = new FormData();
-        formData.append('avatar', avatarFile);
-        const { updateMyProfile: _updateAvatar } = await import('@/api/profiles');
-        // Store base64 preview as avatar_url until backend supports file upload
-        avatarUrl = avatarPreview;
-      } else if (avatarPreview === null && profile?.avatar_url) {
-        avatarUrl = null;
-      }
-
-      // Upload new banner if selected
-      if (bannerFile) {
-        const fileExt = bannerFile.name.split('.').pop();
-        const filePath = `${user.id}/banner-${Date.now()}.${fileExt}`;
-        
-        // Store base64 preview as banner_url until backend supports file upload
-        bannerUrl = bannerPreview;
-      } else if (bannerPreview === null && (profile as any)?.banner_url) {
-        bannerUrl = null;
-      }
-
       const { updateMyProfile } = await import('@/api/profiles');
       await updateMyProfile({
-        bio: bio || null,
-        linkedin_url: linkedinUrl || null,
-        avatar_url: avatarUrl,
+        user_name: fullName || undefined,
+        bio: bio || '',
+        location: location || '',
+        linkedin: linkedinUrl || '',
+        twitter: twitterUrl || '',
+        website: websiteUrl || '',
+        avatarFile: avatarFile ?? undefined,
+        bannerFile: bannerFile ?? undefined,
+        ...(!avatarFile && avatarPreview === null ? { avatar: null } : {}),
+        ...(!bannerFile && bannerPreview === null ? { banner: null } : {}),
       } as any);
 
       // Save role-specific profile if data exists
@@ -358,15 +359,14 @@ export default function Dashboard() {
       toast.success('Profile updated successfully!');
       setAvatarFile(null);
       setBannerFile(null);
-      setIsEditing(false); // Exit edit mode after successful save
+      setIsEditing(false);
     } catch (error: any) {
       toast.error(error.message || 'Failed to update profile');
     } finally {
       setIsSaving(false);
     }
   };
-
-  // Get role-specific tab label
+  
   const getRoleTabLabel = () => {
     switch (role) {
       case 'innovator': return 'Skills & Portfolio';
@@ -535,15 +535,7 @@ export default function Dashboard() {
             thumbnailUrl: roleProfileData?.intro_video_thumbnail_url,
           } : undefined}
           roleSection={role !== 'ecosystem_partner' ? renderRoleSection(false, true) : undefined}
-          portfolioSection={role === 'innovator' ? (
-            <PortfolioSection
-              profile={roleProfileData as Partial<InnovatorProfile>}
-              isEditable={false}
-              isOwner={true}
-              onChange={setRoleProfileData}
-              isMobile={true}
-            />
-          ) : role === 'startup' ? (
+          portfolioSection={(role === 'startup' || role === 'innovator') ? (
             <StartupPortfolioSection
               profile={roleProfileData as Partial<StartupProfile>}
               isEditable={false}
@@ -562,13 +554,50 @@ export default function Dashboard() {
             />
           ) : undefined}
           pitchSection={(role === 'innovator' || role === 'startup') ? (
-            <ProfilePitchSectionWrapper
-              userId={String(user?.id)}
+            <ThePitchSection
+              data={{
+                problem: (roleProfileData as any)?.problem_statement || '',
+                solution: (roleProfileData as any)?.solution || '',
+                why_now: (roleProfileData as any)?.why_now || '',
+                why_us: (roleProfileData as any)?.why_us || '',
+              }}
               isOwner={true}
-              roleLabel={role === 'startup' ? 'Product' : 'Pitches'}
               isMobile={true}
             />
           ) : undefined}
+          profileStrengthSection={
+            <ProfileStrengthCard
+              bio={bio}
+              hasIntroVideo={!!roleProfileData?.intro_video_url}
+              hasFunding={!!(roleProfileData as any)?.funding_data?.stage || !!(roleProfileData as any)?.funding_data?.amount_raised}
+              hasTraction={!!(roleProfileData as any)?.traction_data?.metrics?.length}
+              hasTrustPress={!!(roleProfileData as any)?.trust_press_data?.proofs?.length}
+              hasTeam={!!((roleProfileData?.team_members as any[])?.length)}
+              hasCompanyPortfolio={!!((roleProfileData as any)?.ecosystem_support?.length)}
+              hasPitch={!!(userPitches && userPitches.length > 0)}
+            />
+          }
+          fundingSection={
+            <FundingSection
+              funding={(roleProfileData as any)?.funding_data || null}
+              isOwner={true}
+              isMobile={true}
+            />
+          }
+          tractionSection={
+            <TractionMetricsSection
+              traction={(roleProfileData as any)?.traction_data || null}
+              isOwner={true}
+              isMobile={true}
+            />
+          }
+          trustPressSection={
+            <TrustPressSection
+              trustPress={(roleProfileData as any)?.trust_press_data || null}
+              isOwner={true}
+              isMobile={true}
+            />
+          }
           ecosystemPartnerSections={role === 'ecosystem_partner' ? renderEcosystemPartnerSections(true, true) : undefined}
           pitchFeed={
             userPitches && userPitches.length > 0 ? (
@@ -628,18 +657,24 @@ export default function Dashboard() {
         <div className="flex gap-6 max-w-6xl mx-auto">
           {/* Main Content */}
           <div className="flex-1 min-w-0 max-w-3xl space-y-3">
+            <PaywallGate>
 
           {/* Edit Mode Indicator */}
           {isEditing && (
-            <div className="bg-primary/10 border border-primary/20 rounded-lg px-4 py-3 flex items-center justify-between">
-              <span className="text-sm text-primary font-medium">
-                ✏️ You are editing your profile
-              </span>
-              <Button variant="ghost" size="sm" onClick={handleCancel} className="text-muted-foreground hover:text-foreground">
-                <X className="h-4 w-4 mr-1" />
-                Cancel
-              </Button>
-            </div>
+            <>
+              <div className="bg-primary/10 border border-primary/20 rounded-lg px-4 py-3 flex items-center justify-between">
+                <span className="text-sm text-primary font-medium">
+                  You are editing your profile
+                </span>
+                <Button variant="ghost" size="sm" onClick={handleCancel} className="text-muted-foreground hover:text-foreground">
+                  <X className="h-4 w-4 mr-1" />
+                  Cancel
+                </Button>
+              </div>
+              <div className="flex justify-end">
+                <ShareDashboardButton />
+              </div>
+            </>
           )}
 
           {/* Profile Header */}
@@ -675,34 +710,68 @@ export default function Dashboard() {
           {/* VIEW MODE: Clean profile display */}
           {!isEditing && (
             <>
-              {/* Introduction Video Section - Only for innovator/startup */}
-              {(role === 'innovator' || role === 'startup') && (
-                <div className="relative">
-                  {/* Edit icon - only shown when has content */}
-                  {roleProfileData?.intro_video_url && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => navigate('/edit-section?section=introduction')}
-                      className="absolute top-4 right-4 h-8 w-8 p-0 z-10 bg-background/80 hover:bg-background border border-border/50"
-                    >
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                  <IntroductionVideoSection
-                    videoUrl={roleProfileData?.intro_video_url}
-                    thumbnailUrl={roleProfileData?.intro_video_thumbnail_url}
-                    title={roleProfileData?.intro_video_title}
-                    description={roleProfileData?.intro_video_description}
-                    isOwner={true}
-                    isEditable={false}
-                    isMobile={false}
-                    userId={String(user?.id)}
-                    role={role}
-                    onVideoChange={() => {}}
-                  />
-                </div>
+              {/* Reaction Stats Card */}
+              {/* <ReactionStatsCard stats={reactionStats} /> */}
+
+              <ReactionStatsCard stats={reactionStats ? {
+              fire: reactionStats.fire,
+              love: reactionStats.clap,
+              rocket: reactionStats.bulb,
+              lightbulb: reactionStats.bulb,
+              total: reactionStats.total_reactions,
+            } : undefined} />
+
+              {/* Active Pitch Card */}
+              {/* {activePitch && (
+                <ActivePitchCard
+                  pitch={activePitch}
+                  isEditable={true}
+                  isDeleting={isDeleting}
+                  onDelete={handleDeletePitch}
+                />
+              )} */}
+
+              {activePitch && (
+                <ActivePitchCard
+                  pitch={{
+                    id: String(activePitch.id),
+                    pitch_statement: activePitch.content ?? activePitch.title ?? '',
+                    image_url: activePitch.image ?? undefined,
+                    expires_at: activePitch.expires_at,
+                    reaction_count: activePitch.reaction_count,
+                    save_count: activePitch.save_count,
+                  }}
+                  isEditable={true}
+                  isDeleting={isDeleting}
+                  onDelete={handleDeletePitch}
+                />
               )}
+
+              {/* Introduction Video Section - All roles */}
+              <div className="relative">
+                {roleProfileData?.intro_video_url && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate('/edit-section?section=introduction')}
+                    className="absolute top-4 right-4 h-8 w-8 p-0 z-10 bg-background/80 hover:bg-background border border-border/50"
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </Button>
+                )}
+                <IntroductionVideoSection
+                  videoUrl={roleProfileData?.intro_video_url}
+                  thumbnailUrl={roleProfileData?.intro_video_thumbnail_url}
+                  title={roleProfileData?.intro_video_title}
+                  description={roleProfileData?.intro_video_description}
+                  isOwner={true}
+                  isEditable={false}
+                  isMobile={false}
+                  userId={String(user?.id)}
+                  role={role}
+                  onVideoChange={() => {}}
+                />
+              </div>
 
               {/* Links & Contact Card */}
               <SocialLinksCard
@@ -713,41 +782,61 @@ export default function Dashboard() {
                 contactEmail={contactEmail}
               />
 
-              {/* Role Section (Skills & Portfolio) in View Mode - skip for ecosystem_partner */}
-              {role && role !== 'ecosystem_partner' && roleProfileData && (
+              {/* Role Section (Skills & Portfolio) in View Mode */}
+              {role && (
                 <div className="space-y-2">
                   <h3 className="text-sm font-semibold text-foreground px-1">{getRoleTabLabel()}</h3>
                   {renderRoleSection(false)}
                 </div>
               )}
 
-              {/* Portfolio Section - For Innovators and Startups */}
-              {role === 'innovator' && (
-                <div className="relative">
-                  {/* Edit icon - only shown when has content */}
-                  {(roleProfileData as any)?.work_experience?.length > 0 && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => navigate('/edit-section?section=portfolio')}
-                      className="absolute top-4 right-4 h-8 w-8 p-0 z-10 bg-background/80 hover:bg-background border border-border/50"
-                    >
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                  <PortfolioSection
-                    profile={roleProfileData as Partial<InnovatorProfile>}
-                    isEditable={false}
-                    isOwner={true}
-                    onChange={setRoleProfileData}
-                    isMobile={false}
-                  />
-                </div>
+              {/* Profile Strength Card - only for owner */}
+              <ProfileStrengthCard
+                bio={bio}
+                hasIntroVideo={!!roleProfileData?.intro_video_url}
+                hasFunding={!!(roleProfileData as any)?.funding_data?.stage || !!(roleProfileData as any)?.funding_data?.amount_raised}
+                hasTraction={!!(roleProfileData as any)?.traction_data?.metrics?.length}
+                hasTrustPress={!!(roleProfileData as any)?.trust_press_data?.proofs?.length}
+                hasTeam={!!((roleProfileData?.team_members as any[])?.length)}
+                hasCompanyPortfolio={!!((roleProfileData as any)?.ecosystem_support?.length)}
+                hasPitch={!!(userPitches && userPitches.length > 0)}
+              />
+
+              {/* The Pitch — Problem / Solution / Why Now / Why Us narrative */}
+              {(role === 'startup' || role === 'innovator') && (
+                <ThePitchSection
+                  data={{
+                    problem: (roleProfileData as any)?.problem_statement || '',
+                    solution: (roleProfileData as any)?.solution || '',
+                    why_now: (roleProfileData as any)?.why_now || '',
+                    why_us: (roleProfileData as any)?.why_us || '',
+                  }}
+                  isOwner={true}
+                />
               )}
-              {role === 'startup' && (
+
+              {/* Funding Section */}
+              <FundingSection
+                funding={(roleProfileData as any)?.funding_data || null}
+                isOwner={true}
+              />
+
+              {/* Traction & Metrics Section */}
+              <TractionMetricsSection
+                traction={(roleProfileData as any)?.traction_data || null}
+                isOwner={true}
+              />
+
+              {/* Trust & Press Section */}
+              <TrustPressSection
+                trustPress={(roleProfileData as any)?.trust_press_data || null}
+                isOwner={true}
+              />
+
+              {/* Company Portfolio - For Startups and Innovators */}
+              {(role === 'startup' || role === 'innovator') && (
                 <div className="relative">
-                  {/* Edit icon - only shown when has content */}
-                  {(roleProfileData as any)?.ecosystem_support?.length > 0 && (
+                  {hasPortfolioContent && (
                     <Button
                       variant="ghost"
                       size="sm"
@@ -767,40 +856,61 @@ export default function Dashboard() {
                 </div>
               )}
 
-              {/* Pitches/Product Section - Only for Innovators/Startups */}
-              {(role === 'innovator' || role === 'startup') && (
-                <ProfilePitchSectionWrapper
-                  userId={String(user?.id)}
+              {/* Team Section - All roles */}
+              <div className="relative">
+                {(roleProfileData?.team_members as any[])?.length > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate('/edit-section?section=team')}
+                    className="absolute top-4 right-4 h-8 w-8 p-0 z-10 bg-background/80 hover:bg-background border border-border/50"
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </Button>
+                )}
+                <TeamSection
+                  members={(roleProfileData?.team_members || []) as TeamMember[]}
+                  isEditable={false}
+                  onChange={(members) => setRoleProfileData((prev: any) => ({ ...prev, team_members: members }))}
+                  isMobile={false}
                   isOwner={true}
-                  roleLabel={role === 'startup' ? 'Product' : 'Pitches'}
                 />
-              )}
+              </div>
 
-              {/* Team Section - Only for Innovators/Startups */}
-              {(role === 'innovator' || role === 'startup') && (
-                <div className="relative">
-                  {/* Edit icon - only shown when has content */}
-                  {(roleProfileData?.team_members as any[])?.length > 0 && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => navigate('/edit-section?section=team')}
-                      className="absolute top-4 right-4 h-8 w-8 p-0 z-10 bg-background/80 hover:bg-background border border-border/50"
-                    >
-                      <Edit2 className="h-4 w-4" />
+              {/* Pitches list — desktop */}
+              {(role === 'startup' || role === 'innovator') && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-base font-bold text-foreground">Pitches</h3>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Select and reposition stories from this profile
+                      </p>
+                    </div>
+                    <Button size="sm" onClick={() => navigate('/pitches/new')} className="gap-1.5">
+                      {/* <Plus className="h-4 w-4" /> */}
+                      New Pitch
                     </Button>
+                  </div>
+                  {pitchLoading ? (
+                    <div className="text-sm text-muted-foreground py-4 text-center">Loading…</div>
+                  ) : userPitches && userPitches.length > 0 ? (
+                    <div className="space-y-3">
+                      {userPitches.map((pitch) => (
+                        <PitchCard key={pitch.id} pitch={pitch} hideBorder={false} />
+                      ))}
+                    </div>
+                  ) : (
+                    <Card className="border-2 border-dashed border-border/50">
+                      <CardContent className="py-8 text-center text-sm text-muted-foreground">
+                        No pitches yet. Create your first pitch!
+                      </CardContent>
+                    </Card>
                   )}
-                  <TeamSection
-                    members={(roleProfileData?.team_members || []) as TeamMember[]}
-                    isEditable={false}
-                    onChange={(members) => setRoleProfileData((prev: any) => ({ ...prev, team_members: members }))}
-                    isMobile={false}
-                    isOwner={true}
-                  />
                 </div>
               )}
 
-              {/* Ecosystem Partner Sections */}
+              {/* Ecosystem Partner Sections - always rendered for ep role */}
               {role === 'ecosystem_partner' && (
                 <div className="space-y-6">
                   {renderEcosystemPartnerSections(false, true)}
@@ -1149,6 +1259,7 @@ export default function Dashboard() {
               </div>
             </>
           )}
+          </PaywallGate>
           </div>
 
           {/* Right Sidebar - Desktop only */}

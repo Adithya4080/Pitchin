@@ -29,13 +29,30 @@ function toFollowWithProfile(fr: FollowRequest, side: 'sender' | 'receiver'): Fo
   };
 }
 
+// export function useFollowRequest() {
+//   const qc = useQueryClient();
+//   const { toast } = useToast();
+//   return useMutation({
+//     mutationFn: ({ followingId }: { followingId: number }) => sendFollowRequest(followingId),
+//     onSuccess: (_, { followingId }) => {
+//       qc.invalidateQueries({ queryKey: ['follow-status', followingId] });
+//       qc.invalidateQueries({ queryKey: ['following'] });
+//       toast({ title: 'Follow request sent', description: 'Your request is pending approval.' });
+//     },
+//     onError: (e: Error) => toast({ title: 'Error', description: e.message, variant: 'destructive' }),
+//   });
+// }
+
+// useFollow.tsx — useFollowRequest mutation
 export function useFollowRequest() {
   const qc = useQueryClient();
   const { toast } = useToast();
   return useMutation({
     mutationFn: ({ followingId }: { followingId: number }) => sendFollowRequest(followingId),
     onSuccess: (_, { followingId }) => {
-      qc.invalidateQueries({ queryKey: ['follow-status', followingId] });
+      // Set BOTH string and number versions of the key
+      qc.setQueryData(['follow-status', followingId], 'pending');
+      qc.setQueryData(['follow-status', String(followingId)], 'pending');
       qc.invalidateQueries({ queryKey: ['following'] });
       toast({ title: 'Follow request sent', description: 'Your request is pending approval.' });
     },
@@ -75,6 +92,20 @@ export function useUnfollow() {
   });
 }
 
+// export function useFollowStatus(userId: number | string | undefined) {
+//   const { user } = useAuth();
+//   return useQuery({
+//     queryKey: ['follow-status', userId],
+//     queryFn: async (): Promise<FollowStatus> => {
+//       if (!user || !userId) return 'none';
+//       const following = await getFollowing();
+//       const match = following.find((f) => f.receiver === Number(userId));
+//       return (match?.status as FollowStatus) ?? 'none';
+//     },
+//     enabled: !!user && !!userId,
+//   });
+// }
+
 export function useFollowStatus(userId: number | string | undefined) {
   const { user } = useAuth();
   return useQuery({
@@ -86,6 +117,7 @@ export function useFollowStatus(userId: number | string | undefined) {
       return (match?.status as FollowStatus) ?? 'none';
     },
     enabled: !!user && !!userId,
+    staleTime: 30_000, // ← don't auto-refetch for 30s, preserving our setQueryData
   });
 }
 

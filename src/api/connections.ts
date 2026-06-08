@@ -28,7 +28,7 @@ export interface InterestMessage {
 export async function sendFollowRequest(receiverId: number): Promise<FollowRequest> {
   return apiFetch<FollowRequest>('/connections/follow/', {
     method: 'POST',
-    body: JSON.stringify({ receiver: receiverId }),
+    body: JSON.stringify({ receiver_id: receiverId }),
   });
 }
 
@@ -59,7 +59,7 @@ export async function getFollowing(): Promise<FollowRequest[]> {
 }
 
 export async function sendInterest(data: {
-  receiver: number;
+  receiver_id: number;
   subject: string;
   message: string;
   tag?: string;

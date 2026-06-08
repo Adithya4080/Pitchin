@@ -16,7 +16,6 @@ export default function Feed() {
     isOnboardingChecked
   } = useAuth();
 
-  // Redirect to onboarding if user is logged in but not onboarded
   useEffect(() => {
     if (user && isOnboardingChecked && isOnboarded === false) {
       navigate('/onboarding');
@@ -25,17 +24,17 @@ export default function Feed() {
 
   return (
     <>
-      {/* Mobile view - CSS-driven visibility */}
+      {/* Mobile view */}
       <div className="block md:hidden">
         <MobileFeedPage />
         <BottomNavigation />
       </div>
 
-      {/* Desktop view - CSS-driven visibility */}
+      {/* Desktop view */}
       <div className="hidden md:block">
         <AppLayout showBottomNav={true}>
-          <div className="container py-4 md:py-6">
-            <div className="flex gap-6">
+            <div className="container py-4 md:py-6">
+              <div className="flex gap-6 items-start relative">
               <div className="hidden lg:block">
                 <FeedLeftSidebar />
               </div>

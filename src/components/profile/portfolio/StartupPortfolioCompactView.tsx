@@ -11,13 +11,21 @@ interface StartupPortfolioCompactViewProps {
   isMobile?: boolean;
 }
 
+function toArray(value: any): any[] {
+  if (Array.isArray(value)) return value;
+  if (typeof value === 'string') {
+    try { return JSON.parse(value); } catch { return []; }
+  }
+  return [];
+}
+
 export function StartupPortfolioCompactView({
   profile,
   onViewFull,
   isMobile = false,
 }: StartupPortfolioCompactViewProps) {
   const companySnapshot = profile?.company_snapshot || "";
-  const industryTags = profile?.industry_tags || [];
+  const industryTags = toArray(profile?.industry_tags);
   const marketType = profile?.market_type || "";
   const stage = profile?.stage || "";
   const foundedYear = profile?.founded_year || "";
@@ -35,23 +43,17 @@ export function StartupPortfolioCompactView({
     return null;
   }
 
-  // Format operating status for display
   const formatStatus = (status: string) => {
     switch (status.toLowerCase()) {
-      case "active":
-        return "Active";
-      case "exploring":
-        return "Exploring";
-      case "stealth":
-        return "Stealth";
-      default:
-        return status;
+      case "active": return "Active";
+      case "exploring": return "Exploring";
+      case "stealth": return "Stealth";
+      default: return status;
     }
   };
 
   const content = (
     <div className="space-y-4">
-      {/* Company Snapshot */}
       {companySnapshot && (
         <div>
           <h4 className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
@@ -64,7 +66,6 @@ export function StartupPortfolioCompactView({
         </div>
       )}
 
-      {/* Focus Areas */}
       {(industryTags.length > 0 || marketType || stage) && (
         <>
           {companySnapshot && <Separator className="my-3" />}
@@ -94,7 +95,6 @@ export function StartupPortfolioCompactView({
         </>
       )}
 
-      {/* Company Identity */}
       {(foundedYear || operatingStatus) && (
         <>
           <Separator className="my-3" />
@@ -115,7 +115,6 @@ export function StartupPortfolioCompactView({
         </>
       )}
 
-      {/* View Full Portfolio Button - Centered */}
       <div className="pt-2 flex justify-center">
         <Button
           variant="ghost"

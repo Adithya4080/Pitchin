@@ -26,7 +26,7 @@ export function HeroSection() {
 
           {/* Headline */}
           <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6 animate-fade-in [animation-delay:100ms]">
-            Share your idea.
+            Share your ideas.
             <br />
             <span className="flash-gradient-text">Connect.</span> Make it count.
           </h1>

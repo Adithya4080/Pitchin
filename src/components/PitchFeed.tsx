@@ -52,7 +52,13 @@ export function PitchFeed() {
           {/* PostComposer Capsule */}
           <div className="flex-1 flex items-center gap-3 bg-card border border-border/40 rounded-full pl-2 pr-3 py-2 shadow-sm">
             <Avatar className="h-10 w-10 shrink-0">
-              <AvatarImage src={profile?.avatar_url || undefined} />
+              <AvatarImage
+                src={
+                  profile?.avatar_url ||
+                  profile?.avatar ||
+                  ""
+                }
+              />
               <AvatarFallback className="bg-muted text-muted-foreground font-semibold">
                 {initials}
               </AvatarFallback>
@@ -137,7 +143,6 @@ export function PitchFeed() {
 
       {/* Feed Card Container */}
       <div>
-
         {/* Feed */}
         {isLoading ? (
           <FeedSkeleton count={3} />

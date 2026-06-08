@@ -108,8 +108,7 @@ export function FeedRightSidebar() {
   const { data: recommendedUsers = [] } = useQuery({
     queryKey: ['recommended-users', user?.id],
     queryFn: async () => {
-      // TODO: connect to backend API
-      return  [];
+      return [];
     },
     enabled: !!user,
   });
@@ -117,16 +116,14 @@ export function FeedRightSidebar() {
   const visibleUsers = recommendedUsers.filter((u) => !dismissed.has(u.id));
 
   return (
-    <aside className="w-[22rem] shrink-0 space-y-4 sticky top-20 h-fit">
+    <aside className="w-[22rem] shrink-0 space-y-4 sticky top-20 max-h-[calc(100vh-5rem)] overflow-y-auto self-start">
       {/* Recommended For You */}
       {user && (
         <Card className="bg-card border-border/40 rounded-2xl shadow-sm p-4">
-          {/* Title */}
           <h3 className="text-sm font-semibold text-foreground mb-3 px-1">
             Recommended for You
           </h3>
 
-          {/* Toggle pills */}
           <div className="flex items-center gap-1 bg-muted/50 rounded-full p-1 mb-3">
             {TABS.map((tab) => {
               const isActive = activeTab === tab.id;
@@ -148,12 +145,10 @@ export function FeedRightSidebar() {
             })}
           </div>
 
-          {/* Subtitle */}
           <div className="flex items-center justify-between px-1 mb-1">
             <p className="text-xs text-muted-foreground">{TAB_SUBTITLE[activeTab]}</p>
           </div>
 
-          {/* Content list */}
           <div className="divide-y divide-border/40">
             {activeTab === 'people' &&
               (visibleUsers.length > 0 ? (
@@ -194,7 +189,6 @@ export function FeedRightSidebar() {
             )}
           </div>
 
-          {/* See more */}
           {activeTab === 'people' && visibleUsers.length > 5 && (
             <button className="w-full flex items-center justify-center gap-1 text-xs font-medium text-primary hover:underline mt-3 py-2">
               See more <ArrowRight className="h-3 w-3" />

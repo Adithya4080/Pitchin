@@ -15,6 +15,7 @@ import { OnboardingTutorial } from './OnboardingTutorial';
 import { useAuth } from '@/hooks/useAuth';
 import { useUnreadCount } from '@/hooks/useNotifications';
 import { useUserActivePitch } from '@/hooks/usePitches';
+import { getMediaUrl } from '@/lib/media';
 
 
 export function Header() {
@@ -46,8 +47,8 @@ export function Header() {
     staleTime: 0,
   });
 
-  const displayName = profile?.user_full_name || user?.full_name || user?.email || '?';
-  const avatarUrl = profile?.avatar_url || user?.avatar_url;
+  const displayName = profile?.full_name || user?.full_name || user?.email || '?';
+  const avatarUrl = profile?.avatar || user?.avatar_url;
   const initials = displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
   const handleSignOut = async () => {
     await signOut();
@@ -140,7 +141,7 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full bg-card backdrop-blur supports-[backdrop-filter]:bg-card/95 hidden md:block">
+      <header className="fixed top-0 z-50 w-full bg-card backdrop-blur supports-[backdrop-filter]:bg-card/95 hidden md:block">
         <div className="container h-16">
           <div className="flex h-full items-center gap-6">
             {/* Left column — mirrors FeedLeftSidebar (lg+) */}
@@ -149,7 +150,7 @@ export function Header() {
                 {isFeedPage ? (
                   <span className="font-display font-bold text-2xl tracking-tight text-sky-400">Pitchin</span>
                 ) : (
-                  <img src={pitchinLogo} alt="PitchIn" className="h-12" />
+                  <img src={getMediaUrl("https://fymxcszzdpennpmgnstb.supabase.co/storage/v1/object/public/post-images/platform-official-image/logo-full.png")} alt="PitchIn" width="120" height="48" />
                 )}
               </Link>
             </div>
@@ -159,7 +160,7 @@ export function Header() {
               {isFeedPage ? (
                 <span className="font-display font-bold text-2xl tracking-tight text-sky-400">Pitchin</span>
               ) : (
-                <img src={pitchinLogo} alt="PitchIn" className="h-12" />
+                <img src={getMediaUrl(pitchinLogo)} alt="PitchIn" className="h-12" />
               )}
             </Link>
 

@@ -27,3 +27,7 @@ export async function getFeaturedNews(): Promise<NewsArticle[]> {
 export async function getNewsArticle(id: number): Promise<NewsArticle> {
   return apiFetch<NewsArticle>(`/news/${id}/`);
 }
+
+export async function getLiveNews() {
+  return apiFetch('/news/live/');
+}
