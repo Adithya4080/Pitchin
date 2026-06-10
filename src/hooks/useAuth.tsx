@@ -37,7 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsOnboardingChecked(true);
       return;
     }
-    const onboarded = Boolean(u.role && u.is_profile_complete);
+    const onboarded = Boolean(u.role);
     setIsOnboarded(onboarded);
     setIsOnboardingChecked(true);
   }, []);
