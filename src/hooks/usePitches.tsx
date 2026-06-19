@@ -34,7 +34,11 @@ function adaptPost(p: Post): PitchWithProfile {
       avatar_url: raw.author_avatar ?? null,
     },
     user_has_saved: false,
-    user_reaction: null,
+    // Map backend's liked_by_me / user_has_liked → user_reaction
+    // Backend returns liked_by_me (old) or user_has_liked (new serializer)
+    user_reaction: (raw.liked_by_me || raw.user_has_liked) ? 'fire' : null,
+    // Use real like_count from backend
+    like_count: raw.like_count ?? 0,
   } as any;
 }
 
@@ -124,9 +128,15 @@ export function useDeletePitch() {
 
 export function useReactToPitch() {
   const qc = useQueryClient();
+  const { toast } = useToast();
   return useMutation({
-    mutationFn: ({ pitchId, reactionType }: { pitchId: number | string; reactionType: string; currentReaction: string | null   }) => likePost(Number(pitchId)),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['pitches'] }),
+    mutationFn: ({ pitchId }: { pitchId: number | string; reactionType: string; currentReaction: string | null }) =>
+      likePost(Number(pitchId)),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['pitches'] });
+    },
+    onError: (e: Error) =>
+      toast({ title: 'Failed to react', description: e.message, variant: 'destructive' }),
   });
 }
 

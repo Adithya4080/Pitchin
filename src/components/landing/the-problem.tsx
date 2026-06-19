@@ -8,7 +8,7 @@ export default function TheProblem() {
   return (
     <section
       id="problem"
-      className="relative w-full overflow-hidden bg-background"
+      className="relative w-full overflow-hidden bg-white"
     >
       <div className="mx-auto max-w-7xl px-6 py-20 sm:px-8 md:px-12 md:py-24 lg:px-16 lg:py-28">
 

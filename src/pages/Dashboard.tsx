@@ -731,7 +731,7 @@ export default function Dashboard() {
                 />
               )} */}
 
-              {activePitch && (
+              {/* {activePitch && (
                 <ActivePitchCard
                   pitch={{
                     id: String(activePitch.id),
@@ -745,7 +745,7 @@ export default function Dashboard() {
                   isDeleting={isDeleting}
                   onDelete={handleDeletePitch}
                 />
-              )}
+              )} */}
 
               {/* Introduction Video Section - All roles */}
               <div className="relative">

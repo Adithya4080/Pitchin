@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Flame, Send, Trash2, MoreHorizontal, Share2, Repeat2, ExternalLink, Link2, Megaphone } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Flame, Send, Trash2, MoreHorizontal, Share2, Repeat2, ExternalLink, Link2, Megaphone, MessageCircle, ThumbsUp, } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useComments, useAddComment } from '@/hooks/useComments';
 import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
@@ -222,10 +223,16 @@ export function PitchCard({ pitch, hideBorder = false }: PitchCardProps) {
   const displayText = shouldTruncate
     ? (pitch.pitch_statement ?? '').slice(0, 200) + '…'
     : (pitch.pitch_statement ?? '');
+  
+  // Comment functionality
+  const [showComments, setShowComments] = useState(false);
+  const [commentText, setCommentText] = useState('');
+  const { data: comments = [] } = useComments(pitch.id);
+  const addComment = useAddComment(pitch.id);
 
   return (
     <>
-      <motion.div
+<motion.div
         initial={{ opacity: 0, y: 5 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2 }}
@@ -302,13 +309,6 @@ export function PitchCard({ pitch, hideBorder = false }: PitchCardProps) {
           </DropdownMenu>
         </div>
 
-        {/* ── Post Title ───────────────────────────────────────── */}
-        {postTitle && (
-          <h3 className="text-base font-bold text-foreground mb-2 leading-snug">
-            {postTitle}
-          </h3>
-        )}
-
         {/* ── Description ──────────────────────────────────────── */}
         <div className="mb-3">
           <p className="text-foreground text-[15px] leading-relaxed whitespace-pre-wrap">
@@ -358,51 +358,37 @@ export function PitchCard({ pitch, hideBorder = false }: PitchCardProps) {
           </div>
         )}
 
-        {/* ── Engagement Stats ──────────────────────────────────── */}
-        <div className="flex items-center justify-between text-sm text-muted-foreground py-2 border-b border-border/50">
-          <div className="flex items-center gap-4">
-            {(reactionCounts?.fire || 0) > 0 && (
-              <div className="flex items-center gap-1">
-                <Flame className={cn("h-4 w-4", pitch.user_reaction === 'fire' ? "text-orange-500" : "text-muted-foreground")} />
-                <span>{reactionCounts?.fire}</span>
-              </div>
-            )}
-          </div>
-          <div className="flex items-center gap-4">
-            {pitch.save_count > 0 && <span>{pitch.save_count} saves</span>}
-          </div>
-        </div>
-
         {/* ── Action Bar ───────────────────────────────────────── */}
-        <div className="flex items-center justify-between pt-2">
+        <div className="flex items-center justify-between">
           <Button
             variant="ghost"
             size="sm"
             className={cn(
-              "h-10 px-4 gap-2 text-muted-foreground hover:bg-muted/50 rounded-lg",
-              pitch.user_reaction === 'fire' && "text-orange-500"
+              "h-10 px-4 gap-2 text-muted-foreground  rounded-lg",
+              pitch.user_reaction === 'fire' && "text-blue-500"
             )}
             onClick={() => handleReaction('fire')}
             disabled={!user || isOwner}
           >
-            <Flame className={cn("h-5 w-5", pitch.user_reaction === 'fire' && "fill-current")} />
+            <ThumbsUp className={cn("h-5 w-5", pitch.user_reaction === 'fire' && "fill-current")} />
             <span className="text-sm">{(reactionCounts?.fire || 0) > 0 ? reactionCounts?.fire : ''}</span>
           </Button>
 
           <Button
             variant="ghost"
             size="sm"
-            className="h-10 px-4 gap-2 text-muted-foreground hover:bg-muted/50 rounded-lg"
-            disabled
+            className="h-10 px-4 gap-2 text-muted-foreground  rounded-lg"
+            onClick={() => setShowComments((s) => !s)}
           >
-            <Repeat2 className="h-5 w-5" />
+            <MessageCircle className="h-5 w-5" />
+            <span className="text-sm">{pitch.comment_count > 0 ? pitch.comment_count : ''}</span>
           </Button>
 
           {!isOwner && !hasPendingOrApproved ? (
             <Button
               variant="ghost"
               size="sm"
-              className="h-10 px-4 gap-2 text-muted-foreground hover:bg-muted/50 rounded-lg"
+              className="h-10 px-4 gap-2 text-muted-foreground  rounded-lg"
               onClick={() => setShowInterestDialog(true)}
               disabled={!user}
             >
@@ -421,11 +407,40 @@ export function PitchCard({ pitch, hideBorder = false }: PitchCardProps) {
           <Button
             variant="ghost"
             size="sm"
-            className="h-10 px-4 gap-2 text-muted-foreground hover:bg-muted/50 rounded-lg"
+            className="h-10 px-4 gap-2 text-muted-foreground  rounded-lg"
           >
             <Share2 className="h-5 w-5" />
           </Button>
         </div>
+
+        {/* ── Comments ─────────────────────────────────────────── */}
+        {showComments && (
+          <div className="mt-3 space-y-2 border-t pt-3">
+            {comments.map((c: any) => (
+              <div key={c.id} className="text-sm">
+                <span className="font-medium">{c.author_name}</span>{' '}
+                <span className="text-muted-foreground">{c.content}</span>
+              </div>
+            ))}
+            <div className="flex gap-2">
+              <input
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                placeholder="Write a comment..."
+                className="flex-1 text-sm border rounded-md px-3 py-1.5"
+              />
+              <button
+                onClick={() => {
+                  if (!commentText.trim()) return;
+                  addComment.mutate(commentText, { onSuccess: () => setCommentText('') });
+                }}
+                className="text-sm font-medium text-primary"
+              >
+                Post
+              </button>
+            </div>
+          </div>
+        )}
       </motion.div>
 
       {/* Interest Dialog */}
