@@ -75,12 +75,15 @@ export function ProfileHeader({
   const unfollow = useUnfollow();
 
   // Check if profile can be shared (only innovator and startup)
-  const canShare = isOwnProfile && (userRole?.role === 'innovator' || userRole?.role === 'startup');
+  // Use user.role directly from auth context to avoid waiting for async useUserRole query
+  const effectiveRole = (user as any)?.role || userRole?.role;
+  const canShare = isOwnProfile && (effectiveRole === 'innovator' || effectiveRole === 'startup');
   
   // Profile sharing hook - always pass userId when isOwnProfile to avoid race condition
   const { 
-    copyToClipboard, 
-    regenerateToken, 
+    copyToClipboard,
+    regenerateToken,
+    generateLink,
     hasShareLink,
     isLoading: shareLoading,
     isRegenerating 
@@ -277,7 +280,7 @@ export function ProfileHeader({
                   if (hasShareLink) {
                     copyToClipboard();
                   } else {
-                    regenerateToken();
+                    generateLink();
                   }
                 }}
                 title={shareLoading ? "Loading..." : hasShareLink ? "Copy share link" : "Generate share link"}
