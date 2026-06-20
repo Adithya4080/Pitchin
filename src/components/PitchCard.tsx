@@ -284,11 +284,11 @@ export function PitchCard({ pitch, hideBorder = false }: PitchCardProps) {
 
           {/* Menu */}
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            {/* <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-transparent">
                 <MoreHorizontal className="h-5 w-5" />
               </Button>
-            </DropdownMenuTrigger>
+            </DropdownMenuTrigger> */}
             <DropdownMenuContent align="end">
               {isOwner && (
                 <DropdownMenuItem
