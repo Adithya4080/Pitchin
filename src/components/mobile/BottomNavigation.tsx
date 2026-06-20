@@ -71,7 +71,7 @@ export function BottomNavigation() {
   return (
     <>
       <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-card backdrop-blur-lg border-t border-border safe-area-bottom w-full max-w-full">
-        <div className="flex items-center justify-around h-10 px-1 w-full max-w-full">
+        <div className="flex items-center justify-around h-16 px-1 w-full max-w-full">
           {/* First two nav items */}
           {navItems.slice(0, 2).map((item) => {
             const isActive = location.pathname === item.path;
