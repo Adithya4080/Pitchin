@@ -1932,7 +1932,7 @@ export default function Dashboard() {
         <div className="flex gap-6 max-w-6xl mx-auto">
           {/* Main Content */}
           <div className="flex-1 min-w-0 max-w-3xl space-y-3">
-            <PaywallGate>
+            {/* <PaywallGate> */}
 
           {/* Edit Mode Indicator */}
           {isEditing && (
@@ -2531,7 +2531,7 @@ export default function Dashboard() {
               </div>
             </>
           )}
-          </PaywallGate>
+          {/* </PaywallGate> */}
           </div>
 
           {/* Right Sidebar - Desktop only */}
