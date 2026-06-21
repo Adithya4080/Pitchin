@@ -88,14 +88,12 @@ function DesktopLanding() {
             <div className="absolute bottom-[10%] right-[10%] h-96 w-96 rounded-full bg-accent/10 blur-3xl" />
           </div>
 
-          <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between px-6 sm:px-10 lg:px-16 xl:px-24 py-10 lg:py-16">
-
+          <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between px-6 sm:px-10 lg:px-16 xl:px-24 py-10 lg:py-16 bg-white relative overflow-visible">
             {/* Left Content */}
-            <div className="relative z-10 flex w-full max-w-[620px] flex-col justify-center py-8 lg:py-0">
-
+            <div className="relative z-10 flex w-full max-w-[620px] flex-col justify-center py-8 lg:py-">
               {/* Heading */}
               <div className="mb-8">
-                <h1 className="font-display text-4xl font-medium leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl xl:text-6xl">
+                <h1 className="font-display mt-10 text-[32px] xs:text-[36px] sm:text-[54px] leading-[1.05] sm:leading-[0.95] font-medium tracking-tight text-foreground">
                   <div className="overflow-hidden">
                     <span className="typing-animation typing-animation-1 block">
                       A Smarter
@@ -200,16 +198,14 @@ function DesktopLanding() {
       </section>
 
       {/* Features */}
-      <Features />
-
-      {/* Who We Are */}
-      <WhoWeAre />
+      {/* <Features /> */}
+      {/* <WhoWeAre /> */}
 
       {/* The Problem */}
       <TheProblem />
 
       {/* The Solution */}
-      <TheSolution />
+      {/* <TheSolution /> */}
       {/* Footer */}
       <SiteFooter />
     </div>

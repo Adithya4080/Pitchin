@@ -7,7 +7,12 @@ export function useSendInterest() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (params: { receiverId: number; subject: string; message: string; tag?: string }) =>
-      sendInterest({ receiver: params.receiverId, subject: params.subject, message: params.message, tag: params.tag }),
+      sendInterest({
+        receiver_id: params.receiverId,  // ← was "receiver", backend needs "receiver_id"
+        subject: params.subject,
+        message: params.message,
+        tag: params.tag,
+      }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['interests-sent'] });
       toast({ title: 'Interest sent!', description: 'The user will receive your request.' });

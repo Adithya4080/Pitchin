@@ -33,17 +33,24 @@ export default function Feed() {
       {/* Desktop view */}
       <div className="hidden md:block">
         <AppLayout showBottomNav={true}>
-            <div className="container py-4 md:py-6">
-              <div className="flex gap-6 items-start relative">
-              <div className="hidden lg:block">
+          <div className="container py-4 md:py-6">
+            <div className="flex gap-6 items-start">
+
+              {/* Left sidebar — sticky */}
+              <div className="hidden lg:block sticky top-[88px] self-start">
                 <FeedLeftSidebar />
               </div>
+
+              {/* Center feed — scrolls normally */}
               <div className="flex-1 min-w-0">
                 <PitchFeed />
               </div>
-              <div className="hidden xl:block">
+
+              {/* Right sidebar — sticky */}
+              <div className="hidden xl:block sticky top-[88px] self-start">
                 <FeedRightSidebar />
               </div>
+
             </div>
           </div>
         </AppLayout>

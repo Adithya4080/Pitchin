@@ -12,12 +12,20 @@ export type SuggestedProfile = {
 
 export function useSuggestedProfiles() {
   const { user } = useAuth();
-  return useQuery({
+  return useQuery<SuggestedProfile[]>({
     queryKey: ['suggested-profiles', user?.id],
     queryFn: async () => {
       const profiles = await getPublicProfiles();
-      // Exclude current user
-      return profiles.filter((p) => p.user !== user?.id).slice(0, 10);
+      return profiles
+        .filter((p) => p.id !== user?.id) // exclude current user by profile id
+        .slice(0, 10)
+        .map((p) => ({
+          id: p.id,
+          full_name: p.full_name ?? p.user_name ?? null,
+          avatar_url: p.avatar_url ?? p.avatar ?? null,
+          role: p.role ?? null,
+          bio: p.bio ?? null,
+        }));
     },
     enabled: !!user,
   });
