@@ -57,26 +57,16 @@ export default function Network() {
                     </Button>
                   </div>
                 </div>
-
-                <ImagePlaceholder label="Ecosystem illustration" aspect="aspect-[4/3] md:aspect-square" />
+                <div className="aspect-[4/3] md:aspect-square overflow-hidden rounded-3xl border border-border/50 bg-white shadow-sm">
+                  <img
+                    src="https://fymxcszzdpennpmgnstb.supabase.co/storage/v1/object/public/post-images/platform-official-image/pitch-connect-image.png"
+                    alt="PitchIn Ecosystem"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               </div>
             </Card>
           </section>
-
-          {/* JOURNEY */}
-          <section>
-            <SectionHeader title="Your Startup Journey" subtitle="Pick where you are — we'll show what matters next." />
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
-              {journeyStages.map((s) => (
-                <Card key={s.id} className="bg-white border-foreground/10 p-4 h-full flex flex-col">
-                  <p className="text-[10px] uppercase tracking-wide text-foreground/50">{s.stageLabel}</p>
-                  <h3 className="text-base font-semibold text-foreground mt-0.5">{s.title}</h3>
-                  <p className="text-xs text-foreground/60 mt-1 flex-1">{s.description}</p>
-                </Card>
-              ))}
-            </div>
-          </section>
-
           {/* SERVICES MARKETPLACE — live data */}
           <section>
             <SectionHeader

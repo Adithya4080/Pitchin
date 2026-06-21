@@ -1,8 +1,9 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Bell, Zap } from 'lucide-react';
+import { Bell, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useUnreadCount } from '@/hooks/useNotifications';
+import { MobileSidebar } from './MobileSidebar';
 
 interface MobileHeaderProps {
   title?: string;
@@ -15,12 +16,61 @@ export function MobileHeader({ title, showNotifications = true }: MobileHeaderPr
   const { data: unreadCount = 0 } = useUnreadCount();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-card backdrop-blur supports-[backdrop-filter]:bg-card/95 md:hidden">
-      <div className="flex h-14 items-center justify-between px-4">
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-1.5">
-          <span className="font-display font-bold text-xl tracking-tight text-sky-400">Pitchin</span>
-        </Link>
+    <header
+      className="
+        sticky
+        top-0
+        z-50
+        w-full
+        border-b
+        bg-background/95
+        backdrop-blur-md
+        supports-[backdrop-filter]:bg-background/80
+        md:hidden
+      ">
+       <div className="
+            flex
+            h-16
+            items-center
+            justify-between
+            px-4
+            max-w-screen-xl
+            mx-auto
+          "
+        >
+        {/* Menu + Logo */}
+        <div className="flex items-center gap-1.5">
+          <MobileSidebar
+            trigger={
+              <Button
+                variant="ghost"
+                size="icon"
+                className="
+                  h-10
+                  w-10
+                  rounded-xl
+                  hover:bg-muted
+                  transition-colors
+                "
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+            }
+          />
+          <Link to="/" className="flex items-center gap-2">
+            <span
+              className="
+                font-display
+                text-xl
+                font-semibold
+                tracking-tight
+                text-sky-400
+              "
+            >
+              PitchIn
+            </span>
+          </Link>
+        </div>
 
         {/* Title (optional) */}
         {title && (
