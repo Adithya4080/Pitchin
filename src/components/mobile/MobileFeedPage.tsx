@@ -12,6 +12,7 @@ import { usePitches } from '@/hooks/usePitches';
 import { useSuggestedProfiles } from '@/hooks/useSuggestedProfiles';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
+import { MobileSidebar } from '@/components/mobile/MobileSidebar';
 import { cn } from '@/lib/utils';
 
 const FEED_TABS = [
@@ -69,19 +70,19 @@ export function MobileFeedPage() {
       {/* App Bar */}
       <div className="sticky top-0 z-40 bg-card backdrop-blur-md border-b border-border/50">
         <div className="flex items-center justify-between px-4 py-3">
-          {/* Left - Profile Picture */}
-          {/* <button
-            onClick={() => user ? navigate('/dashboard') : navigate('/auth')}
-            className="touch-manipulation"
-            >
-            <Avatar className="h-8 w-8 ring-2 ring-primary/20">
-              <AvatarImage src={profile?.avatar ?? user?.avatar_url} />
-              <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-          </button> */}
-
+          {/* Left - Avatar opens Sidebar */}
+          <MobileSidebar
+            trigger={
+              <button className="touch-manipulation flex-shrink-0">
+                <Avatar className="h-8 w-8 ring-2 ring-primary/20">
+                  <AvatarImage src={profile?.avatar ?? user?.avatar_url} />
+                  <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+              </button>
+            }
+          />
           {/* Center - Logo */}
           <span className="font-display font-bold text-xl tracking-tight text-sky-400">Pitchin</span>
 
