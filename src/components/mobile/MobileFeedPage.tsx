@@ -7,7 +7,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PitchCard } from '@/components/PitchCard';
 import { CreatePitchModal } from '@/components/CreatePitchModal';
-import { OnboardingTutorial } from '@/components/OnboardingTutorial';
 import { SuggestedProfilesCard } from '@/components/mobile/SuggestedProfilesCard';
 import { usePitches } from '@/hooks/usePitches';
 import { useSuggestedProfiles } from '@/hooks/useSuggestedProfiles';
@@ -224,14 +223,6 @@ export function MobileFeedPage() {
         open={showCreateModal} 
         onOpenChange={setShowCreateModal} 
       />
-
-      {/* Tutorial Overlay */}
-      {showTutorial && (
-        <OnboardingTutorial 
-          onComplete={() => setShowTutorial(false)} 
-          isOverlay 
-        />
-      )}
     </div>
   );
 }

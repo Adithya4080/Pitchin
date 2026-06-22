@@ -11,7 +11,6 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Input } from '@/components/ui/input';
 import { NotificationList } from './NotificationList';
 import { CreatePitchModal } from './CreatePitchModal';
-import { OnboardingTutorial } from './OnboardingTutorial';
 import { useAuth } from '@/hooks/useAuth';
 import { useUnreadCount } from '@/hooks/useNotifications';
 import { useUserActivePitch } from '@/hooks/usePitches';
@@ -214,12 +213,6 @@ export function Header() {
       <CreatePitchModal open={showCreateModal} onOpenChange={setShowCreateModal} />
       
       {/* Tutorial Overlay */}
-      {showTutorial && (
-        <OnboardingTutorial 
-          onComplete={() => setShowTutorial(false)} 
-          isOverlay 
-        />
-      )}
     </>
   );
 }

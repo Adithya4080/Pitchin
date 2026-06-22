@@ -6,7 +6,6 @@ import { Header } from '@/components/Header';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { MobileLandingPage } from '@/components/mobile';
-import { OnboardingTutorial } from '@/components/OnboardingTutorial';
 import WhoWeAre from '@/components/landing/who-we-are';
 import TheProblem from '@/components/landing/the-problem';
 import TheSolution from '@/components/landing/solution';
@@ -51,10 +50,6 @@ export default function Index() {
 
   if (showTutorial === null) {
     return null;
-  }
-
-  if (showTutorial && !user) {
-    return <OnboardingTutorial onComplete={handleTutorialComplete} />;
   }
 
   if (user) {

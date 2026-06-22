@@ -24,7 +24,7 @@ import News from "./pages/News";
 import Messages from "./pages/Messages";
 import ResetPassword from '@/pages/ResetPassword';
 import ContactUs from "./pages/ContactUs";
-import Network from "./pages/Network";
+import Network from "./pages/NetworkServices";
 import NetworkServices from "./pages/NetworkServices";
 import ProviderDetail from "./pages/ProviderDetail";
 
@@ -60,6 +60,7 @@ const App = () => (
             <Route path="/network" element={<Network />} />
             <Route path="/network/services" element={<NetworkServices />} />
             <Route path="/network/provider/:slug" element={<ProviderDetail />} />
+            <Route path="/network/provider/:slug/pitch/:pitchId" element={<PitchDetail />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
