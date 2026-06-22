@@ -51,12 +51,10 @@ export function usePitches(
     queryKey: ['pitches', sortBy, category, user?.id],
     queryFn: async (): Promise<PitchWithProfile[]> => {
       const ordering = sortBy === 'trending' ? '-like_count' : '-created_at';
-      const posts = await getFeed({
-        post_type: category,
-        ordering,
-      });
+      const posts = await getFeed({ post_type: category, ordering });
       return posts.map(adaptPost);
     },
+    enabled: !!user,   // ← ADD THIS
   });
 }
 
