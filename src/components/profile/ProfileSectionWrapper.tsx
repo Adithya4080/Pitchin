@@ -79,7 +79,7 @@ export function ProfileSectionWrapper({
     }
 
     return (
-      <Card className="border-2 border-dashed border-border/50 bg-muted/5">
+      <Card className="border-border/50 shadow-sm">
         <CardContent className="py-8 text-center">
           <h3 className="text-sm font-bold text-foreground mb-1.5">
             {title}

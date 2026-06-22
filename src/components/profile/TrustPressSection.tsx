@@ -47,7 +47,7 @@ export function TrustPressSection({ trustPress, isOwner = false, isMobile = fals
 
   if (isEmpty && isOwner) {
     return (
-      <Card className="border-2 border-dashed border-border/50 bg-muted/5">
+      <Card className="border-border/50 shadow-sm">
         <CardContent className="py-8 text-center">
           <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 mb-3">
             <ShieldCheck className="h-5 w-5 text-primary" />
