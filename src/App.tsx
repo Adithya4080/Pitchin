@@ -24,11 +24,20 @@ import News from "./pages/News";
 import Messages from "./pages/Messages";
 import ResetPassword from '@/pages/ResetPassword';
 import ContactUs from "./pages/ContactUs";
-import Network from "./pages/NetworkServices";
+import Network from "./pages/network";
 import NetworkServices from "./pages/NetworkServices";
 import ProviderDetail from "./pages/ProviderDetail";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,    
+      refetchOnWindowFocus: false,  
+      refetchOnMount: false,        
+      retry: 1,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
