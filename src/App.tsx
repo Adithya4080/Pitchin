@@ -25,7 +25,7 @@ import Messages from "./pages/Messages";
 import ResetPassword from '@/pages/ResetPassword';
 import ContactUs from "./pages/ContactUs";
 import Network from "./pages/network";
-import NetworkServices from "./pages/NetworkServices";
+// import NetworkServices from "./pages/NetworkServices";
 import ServiceCategoryPage from "./pages/ServiceCategoryPage";
 import ProviderDetail from "./pages/ProviderDetail";
 
@@ -68,7 +68,7 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/contact" element={<ContactUs />} />
             <Route path="/network" element={<Network />} />
-            <Route path="/network/services" element={<NetworkServices />} />
+            {/* <Route path="/network/services" element={<NetworkServices />} /> */}
             <Route path="/network/services/:slug" element={<ServiceCategoryPage />} />
             <Route path="/network/provider/:slug" element={<ProviderDetail />} />
             <Route path="/network/provider/:slug/pitch/:pitchId" element={<PitchDetail />} />
