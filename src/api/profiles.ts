@@ -565,3 +565,44 @@ export async function updateMyProfile(
     body: formData,
   });
 }
+// ─── Networking & Opportunities ────────────────────────────────────────────────
+
+export type NetworkTab = 'investor' | 'mentor' | 'partner' | 'accelerator' | 'community';
+
+export interface NetworkProfile {
+  id: number;
+  user_id: number;
+  name: string;
+  role: string;
+  role_label: string;
+  org_name: string;
+  avatar: string | null;
+  bio: string;
+  tags: string[];
+  is_verified: boolean;
+  location: string;
+  website: string;
+}
+
+export interface NetworkDiscoverResponse {
+  results: NetworkProfile[];
+  count: number;
+  num_pages: number;
+  page: number;
+}
+
+export async function getNetworkDiscover(params: {
+  tab?: NetworkTab;
+  search?: string;
+  stage?: string;
+  page?: number;
+  page_size?: number;
+}): Promise<NetworkDiscoverResponse> {
+  const q = new URLSearchParams();
+  if (params.tab) q.set('tab', params.tab);
+  if (params.search) q.set('search', params.search);
+  if (params.stage) q.set('stage', params.stage);
+  if (params.page) q.set('page', String(params.page));
+  if (params.page_size) q.set('page_size', String(params.page_size));
+  return apiFetch(`/profiles/network/discover/?${q.toString()}`);
+}
