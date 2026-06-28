@@ -609,70 +609,70 @@ function QuickActionsPanel() {
 }
 
 // ─── Recommended panel ─────────────────────────────────────────────────────────
-const LOGO_COLORS = ['#111827','#F97316','#0891B2','#7C3AED','#D97706'];
+// const LOGO_COLORS = ['#111827','#F97316','#0891B2','#7C3AED','#D97706'];
 
-function RecommendedPanel() {
-  const { data: providers = [], isLoading } = useServiceProviders({ sort: 'top_rated' } as any);
-  const top = providers.slice(0, 5);
+// function RecommendedPanel() {
+//   const { data: providers = [], isLoading } = useServiceProviders({ sort: 'top_rated' } as any);
+//   const top = providers.slice(0, 5);
 
-  return (
-    <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
-      <div className="px-4 pt-4 pb-2 border-b border-gray-50 flex items-center justify-between">
-        <div>
-          <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-gray-300">Top Rated</p>
-          <p className="text-[13px] font-bold text-gray-800 mt-0.5">Recommended</p>
-        </div>
-        <div className="h-7 w-7 rounded-lg bg-amber-50 flex items-center justify-center">
-          <Zap className="h-3.5 w-3.5 text-amber-400" strokeWidth={2} />
-        </div>
-      </div>
-      <div className="p-3 space-y-2">
-        {isLoading
-          ? Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="flex items-center gap-2.5 p-2 animate-pulse">
-                <div className="h-9 w-9 rounded-xl bg-gray-100 shrink-0" />
-                <div className="flex-1 space-y-1.5">
-                  <div className="h-3 w-24 bg-gray-100 rounded" />
-                  <div className="h-2.5 w-16 bg-gray-50 rounded" />
-                </div>
-              </div>
-            ))
-          : top.map((p, i) => {
-              const initials = p.name.split(' ').slice(0, 2).map((w: string) => w[0]?.toUpperCase()).join('');
-              return (
-                <Link key={p.id} to={`/network/services/${p.category_slug}`}
-                  className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-gray-50 transition-colors group"
-                >
-                  {p.logo_url
-                    ? <img src={p.logo_url} alt={p.name} className="h-9 w-9 rounded-xl object-cover shrink-0 border border-gray-100" />
-                    : <div className="h-9 w-9 rounded-xl flex items-center justify-center text-white text-[11px] font-bold shrink-0"
-                        style={{ background: LOGO_COLORS[i % LOGO_COLORS.length] }}>
-                        {initials}
-                      </div>
-                  }
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[12px] font-bold text-gray-800 truncate group-hover:text-gray-900">{p.name}</p>
-                    <div className="flex items-center gap-1 mt-0.5">
-                      <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                      <span className="text-[11px] font-semibold text-gray-600">{p.rating}</span>
-                      <span className="text-[11px] text-gray-300">({p.review_count})</span>
-                    </div>
-                  </div>
-                  <Bookmark className="h-3.5 w-3.5 text-gray-200 group-hover:text-gray-400 transition-colors" />
-                </Link>
-              );
-            })}
-      </div>
-      <div className="px-4 pb-3">
-        <Link to="/network/services?view=all"
-          className="flex items-center gap-1.5 text-[12px] font-bold text-gray-900 hover:text-gray-600 transition-colors"
-        >
-          See all providers <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
-      </div>
-    </div>
-  );
-}
+//   return (
+//     <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+//       <div className="px-4 pt-4 pb-2 border-b border-gray-50 flex items-center justify-between">
+//         <div>
+//           <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-gray-300">Top Rated</p>
+//           <p className="text-[13px] font-bold text-gray-800 mt-0.5">Recommended</p>
+//         </div>
+//         <div className="h-7 w-7 rounded-lg bg-amber-50 flex items-center justify-center">
+//           <Zap className="h-3.5 w-3.5 text-amber-400" strokeWidth={2} />
+//         </div>
+//       </div>
+//       <div className="p-3 space-y-2">
+//         {isLoading
+//           ? Array.from({ length: 4 }).map((_, i) => (
+//               <div key={i} className="flex items-center gap-2.5 p-2 animate-pulse">
+//                 <div className="h-9 w-9 rounded-xl bg-gray-100 shrink-0" />
+//                 <div className="flex-1 space-y-1.5">
+//                   <div className="h-3 w-24 bg-gray-100 rounded" />
+//                   <div className="h-2.5 w-16 bg-gray-50 rounded" />
+//                 </div>
+//               </div>
+//             ))
+//           : top.map((p, i) => {
+//               const initials = p.name.split(' ').slice(0, 2).map((w: string) => w[0]?.toUpperCase()).join('');
+//               return (
+//                 <Link key={p.id} to={`/network/services/${p.category_slug}`}
+//                   className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-gray-50 transition-colors group"
+//                 >
+//                   {p.logo_url
+//                     ? <img src={p.logo_url} alt={p.name} className="h-9 w-9 rounded-xl object-cover shrink-0 border border-gray-100" />
+//                     : <div className="h-9 w-9 rounded-xl flex items-center justify-center text-white text-[11px] font-bold shrink-0"
+//                         style={{ background: LOGO_COLORS[i % LOGO_COLORS.length] }}>
+//                         {initials}
+//                       </div>
+//                   }
+//                   <div className="flex-1 min-w-0">
+//                     <p className="text-[12px] font-bold text-gray-800 truncate group-hover:text-gray-900">{p.name}</p>
+//                     <div className="flex items-center gap-1 mt-0.5">
+//                       <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+//                       <span className="text-[11px] font-semibold text-gray-600">{p.rating}</span>
+//                       <span className="text-[11px] text-gray-300">({p.review_count})</span>
+//                     </div>
+//                   </div>
+//                   <Bookmark className="h-3.5 w-3.5 text-gray-200 group-hover:text-gray-400 transition-colors" />
+//                 </Link>
+//               );
+//             })}
+//       </div>
+//       <div className="px-4 pb-3">
+//         <Link to="/network/services?view=all"
+//           className="flex items-center gap-1.5 text-[12px] font-bold text-gray-900 hover:text-gray-600 transition-colors"
+//         >
+//           See all providers <ArrowRight className="h-3.5 w-3.5" />
+//         </Link>
+//       </div>
+//     </div>
+//   );
+// }
 
 // ─── Activity feed widget ──────────────────────────────────────────────────────
 const ACTIVITY = [
@@ -682,27 +682,27 @@ const ACTIVITY = [
   { text: '3 new Design providers listed', time: '2h ago' },
 ];
 
-function LiveActivityPanel() {
-  return (
-    <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
-      <div className="px-4 pt-4 pb-2 border-b border-gray-50 flex items-center gap-2">
-        <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-        <p className="text-[12px] font-bold text-gray-700">Live Activity</p>
-      </div>
-      <div className="p-3 space-y-2">
-        {ACTIVITY.map((a, i) => (
-          <div key={i} className="flex items-start gap-2.5 px-1 py-1.5">
-            <div className="h-1.5 w-1.5 rounded-full bg-gray-200 mt-1.5 shrink-0" />
-            <div className="flex-1 min-w-0">
-              <p className="text-[11px] text-gray-600 leading-snug">{a.text}</p>
-              <p className="text-[10px] text-gray-300 mt-0.5">{a.time}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+// function LiveActivityPanel() {
+//   return (
+//     <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+//       <div className="px-4 pt-4 pb-2 border-b border-gray-50 flex items-center gap-2">
+//         <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+//         <p className="text-[12px] font-bold text-gray-700">Live Activity</p>
+//       </div>
+//       <div className="p-3 space-y-2">
+//         {ACTIVITY.map((a, i) => (
+//           <div key={i} className="flex items-start gap-2.5 px-1 py-1.5">
+//             <div className="h-1.5 w-1.5 rounded-full bg-gray-200 mt-1.5 shrink-0" />
+//             <div className="flex-1 min-w-0">
+//               <p className="text-[11px] text-gray-600 leading-snug">{a.text}</p>
+//               <p className="text-[10px] text-gray-300 mt-0.5">{a.time}</p>
+//             </div>
+//           </div>
+//         ))}
+//       </div>
+//     </div>
+//   );
+// }
 
 // ─── Provider CTA ─────────────────────────────────────────────────────────────
 function ProviderCTACard() {
@@ -872,8 +872,8 @@ function RightSidebar() {
   return (
     <aside className="w-[240px] shrink-0 hidden xl:flex flex-col gap-3 sticky top-20 self-start">
       <QuickActionsPanel />
-      <RecommendedPanel />
-      <LiveActivityPanel />
+      {/* <RecommendedPanel /> */}
+      {/* <LiveActivityPanel /> */}
       <ProviderCTACard />
     </aside>
   );
