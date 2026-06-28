@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useCallback } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import {
   Star, ShieldCheck, MapPin, Users, Heart, Grid3X3,
@@ -386,10 +386,32 @@ function RightSidebar({
   );
 }
 
-// ─── Provider card (matches screenshot exactly) ───────────────────────────────
+// ─── Provider card — thrust-forward + macOS liquid hover ─────────────────────
 function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProviders>['data'] extends (infer T)[] | undefined ? T : never }) {
   const [saved, setSaved] = useState(false);
   const sendInquiry = useSendServiceInquiry();
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const [glowPos, setGlowPos] = useState({ x: 50, y: 50 });
+  const [hovered, setHovered] = useState(false);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const card = cardRef.current;
+    if (!card) return;
+    const rect = card.getBoundingClientRect();
+    const cx = e.clientX - rect.left;
+    const cy = e.clientY - rect.top;
+    setTilt({
+      x: ((cy / rect.height) - 0.5) * -10,
+      y: ((cx / rect.width) - 0.5) * 10,
+    });
+    setGlowPos({ x: (cx / rect.width) * 100, y: (cy / rect.height) * 100 });
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setTilt({ x: 0, y: 0 });
+    setHovered(false);
+  }, []);
 
   const handleBook = () => {
     sendInquiry.mutate(
@@ -402,115 +424,142 @@ function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProv
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition-shadow">
-      <div className="flex gap-4">
+    <div style={{ perspective: '900px' }}>
+      <div
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={handleMouseLeave}
+        className="relative bg-white rounded-xl overflow-hidden"
+        style={{
+          border: '1px solid #e5e7eb',
+          transform: hovered
+            ? `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateZ(14px) scale(1.015)`
+            : 'rotateX(0deg) rotateY(0deg) translateZ(0px) scale(1)',
+          transition: hovered
+            ? 'transform 0.08s ease-out, box-shadow 0.2s ease-out'
+            : 'transform 0.45s cubic-bezier(0.23,1,0.32,1), box-shadow 0.45s ease-out',
+          boxShadow: hovered
+            ? '0 20px 60px -8px rgba(0,0,0,0.16), 0 8px 20px -4px rgba(0,0,0,0.09), 0 0 0 1px rgba(0,0,0,0.04)'
+            : '0 1px 3px rgba(0,0,0,0.05)',
+          willChange: 'transform',
+        }}
+      >
+        {/* macOS liquid glow */}
+        {hovered && (
+          <div
+            className="absolute inset-0 pointer-events-none rounded-xl z-10"
+            style={{
+              background: `radial-gradient(300px circle at ${glowPos.x}% ${glowPos.y}%, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.05) 50%, transparent 100%)`,
+              mixBlendMode: 'screen',
+            }}
+          />
+        )}
 
-        {/* Logo */}
-        <ProviderLogo name={provider.name} logoUrl={provider.logo_url} />
+        {/* Single grey top border accent */}
+        <div className="h-px w-full bg-gray-200" />
 
-        {/* Middle: name, rating, tags, meta */}
-        <div className="flex-1 min-w-0">
+        <div className="p-5">
+          <div className="flex gap-4">
 
-          {/* Name row */}
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <h3 className="text-[14px] font-semibold text-gray-900 leading-snug">
-              {provider.name}
-            </h3>
-            {provider.is_verified && <VerifiedBadge />}
-            {provider.is_top_rated && (
-              <span className="text-[10px] font-semibold px-2 py-0.5 bg-orange-50 text-orange-500 border border-orange-200 rounded-full ml-1">
-                Top Rated
-              </span>
-            )}
-          </div>
+            {/* Logo */}
+            <ProviderLogo name={provider.name} logoUrl={provider.logo_url} />
 
-          {/* Rating row */}
-          {Number(provider.rating) > 0 && (
-            <div className="flex items-center gap-1.5 mt-1">
-              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-              <span className="text-[12px] font-medium text-gray-700">
-                {provider.rating}
-              </span>
-              <span className="text-[12px] text-gray-400">
-                ({provider.review_count} reviews)
-              </span>
-            </div>
-          )}
+            {/* Middle: name, rating, tags, meta */}
+            <div className="flex-1 min-w-0">
 
-          {/* Tagline */}
-          {provider.tagline && (
-            <p className="text-[12px] text-gray-500 mt-1.5 line-clamp-2">
-              {provider.tagline}
-            </p>
-          )}
+              {/* Name row */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <h3 className="text-[14px] font-semibold text-gray-900 leading-snug">
+                  {provider.name}
+                </h3>
+                {provider.is_verified && <VerifiedBadge />}
+                {provider.is_top_rated && (
+                  <span className="text-[10px] font-semibold px-2 py-0.5 bg-orange-50 text-orange-500 border border-orange-200 rounded-full ml-1">
+                    Top Rated
+                  </span>
+                )}
+              </div>
 
-          {/* Service tags */}
-          {provider.tags?.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-2">
-              {provider.tags.slice(0, 3).map(tag => (
-                <span key={tag}
-                  className="text-[11px] px-2.5 py-[3px] bg-gray-100 text-gray-600 border border-gray-200 rounded-full">
-                  {tag}
-                </span>
-              ))}
-              {provider.tags.length > 3 && (
-                <span className="text-[11px] px-2.5 py-[3px] bg-gray-100 text-gray-500 border border-gray-200 rounded-full">
-                  +{provider.tags.length - 3} more
-                </span>
+              {/* Rating row */}
+              {Number(provider.rating) > 0 && (
+                <div className="flex items-center gap-1.5 mt-1">
+                  <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                  <span className="text-[12px] font-medium text-gray-700">{provider.rating}</span>
+                  <span className="text-[12px] text-gray-400">({provider.review_count} reviews)</span>
+                </div>
               )}
+
+              {/* Tagline */}
+              {provider.tagline && (
+                <p className="text-[12px] text-gray-500 mt-1.5 line-clamp-2">{provider.tagline}</p>
+              )}
+
+              {/* Service tags */}
+              {provider.tags?.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {provider.tags.slice(0, 3).map(tag => (
+                    <span key={tag} className="text-[11px] px-2.5 py-[3px] bg-gray-100 text-gray-600 border border-gray-200 rounded-full">
+                      {tag}
+                    </span>
+                  ))}
+                  {provider.tags.length > 3 && (
+                    <span className="text-[11px] px-2.5 py-[3px] bg-gray-100 text-gray-500 border border-gray-200 rounded-full">
+                      +{provider.tags.length - 3} more
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {/* Meta row */}
+              <div className="flex flex-wrap items-center gap-3 mt-2.5">
+                {provider.stage_focus_label && (
+                  <span className="inline-flex items-center gap-1 text-[11px] text-gray-500">
+                    <Users className="h-3 w-3" />{provider.stage_focus_label}
+                  </span>
+                )}
+                {provider.startups_served > 0 && (
+                  <span className="inline-flex items-center gap-1 text-[11px] text-gray-500">
+                    <Users className="h-3 w-3" />{provider.startups_served}+ Startups Served
+                  </span>
+                )}
+                {provider.location && (
+                  <span className="inline-flex items-center gap-1 text-[11px] text-gray-500">
+                    <MapPin className="h-3 w-3" />{provider.location}
+                  </span>
+                )}
+              </div>
             </div>
-          )}
 
-          {/* Meta row: stage · startups served · location */}
-          <div className="flex flex-wrap items-center gap-3 mt-2.5">
-            {provider.stage_focus_label && (
-              <span className="inline-flex items-center gap-1 text-[11px] text-gray-500">
-                <Users className="h-3 w-3" />
-                {provider.stage_focus_label}
-              </span>
-            )}
-            {provider.startups_served > 0 && (
-              <span className="inline-flex items-center gap-1 text-[11px] text-gray-500">
-                <Users className="h-3 w-3" />
-                {provider.startups_served}+ Startups Served
-              </span>
-            )}
-            {provider.location && (
-              <span className="inline-flex items-center gap-1 text-[11px] text-gray-500">
-                <MapPin className="h-3 w-3" />
-                {provider.location}
-              </span>
-            )}
-          </div>
-        </div>
+            {/* Right: price + save + actions */}
+            <div className="flex flex-col items-end shrink-0 gap-2 min-w-[130px]">
+              <button onClick={() => setSaved(s => !s)}
+                className={`p-1.5 rounded-lg border transition-colors ${saved ? 'border-rose-300 bg-rose-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                <Heart className={`h-4 w-4 ${saved ? 'fill-rose-500 text-rose-500' : 'text-gray-400'}`} />
+              </button>
 
-        {/* Right: price + save + actions */}
-        <div className="flex flex-col items-end shrink-0 gap-2 min-w-[130px]">
-          <button onClick={() => setSaved(s => !s)}
-            className={`p-1.5 rounded-lg border transition-colors ${saved ? 'border-rose-300 bg-rose-50' : 'border-gray-200 hover:border-gray-300'}`}>
-            <Heart className={`h-4 w-4 ${saved ? 'fill-rose-500 text-rose-500' : 'text-gray-400'}`} />
-          </button>
+              {provider.starting_price && (
+                <div className="text-right">
+                  <p className="text-[10px] text-gray-400">Starting from</p>
+                  <p className="text-[15px] font-bold text-gray-900">
+                    ₹{Number(provider.starting_price).toLocaleString('en-IN')}
+                  </p>
+                </div>
+              )}
 
-          {provider.starting_price && (
-            <div className="text-right">
-              <p className="text-[10px] text-gray-400">Starting from</p>
-              <p className="text-[15px] font-bold text-gray-900">
-                ₹{Number(provider.starting_price).toLocaleString('en-IN')}
-              </p>
+              <div className="flex flex-col gap-1.5 w-full mt-auto">
+                <Link to={`/network/provider/${provider.slug}`}
+                  className="w-full text-center bg-blue-600 hover:bg-blue-500 text-white text-[12px] font-medium py-2 rounded-xl transition-colors">
+                  View Profile
+                </Link>
+                <button
+                  onClick={handleBook}
+                  disabled={sendInquiry.isPending}
+                  className="w-full text-center border border-gray-300 hover:bg-gray-50 text-gray-700 text-[12px] font-medium py-2 rounded-xl transition-colors disabled:opacity-60">
+                  Book Consultation
+                </button>
+              </div>
             </div>
-          )}
-
-          <div className="flex flex-col gap-1.5 w-full mt-auto">
-            <Link to={`/network/provider/${provider.slug}`}
-              className="w-full text-center bg-blue-600 hover:bg-blue-500 text-white text-[12px] font-medium py-2 rounded-xl transition-colors">
-              View Profile
-            </Link>
-            <button
-              onClick={handleBook}
-              disabled={sendInquiry.isPending}
-              className="w-full text-center border border-gray-300 hover:bg-gray-50 text-gray-700 text-[12px] font-medium py-2 rounded-xl transition-colors disabled:opacity-60">
-              Book Consultation
-            </button>
           </div>
         </div>
       </div>
@@ -518,7 +567,6 @@ function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProv
   );
 }
 
-// ─── Skeleton card ────────────────────────────────────────────────────────────
 function CardSkeleton() {
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-5 animate-pulse">

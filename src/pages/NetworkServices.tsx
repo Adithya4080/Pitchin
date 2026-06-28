@@ -739,20 +739,34 @@ function ProviderCTACard() {
 
 // ─── Trust strip ──────────────────────────────────────────────────────────────
 const TRUST = [
-  { num: '100%', label: 'Verified Providers', sub: 'Every provider reviewed before going live' },
-  { num: '2 hrs', label: 'Avg Response Time', sub: 'Connect with experts, fast' },
-  { num: 'Free', label: 'To Browse & Connect', sub: 'No hidden fees or paywalls' },
-  { num: 'Daily', label: 'New Opportunities', sub: 'Fresh programs and connections' },
+  {
+    num: '100%', label: 'Verified Providers', sub: 'Every provider reviewed before going live',
+    icon: <svg viewBox="0 0 40 40" className="h-9 w-9" fill="none"><circle cx="20" cy="20" r="18" fill="#EFF6FF"/><path d="M20 10l-8 4v6c0 5 3.5 9 8 10 4.5-1 8-5 8-10v-6l-8-4z" stroke="#2563EB" strokeWidth="1.6" strokeLinejoin="round"/><path d="M15 20l3 3 6-6" stroke="#2563EB" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  },
+  {
+    num: '2 hrs', label: 'Avg Response Time', sub: 'Connect with experts, fast',
+    icon: <svg viewBox="0 0 40 40" className="h-9 w-9" fill="none"><circle cx="20" cy="20" r="18" fill="#F0FDF4"/><circle cx="20" cy="20" r="7" stroke="#16A34A" strokeWidth="1.6"/><path d="M20 16v4l2.5 2.5" stroke="#16A34A" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  },
+  {
+    num: 'Free', label: 'To Browse & Connect', sub: 'No hidden fees or paywalls',
+    icon: <svg viewBox="0 0 40 40" className="h-9 w-9" fill="none"><circle cx="20" cy="20" r="18" fill="#FFF7ED"/><path d="M14 22c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="#F97316" strokeWidth="1.6" strokeLinecap="round"/><path d="M17 26h6M20 16v-2" stroke="#F97316" strokeWidth="1.6" strokeLinecap="round"/><circle cx="20" cy="22" r="2" stroke="#F97316" strokeWidth="1.4"/></svg>,
+  },
+  {
+    num: 'Daily', label: 'New Opportunities', sub: 'Fresh programs and connections',
+    icon: <svg viewBox="0 0 40 40" className="h-9 w-9" fill="none"><circle cx="20" cy="20" r="18" fill="#F5F3FF"/><path d="M13 27l4-8 4 4 3-6" stroke="#7C3AED" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/><circle cx="27" cy="14" r="2" fill="#7C3AED"/></svg>,
+  },
 ];
-
 function TrustStrip() {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6 border-t border-gray-100">
       {TRUST.map(item => (
-        <div key={item.label}>
-          <p className="text-[20px] font-bold text-gray-900 leading-none mb-1">{item.num}</p>
-          <p className="text-[12px] font-semibold text-gray-700 leading-snug">{item.label}</p>
-          <p className="text-[11px] text-gray-400 mt-0.5 leading-snug">{item.sub}</p>
+        <div key={item.label} className="flex flex-col items-start gap-2 bg-white border border-gray-200 rounded-xl p-4 hover:shadow-sm transition-shadow">
+          <div className="shrink-0">{item.icon}</div>
+          <div>
+            <p className="text-[15px] font-bold text-gray-900 leading-none">{item.num}</p>
+            <p className="text-[12px] font-semibold text-gray-700 leading-snug mt-0.5">{item.label}</p>
+            <p className="text-[11px] text-gray-400 mt-1 leading-snug">{item.sub}</p>
+          </div>
         </div>
       ))}
     </div>
