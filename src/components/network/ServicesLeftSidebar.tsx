@@ -285,14 +285,16 @@ function NavItem({ icon: Icon, label, sub, path, active, badge, onClick }: {
   return (
     <Link to={path} onClick={onClick}
       className={cn(
-        'flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-150 group',
-        active ? 'bg-gray-950 text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+        'flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200 group',
+        active
+          ? 'bg-white/90 backdrop-blur-sm text-primary shadow-sm border border-primary/15 ring-1 ring-primary/10'
+          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
       )}
     >
-      <Icon className={cn('h-4 w-4 shrink-0', active ? 'text-white' : 'text-gray-400 group-hover:text-gray-600')} strokeWidth={1.75} />
+      <Icon className={cn('h-4 w-4 shrink-0', active ? 'text-primary' : 'text-gray-400 group-hover:text-gray-600')} strokeWidth={1.75} />
       <div className="flex-1 min-w-0">
-        <p className={cn('text-[12.5px] font-semibold leading-none', active ? 'text-white' : '')}>{label}</p>
-        {sub && <p className={cn('text-[11px] mt-0.5 leading-none', active ? 'text-gray-300' : 'text-gray-400')}>{sub}</p>}
+        <p className={cn('text-[12.5px] font-semibold leading-none', active ? 'text-primary' : '')}>{label}</p>
+        {sub && <p className={cn('text-[11px] mt-0.5 leading-none', active ? 'text-primary/60' : 'text-gray-400')}>{sub}</p>}
       </div>
       {badge != null && badge > 0 && (
         <span className="h-5 min-w-5 px-1.5 rounded-full bg-blue-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0">
@@ -309,12 +311,14 @@ function RailItem({ icon: Icon, label, path, active, badge }: {
   return (
     <Link to={path} title={label}
       className={cn(
-        'relative flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-150 group',
-        active ? 'bg-gray-950' : 'hover:bg-gray-100'
+        'relative flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-200 group',
+        active
+          ? 'bg-white/90 backdrop-blur-sm shadow-sm border border-primary/15 ring-1 ring-primary/10'
+          : 'hover:bg-gray-100'
       )}
     >
-      <Icon className={cn('h-5 w-5 shrink-0', active ? 'text-white' : 'text-gray-400 group-hover:text-gray-700')} strokeWidth={1.75} />
-      <span className={cn('text-[9px] font-bold leading-none text-center', active ? 'text-white' : 'text-gray-400 group-hover:text-gray-600')}>
+      <Icon className={cn('h-5 w-5 shrink-0', active ? 'text-primary' : 'text-gray-400 group-hover:text-gray-700')} strokeWidth={1.75} />
+      <span className={cn('text-[9px] font-bold leading-none text-center', active ? 'text-primary' : 'text-gray-400 group-hover:text-gray-600')}>
         {label.split(' ')[0]}
       </span>
       {badge != null && badge > 0 && (
