@@ -332,7 +332,7 @@ export default function Onboarding() {
       await refreshUser();
       setIsOnboarded(true);
       toast({ title: "You're all set!", description: 'Welcome to PitchIn!' });
-      navigate('/feed');
+      navigate('/network');
     } catch (e: any) {
       toast({ title: 'Setup failed', description: e.message, variant: 'destructive' });
     } finally {

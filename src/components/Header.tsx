@@ -175,8 +175,8 @@ export function Header() {
               </div>
               <nav className="flex items-center gap-1 shrink-0">
                 {[
-                  { to: '/feed', label: 'Home', icon: Home, active: isFeedPage },
-                  { to: '/network', label: 'Network', icon: Users, active: location.pathname === '/network' },
+                  { to: '/network', label: 'Home', icon: Users, active: location.pathname === '/network' },
+                  { to: '/feed', label: 'Feed', icon: Home, active: isFeedPage },
                   { to: '/news', label: 'News', icon: Newspaper, active: location.pathname === '/news' },
                 ].map(({ to, label, icon: Icon, active }) => (
                   <Link

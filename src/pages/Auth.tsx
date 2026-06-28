@@ -42,7 +42,7 @@ export default function Auth() {
     if (error) {
       toast({ title: 'Sign in failed', description: error.message, variant: 'destructive' });
     } else {
-      navigate('/feed');
+      navigate('/network');
     }
   };
 
