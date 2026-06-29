@@ -203,7 +203,7 @@ export function ServicesTopBar() {
   return (
     <>
       {/* Sticky mobile bar */}
-      <div className="lg:hidden sticky top-16 z-30 bg-white/95 backdrop-blur-sm border-b border-gray-100 px-4 py-2.5 flex items-center gap-3">
+      <div className="lg:hidden sticky top-14 z-30 bg-white/95 backdrop-blur-sm border-b border-gray-100 px-4 py-2.5 flex items-center gap-3">
         <button
           onClick={() => setDrawerOpen(true)}
           className="h-8 w-8 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-colors shrink-0"

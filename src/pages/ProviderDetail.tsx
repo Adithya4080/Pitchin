@@ -457,11 +457,11 @@ export default function ProviderDetail() {
 
         {/* Breadcrumb */}
         <nav style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#9ca3af', marginBottom: 20, flexWrap: 'wrap' }}>
-          <Link to="/" style={{ color: '#9ca3af', textDecoration: 'none' }} onMouseEnter={e => (e.currentTarget.style.color = '#374151')} onMouseLeave={e => (e.currentTarget.style.color = '#9ca3af')}>Home</Link>
+          <span><Link to="/" style={{ color: '#9ca3af', textDecoration: 'none' }} onMouseEnter={e => (e.currentTarget.style.color = '#374151')} onMouseLeave={e => (e.currentTarget.style.color = '#9ca3af')}>Home</Link></span>
           <span>›</span>
-          <Link to="/network/services" style={{ color: '#9ca3af', textDecoration: 'none' }} onMouseEnter={e => (e.currentTarget.style.color = '#374151')} onMouseLeave={e => (e.currentTarget.style.color = '#9ca3af')}>Services</Link>
+          <span><Link to="/network/services" style={{ color: '#9ca3af', textDecoration: 'none' }} onMouseEnter={e => (e.currentTarget.style.color = '#374151')} onMouseLeave={e => (e.currentTarget.style.color = '#9ca3af')}>Services</Link></span>
           <span>›</span>
-          <Link to={`/network/services/${provider.category_slug}`} style={{ color: '#9ca3af', textDecoration: 'none' }} onMouseEnter={e => (e.currentTarget.style.color = '#374151')} onMouseLeave={e => (e.currentTarget.style.color = '#9ca3af')}>{provider.category_name}</Link>
+          <span><Link to={`/network/services/${provider.category_slug}`} style={{ color: '#9ca3af', textDecoration: 'none' }} onMouseEnter={e => (e.currentTarget.style.color = '#374151')} onMouseLeave={e => (e.currentTarget.style.color = '#9ca3af')}>{provider.category_name}</Link></span>
           <span>›</span>
           <span style={{ color: '#374151', fontWeight: 600 }}>{provider.name}</span>
         </nav>

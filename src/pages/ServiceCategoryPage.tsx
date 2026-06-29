@@ -204,7 +204,7 @@ function FilterSidebar({
 
         {/* Header */}
         <div className="flex items-center justify-between">
-          <span className="text-[13px] font-semibold text-gray-800">Filter Providers</span>
+          <span className="text-[13px] font-semibold text-gray-800">Filter Providers  </span>
           <button onClick={reset}
             className="flex items-center gap-1 text-[11px] text-blue-600 hover:text-blue-500">
             <RotateCcw className="h-3 w-3" /> Reset
@@ -483,7 +483,7 @@ function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProv
 
               {/* Rating row */}
               {Number(provider.rating) > 0 && (
-                <div className="flex items-center gap-1.5 mt-1">
+                <div className="flex items-center whitespace-nowrap gap-1.5 mt-1">
                   <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
                   <span className="text-[12px] font-medium text-gray-700">{provider.rating}</span>
                   <span className="text-[12px] text-gray-400">({provider.review_count} reviews)</span>
@@ -539,7 +539,7 @@ function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProv
               </button>
 
               {provider.starting_price && (
-                <div className="text-right">
+                <div className="text-right flex items-center justify-center gap-1 whitespace-nowrap">
                   <p className="text-[10px] text-gray-400">Starting from</p>
                   <p className="text-[15px] font-bold text-gray-900">
                     ₹{Number(provider.starting_price).toLocaleString('en-IN')}
@@ -635,10 +635,10 @@ export default function ServiceCategoryPage() {
       <div className="max-w-[1180px] mx-auto px-4 md:px-6 py-5 md:py-6">
 
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-1.5 text-[12px] text-gray-400 mb-4">
-          <Link to="/" className="hover:text-gray-600">Home</Link>
+        <nav className="flex justify-start items-center gap-2 text-[12px] text-gray-400 mb-4">
+          <span><Link to="/" className="hover:text-gray-600">Home</Link></span>
           <span>›</span>
-          <Link to="/network/services" className="hover:text-gray-600">Services</Link>
+          <span><Link to="/network/services" className="hover:text-gray-600">Services</Link></span>
           <span>›</span>
           <span className="text-blue-600 font-medium">{category?.name ?? slug}</span>
         </nav>
@@ -714,7 +714,7 @@ export default function ServiceCategoryPage() {
           <div className="flex-1 min-w-0">
 
             {/* Toolbar */}
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex flex-wrap items-center justify-between space-y-2 mb-3">
               <p className="text-[13px] text-gray-500">
                 Showing <span className="font-medium text-gray-800">{providers.length}</span> providers
                 {activeSubCat && (
