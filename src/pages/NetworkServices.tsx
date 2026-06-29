@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   LayoutGrid, Phone, ClipboardList, Heart,
@@ -6,12 +6,11 @@ import {
   MapPin, ExternalLink, Bookmark, Zap, TrendingUp,
 } from 'lucide-react';
 import { AppLayout } from '@/components/layouts/AppLayout';
-import { ServicesLeftSidebar,   } from '@/components/network/ServicesLeftSidebar';
+import { ServicesLeftSidebar, ServicesTopBar } from '@/components/network/ServicesLeftSidebar';
 import { ServiceHeroBanner } from '@/components/network/ServiceHeroBanner';
 import { ServiceCategoryGrid } from '@/components/network/ServiceCategoryGrid';
 import { NetworkingOpportunitiesSection } from '@/components/network/NetworkingOpportunitiesSection';
 import { useServiceProviders, useServiceCategories } from '@/hooks/useServices';
-import { AllProvidersView } from '@/components/network/AllProvidersView';
 
 // ─── Quick Actions ─────────────────────────────────────────────────────────────
 const QUICK_ACTIONS = [
@@ -50,72 +49,6 @@ function QuickActionsPanel() {
   );
 }
 
-// ─── Recommended panel ─────────────────────────────────────────────────────────
-// const LOGO_COLORS = ['#111827','#F97316','#0891B2','#7C3AED','#D97706'];
-
-// function RecommendedPanel() {
-//   const { data: providers = [], isLoading } = useServiceProviders({ sort: 'top_rated' } as any);
-//   const top = providers.slice(0, 5);
-
-//   return (
-//     <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
-//       <div className="px-4 pt-4 pb-2 border-b border-gray-50 flex items-center justify-between">
-//         <div>
-//           <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-gray-300">Top Rated</p>
-//           <p className="text-[13px] font-bold text-gray-800 mt-0.5">Recommended</p>
-//         </div>
-//         <div className="h-7 w-7 rounded-lg bg-amber-50 flex items-center justify-center">
-//           <Zap className="h-3.5 w-3.5 text-amber-400" strokeWidth={2} />
-//         </div>
-//       </div>
-//       <div className="p-3 space-y-2">
-//         {isLoading
-//           ? Array.from({ length: 4 }).map((_, i) => (
-//               <div key={i} className="flex items-center gap-2.5 p-2 animate-pulse">
-//                 <div className="h-9 w-9 rounded-xl bg-gray-100 shrink-0" />
-//                 <div className="flex-1 space-y-1.5">
-//                   <div className="h-3 w-24 bg-gray-100 rounded" />
-//                   <div className="h-2.5 w-16 bg-gray-50 rounded" />
-//                 </div>
-//               </div>
-//             ))
-//           : top.map((p, i) => {
-//               const initials = p.name.split(' ').slice(0, 2).map((w: string) => w[0]?.toUpperCase()).join('');
-//               return (
-//                 <Link key={p.id} to={`/network/services/${p.category_slug}`}
-//                   className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-gray-50 transition-colors group"
-//                 >
-//                   {p.logo_url
-//                     ? <img src={p.logo_url} alt={p.name} className="h-9 w-9 rounded-xl object-cover shrink-0 border border-gray-100" />
-//                     : <div className="h-9 w-9 rounded-xl flex items-center justify-center text-white text-[11px] font-bold shrink-0"
-//                         style={{ background: LOGO_COLORS[i % LOGO_COLORS.length] }}>
-//                         {initials}
-//                       </div>
-//                   }
-//                   <div className="flex-1 min-w-0">
-//                     <p className="text-[12px] font-bold text-gray-800 truncate group-hover:text-gray-900">{p.name}</p>
-//                     <div className="flex items-center gap-1 mt-0.5">
-//                       <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-//                       <span className="text-[11px] font-semibold text-gray-600">{p.rating}</span>
-//                       <span className="text-[11px] text-gray-300">({p.review_count})</span>
-//                     </div>
-//                   </div>
-//                   <Bookmark className="h-3.5 w-3.5 text-gray-200 group-hover:text-gray-400 transition-colors" />
-//                 </Link>
-//               );
-//             })}
-//       </div>
-//       <div className="px-4 pb-3">
-//         <Link to="/network/services?view=all"
-//           className="flex items-center gap-1.5 text-[12px] font-bold text-gray-900 hover:text-gray-600 transition-colors"
-//         >
-//           See all providers <ArrowRight className="h-3.5 w-3.5" />
-//         </Link>
-//       </div>
-//     </div>
-//   );
-// }
-
 // ─── Activity feed widget ──────────────────────────────────────────────────────
 const ACTIVITY = [
   { text: 'Arjun S. connected with a Legal advisor', time: '2m ago' },
@@ -123,28 +56,6 @@ const ACTIVITY = [
   { text: 'Priya M. booked a mentorship call', time: '1h ago' },
   { text: '3 new Design providers listed', time: '2h ago' },
 ];
-
-// function LiveActivityPanel() {
-//   return (
-//     <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
-//       <div className="px-4 pt-4 pb-2 border-b border-gray-50 flex items-center gap-2">
-//         <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-//         <p className="text-[12px] font-bold text-gray-700">Live Activity</p>
-//       </div>
-//       <div className="p-3 space-y-2">
-//         {ACTIVITY.map((a, i) => (
-//           <div key={i} className="flex items-start gap-2.5 px-1 py-1.5">
-//             <div className="h-1.5 w-1.5 rounded-full bg-gray-200 mt-1.5 shrink-0" />
-//             <div className="flex-1 min-w-0">
-//               <p className="text-[11px] text-gray-600 leading-snug">{a.text}</p>
-//               <p className="text-[10px] text-gray-300 mt-0.5">{a.time}</p>
-//             </div>
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// }
 
 // ─── Provider CTA ─────────────────────────────────────────────────────────────
 function ProviderCTACard() {
@@ -215,13 +126,201 @@ function TrustStrip() {
   );
 }
 
+// ─── Category → gradient color map ───────────────────────────────────────────
+const CATEGORY_GRADIENT: Record<string, string> = {
+  'marketing':          'from-orange-400 to-rose-400',
+  'design':             'from-pink-500 to-fuchsia-500',
+  'designing':          'from-pink-500 to-fuchsia-500',
+  'designing & branding': 'from-pink-500 to-fuchsia-500',
+  'legal':              'from-red-400 to-rose-500',
+  'legel':              'from-red-400 to-rose-500',
+  'web development':    'from-blue-500 to-indigo-500',
+  'web devolepment':    'from-blue-500 to-indigo-500',
+  'technology':         'from-blue-500 to-indigo-500',
+  'finance':            'from-emerald-400 to-teal-500',
+  'accounting':         'from-emerald-400 to-teal-500',
+  'book keeping':       'from-emerald-400 to-teal-500',
+  'hr':                 'from-violet-400 to-purple-500',
+  'documentation':      'from-cyan-400 to-sky-500',
+};
+
+function getCategoryGradient(categoryName: string): string {
+  const key = categoryName?.toLowerCase().trim() ?? '';
+  return CATEGORY_GRADIENT[key] ?? 'from-blue-500 to-indigo-500';
+}
+
+// ─── ProviderMiniCard — 3D tilt + liquid glow (matches ServiceCategoryPage) ───
+type ProviderItem = {
+  id: number; name: string; logo_url: string | null; is_verified: boolean;
+  category_name: string; category_slug: string; location: string | null;
+  tagline: string | null; rating: string | number; review_count: number; website: string | null;
+};
+
+function ProviderMiniCard({ provider: p }: { provider: ProviderItem }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const [glowPos, setGlowPos] = useState({ x: 50, y: 50 });
+  const [hovered, setHovered] = useState(false);
+
+  const initials = p.name.split(' ').slice(0, 2).map((w: string) => w[0]?.toUpperCase()).join('');
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const card = cardRef.current;
+    if (!card) return;
+    const rect = card.getBoundingClientRect();
+    const cx = e.clientX - rect.left;
+    const cy = e.clientY - rect.top;
+    setTilt({ x: ((cy / rect.height) - 0.5) * -10, y: ((cx / rect.width) - 0.5) * 10 });
+    setGlowPos({ x: (cx / rect.width) * 100, y: (cy / rect.height) * 100 });
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setTilt({ x: 0, y: 0 });
+    setHovered(false);
+  }, []);
+
+  return (
+    <div style={{ perspective: '900px' }}>
+      <div
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={handleMouseLeave}
+        className="group relative bg-white rounded-2xl overflow-hidden"
+        style={{
+          border: hovered ? '1px solid #d1d5db' : '1px solid #f3f4f6',
+          transform: hovered
+            ? `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateZ(14px) scale(1.015)`
+            : 'rotateX(0deg) rotateY(0deg) translateZ(0px) scale(1)',
+          transition: hovered
+            ? 'transform 0.08s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease-out'
+            : 'transform 0.45s cubic-bezier(0.23,1,0.32,1), box-shadow 0.45s ease-out, border-color 0.45s ease-out',
+          boxShadow: hovered
+            ? '0 20px 60px -8px rgba(0,0,0,0.16), 0 8px 20px -4px rgba(0,0,0,0.09), 0 0 0 1px rgba(0,0,0,0.04)'
+            : '0 1px 3px rgba(0,0,0,0.05)',
+          willChange: 'transform',
+        }}
+      >
+        {hovered && (
+          <div className="absolute inset-0 pointer-events-none rounded-2xl z-10"
+            style={{
+              background: `radial-gradient(300px circle at ${glowPos.x}% ${glowPos.y}%, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.05) 50%, transparent 100%)`,
+              mixBlendMode: 'screen',
+            }}
+          />
+        )}
+        <div className={`h-1 w-full bg-gradient-to-r ${getCategoryGradient(p.category_name)} opacity-60 group-hover:opacity-100 transition-opacity duration-200`} />
+        <div className="p-4 flex flex-col gap-3">
+          <div className="flex items-start gap-3">
+            {p.logo_url
+              ? <img src={p.logo_url} alt={p.name} className="h-11 w-11 rounded-xl object-cover shrink-0 border border-gray-100" />
+              : <div className="h-11 w-11 rounded-xl bg-gray-950 flex items-center justify-center text-white text-sm font-bold shrink-0">{initials}</div>
+            }
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5">
+                <p className="text-[13px] font-bold text-gray-900 truncate">{p.name}</p>
+                {p.is_verified && <ShieldCheck className="h-3.5 w-3.5 text-blue-500 shrink-0" />}
+              </div>
+              <p className="text-[11px] text-gray-400 font-semibold">{p.category_name}</p>
+              {p.location && (
+                <span className="inline-flex items-center gap-1 text-[11px] text-gray-300 mt-0.5">
+                  <MapPin className="h-3 w-3" />{p.location}
+                </span>
+              )}
+            </div>
+          </div>
+          {p.tagline && <p className="text-[12px] text-gray-500 leading-relaxed line-clamp-2">{p.tagline}</p>}
+          {Number(p.rating) > 0 && (
+            <div className="flex items-center gap-1">
+              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+              <span className="text-[12px] font-bold text-gray-700">{p.rating}</span>
+              <span className="text-[11px] text-gray-300">({p.review_count})</span>
+            </div>
+          )}
+          <div className="flex gap-2 mt-auto">
+            <Link to={`/network/services/${p.category_slug}`}
+              className="flex-1 text-center text-[12px] font-bold bg-gray-950 hover:bg-gray-800 text-white py-2.5 rounded-xl transition-colors"
+            >View Profile</Link>
+            {p.website && (
+              <a href={p.website} target="_blank" rel="noreferrer"
+                className="p-2.5 border border-gray-200 rounded-xl text-gray-400 hover:text-gray-700 hover:border-gray-300 transition-colors">
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── All Providers browse ─────────────────────────────────────────────────────
+function AllProvidersView() {
+  const [search, setSearch] = useState('');
+  const [activeCategory, setActiveCategory] = useState('');
+  const { data: categories = [] } = useServiceCategories();
+  const { data: providers = [], isLoading } = useServiceProviders({
+    category: activeCategory || undefined,
+    search: search || undefined,
+    sort: 'top_rated',
+  } as any);
+
+  return (
+    <div className="space-y-5">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-[18px] font-bold text-gray-900 tracking-tight">All Service Providers</h2>
+          <p className="text-[13px] text-gray-400 mt-0.5">Browse vetted providers across every category.</p>
+        </div>
+        <Link to="/network/services" className="text-[13px] font-bold text-gray-500 hover:text-gray-900 transition-colors">← Back</Link>
+      </div>
+
+      <div className="relative max-w-sm">
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search providers…"
+          className="w-full pl-10 pr-4 py-2.5 text-[13px] border border-gray-200 rounded-xl bg-white focus:outline-none focus:border-gray-400 placeholder:text-gray-300"
+        />
+      </div>
+
+      <div className="flex flex-wrap gap-1.5">
+        <button onClick={() => setActiveCategory('')}
+          className={`text-[12px] font-bold px-3.5 py-1.5 rounded-full border transition-all ${
+            !activeCategory ? 'bg-gray-950 text-white border-gray-950' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
+          }`}
+        >All</button>
+        {categories.map(c => (
+          <button key={c.id} onClick={() => setActiveCategory(activeCategory === c.slug ? '' : c.slug)}
+            className={`text-[12px] font-bold px-3.5 py-1.5 rounded-full border transition-all ${
+              activeCategory === c.slug ? 'bg-gray-950 text-white border-gray-950' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
+            }`}
+          >{c.name}</button>
+        ))}
+      </div>
+
+      {isLoading && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-44 rounded-2xl bg-gray-50 animate-pulse" />
+          ))}
+        </div>
+      )}
+
+      {!isLoading && providers.length === 0 && (
+        <p className="text-[13px] text-gray-400 py-12 text-center">No providers found.</p>
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {providers.map(p => <ProviderMiniCard key={p.id} provider={p} />)}
+      </div>
+    </div>
+  );
+}
+
 // ─── Right sidebar ─────────────────────────────────────────────────────────────
 function RightSidebar() {
   return (
     <aside className="w-[240px] shrink-0 hidden xl:flex flex-col gap-3 sticky top-20 self-start">
       <QuickActionsPanel />
-      {/* <RecommendedPanel /> */}
-      {/* <LiveActivityPanel /> */}
       <ProviderCTACard />
     </aside>
   );
@@ -236,7 +335,7 @@ export default function NetworkServices() {
     <AppLayout showMobileHeader title="Services" showBottomNav>
       <div className="max-w-[1400px] mx-auto">
         {/* Mobile/tablet sticky nav bar — lives above the flex row, full width */}
-        {/* <ServiceTopBar /> */}
+        <ServicesTopBar />
 
         <div className="px-4 md:px-6 py-4 md:py-8">
           <div className="flex gap-3 md:gap-4 lg:gap-5 items-start">
@@ -245,14 +344,16 @@ export default function NetworkServices() {
 
             {/* Main content */}
             <div className="flex-1 min-w-0 space-y-6 md:space-y-8">
-{isViewAll ? <AllProvidersView /> : (
-  <>
-    <ServiceHeroBanner />
-    <ServiceCategoryGrid />
-    <NetworkingOpportunitiesSection />
-    <TrustStrip />
-  </>
-)}
+              {isViewAll ? (
+                <AllProvidersView />
+              ) : (
+                <>
+                  <ServiceHeroBanner />
+                  <ServiceCategoryGrid />
+                  <NetworkingOpportunitiesSection />
+                  <TrustStrip />
+                </>
+              )}
             </div>
 
             {/* Right sidebar */}

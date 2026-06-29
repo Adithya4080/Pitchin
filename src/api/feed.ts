@@ -39,6 +39,8 @@ export interface FeedFilters {
   author__role?: string;
   search?: string;
   ordering?: string;
+  page?: number;        
+  page_size?: number;
 }
 
 interface PaginatedResponse<T> {
@@ -58,6 +60,8 @@ export async function getFeed(filters?: FeedFilters): Promise<Post[]> {
   if (filters?.author__role) params.set('author__role', filters.author__role);
   if (filters?.search) params.set('search', filters.search);
   if (filters?.ordering) params.set('ordering', filters.ordering);
+  if (filters?.page) params.set('page', String(filters.page));
+  params.set('page_size', String(filters?.page_size ?? 10));
   const query = params.toString() ? `?${params.toString()}` : '';
   const response = await apiFetch<Post[] | PaginatedResponse<Post>>(`/feed/${query}`);
   return unwrapPaginated(response);

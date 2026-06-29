@@ -72,7 +72,7 @@ function Avatar({ src, name }: { src: string | null; name: string }) {
   const initials = name.split(' ').filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('');
   const { bg, text } = getAvatarPalette(name);
   if (src) {
-    return <img src={src} alt={name} className="h-11 w-11 rounded-full object-cover shrink-0 ring-1 ring-black/5" />;
+    return <img src={src} alt={name} loading="lazy" className="h-11 w-11 rounded-full object-cover shrink-0 ring-1 ring-black/5" />;
   }
   return (
     <div className={`h-11 w-11 rounded-full ${bg} ${text} flex items-center justify-center text-sm font-bold shrink-0 ring-1 ring-black/5`}>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,6 +33,8 @@ export default function Auth() {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotSent, setForgotSent] = useState(false);
+  const [forgotSending, setForgotSending] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,21 +64,7 @@ export default function Auth() {
     }
   };
 
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await apiFetch('/auth/forgot-password/', {
-        method: 'POST',
-        body: JSON.stringify({ email: forgotEmail }),
-      });
-      setForgotSent(true);
-    } catch (error: any) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
-    } finally {
-      setLoading(false);
-    }
-  };
+  // handleForgotPassword removed — auto-send via useEffect above
 
   // Show forgot password screen
   if (showForgotPassword) {
@@ -125,24 +113,51 @@ export default function Auth() {
                   </Button>
                 </div>
               ) : (
-                <form onSubmit={handleForgotPassword} className="space-y-4">
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (debounceRef.current) clearTimeout(debounceRef.current);
+                  setForgotSending(true);
+                  try {
+                    await apiFetch('/auth/forgot-password/', {
+                      method: 'POST',
+                      body: JSON.stringify({ email: forgotEmail }),
+                    });
+                    setForgotSent(true);
+                  } catch (error: any) {
+                    toast({ title: 'Error', description: error.message, variant: 'destructive' });
+                  } finally {
+                    setForgotSending(false);
+                  }
+                }} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="forgot-email">Email</Label>
-                    <Input
-                      id="forgot-email"
-                      type="email"
-                      placeholder="you@example.com"
-                      value={forgotEmail}
-                      onChange={(e) => setForgotEmail(e.target.value)}
-                      required
-                    />
+                    <div className="relative">
+                      <Input
+                        id="forgot-email"
+                        type="email"
+                        placeholder="you@example.com"
+                        value={forgotEmail}
+                        onChange={(e) => setForgotEmail(e.target.value)}
+                        autoFocus
+                        className="pr-10"
+                        required
+                      />
+                      {forgotSending && (
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <svg className="h-4 w-4 animate-spin text-muted-foreground" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <Button
                     type="submit"
                     className="w-full flash-gradient text-primary-foreground"
-                    disabled={loading}
+                    disabled={forgotSending}
                   >
-                    {loading ? 'Sending...' : 'Send Reset Link'}
+                    {forgotSending ? 'Sending…' : 'Send Reset Link'}
                   </Button>
                   <Button
                     type="button"

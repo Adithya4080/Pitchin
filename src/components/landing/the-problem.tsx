@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 
-const PROBLEM_IMAGE =
-  "https://fymxcszzdpennpmgnstb.supabase.co/storage/v1/object/public/post-images/platform-official-image/problem-newspaper.png";
+// const PROBLEM_IMAGE =
+//   "https://fymxcszzdpennpmgnstb.supabase.co/storage/v1/object/public/post-images/platform-official-image/problem-newspaper.png";
 
 export default function TheProblem() {
   return (
@@ -15,15 +15,15 @@ export default function TheProblem() {
         <div className="grid items-center gap-10 lg:grid-cols-[420px_1fr] lg:gap-16">
 
           {/* Image */}
-          <div className="relative overflow-hidden rounded-none">
+          {/* <div className="relative overflow-hidden rounded-none">
 
             <img
-              src={PROBLEM_IMAGE}
+              // src={PROBLEM_IMAGE}
               alt="Newspaper clippings illustrating common reasons startups fail"
               className="w-full object-cover"
             />
 
-          </div>
+          </div> */}
 
           {/* Content */}
           <div>

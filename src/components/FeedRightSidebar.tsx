@@ -153,7 +153,7 @@ function InsightRow({ article }: { article: NewsArticle }) {
       className="flex items-start gap-3 px-1 py-2.5 hover:bg-muted/40 rounded-lg transition-colors"
     >
       {article.image_url ? (
-        <img src={article.image_url} alt="" className="h-12 w-12 rounded-lg object-cover shrink-0 bg-muted" />
+        <img src={article.image_url} alt="" loading="lazy" className="h-12 w-12 rounded-lg object-cover shrink-0 bg-muted " />
       ) : (
         <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
           <Newspaper className="h-5 w-5 text-primary/60" />
