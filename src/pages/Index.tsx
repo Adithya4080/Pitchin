@@ -11,6 +11,7 @@ import TheProblem from '@/components/landing/the-problem';
 import TheSolution from '@/components/landing/solution';
 import { SiteFooter } from '@/components/landing/footer';
 import Features from '@/components/landing/features';
+import heroIllustration from '@/assets/hero-illustration.webp';
 
 
 const TUTORIAL_COMPLETED_KEY = 'pitchnet_tutorial_completed';
@@ -88,7 +89,7 @@ function DesktopLanding() {
             <div className="relative z-10 flex w-full max-w-[620px] flex-col justify-center py-8 lg:py-">
               {/* Heading */}
               <div className="mb-8">
-                <h1 className="font-display mt-10 text-[32px] xs:text-[36px] sm:text-[54px] leading-[1.05] sm:leading-[0.95] font-medium tracking-tight text-foreground">
+                <h1 className="text-xs font-uppercase mt-10 text-[32px] xs:text-[36px] sm:text-[54px] leading-[1.05] sm:leading-[0.95] font-medium tracking-tight text-foreground">
                   <div className="overflow-hidden">
                     <span className="typing-animation typing-animation-1 block">
                       A Smarter
@@ -142,7 +143,14 @@ function DesktopLanding() {
             {/* Right Illustration — original size restored */}
             <div className="absolute right-[-8%] top-0 w-[65%] lg:w-[58%] xl:w-[55%] h-full flex items-start justify-end pointer-events-none">
               <img
+                src={heroIllustration}
                 alt="Team collaborating on ideas"
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
+                width={1050}
+                height={700}
+                draggable={false}
                 className="
                   w-full
                   h-auto
@@ -154,11 +162,12 @@ function DesktopLanding() {
                   md:min-w-[750px]
                   lg:min-w-[900px]
                   xl:min-w-[1050px]
+                  select-none
+                  will-change-transform
+                  [content-visibility:auto]
                 "
-                src="https://fymxcszzdpennpmgnstb.supabase.co/storage/v1/object/public/post-images/platform-official-image/hero-illustration.png"
               />
             </div>
-
           </div>
         </section>
 

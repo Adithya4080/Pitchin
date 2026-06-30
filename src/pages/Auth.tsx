@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
-import pitchinLogo from '@/assets/pitchin-logo-new.png';
+import pitchinLogo from '@/assets/pitchin-logo-text.webp';
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { apiFetch } from '@/api/client';
 
@@ -64,12 +64,10 @@ export default function Auth() {
     }
   };
 
-  // handleForgotPassword removed — auto-send via useEffect above
-
   // Show forgot password screen
   if (showForgotPassword) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-[#fefefe] px-4">
         <div className="absolute inset-0 -z-10 overflow-hidden">
           <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
           <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
@@ -178,7 +176,7 @@ export default function Auth() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[#fefefe] px-4">
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
@@ -188,7 +186,7 @@ export default function Auth() {
         <div className="text-center">
           <img src={pitchinLogo} alt="PitchIn" className="h-20 mx-auto mb-4" />
           <h1 className="font-display text-3xl font-bold tracking-tight">
-            Welcome to <span className="flash-gradient-text">PitchIn</span>
+            Welcome to <span className="flash-gradient-text">pichin</span>
           </h1>
           <p className="mt-2 text-muted-foreground">
             Connect, pitch, and grow with the ecosystem

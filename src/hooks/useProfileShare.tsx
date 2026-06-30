@@ -70,7 +70,7 @@ import {
   revokeDashboardShare,
 } from '@/api/payment';
 
-const SHARE_BASE_URL = 'http://localhost:8080';
+const SHARE_BASE_URL = 'https://www.pichin.in';
 
 export function useProfileShare(userId?: string | number) {
   const { toast } = useToast();
