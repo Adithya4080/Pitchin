@@ -92,12 +92,12 @@ function ProviderLogo({ name, logoUrl }: { name: string; logoUrl: string | null 
   if (logoUrl) {
     return (
       <img src={logoUrl} alt={name}
-        className="w-[72px] h-[72px] rounded-xl object-cover shrink-0 border border-gray-200"
+        className="w-14 h-14 sm:w-[72px] sm:h-[72px] rounded-xl object-cover shrink-0 border border-gray-200"
       />
     );
   }
   return (
-    <div className={`w-[72px] h-[72px] rounded-xl ${bg} flex items-center justify-center text-white text-lg font-bold shrink-0`}>
+    <div className={`w-14 h-14 sm:w-[72px] sm:h-[72px] rounded-xl ${bg} flex items-center justify-center text-white text-base sm:text-lg font-bold shrink-0`}>
       {initials}
     </div>
   );
@@ -175,7 +175,7 @@ type FilterState = {
   location: string;
 };
 
-function FilterSidebar({
+function FilterSidebarContent({
   filters,
   setFilters,
   subCategories,
@@ -199,116 +199,151 @@ function FilterSidebar({
     setFilters({ stages: [], sort: 'top_rated', budgetIdx: 0, location: '' });
 
   return (
-    <aside className="w-[220px] shrink-0 hidden lg:block">
-      <div className="bg-white border border-gray-200 rounded-xl p-4 sticky top-24 space-y-5">
+    <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-5">
 
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <span className="text-[13px] font-semibold text-gray-800">Filter Providers  </span>
-          <button onClick={reset}
-            className="flex items-center gap-1 text-[11px] text-blue-600 hover:text-blue-500">
-            <RotateCcw className="h-3 w-3" /> Reset
-          </button>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <span className="text-[13px] font-semibold text-gray-800">Filter Providers</span>
+        <button onClick={reset}
+          className="flex items-center gap-1 text-[11px] text-blue-600 hover:text-blue-500">
+          <RotateCcw className="h-3 w-3" /> Reset
+        </button>
+      </div>
+
+      {/* Startup Stage */}
+      <div>
+        <p className="text-[12px] font-semibold text-gray-700 mb-2">Startup Stage</p>
+        <div className="space-y-1.5">
+          {STAGES.map(s => (
+            <label key={s.value} className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={filters.stages.includes(s.value)}
+                onChange={() => toggleStage(s.value)}
+                className="h-3.5 w-3.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 accent-blue-600"
+              />
+              <span className="text-[12px] text-gray-600">{s.label}</span>
+            </label>
+          ))}
         </div>
+      </div>
 
-        {/* Startup Stage */}
+      {/* Service Type (sub-categories) */}
+      {subCategories.length > 0 && (
         <div>
-          <p className="text-[12px] font-semibold text-gray-700 mb-2">Startup Stage</p>
+          <p className="text-[12px] font-semibold text-gray-700 mb-2">Service Type</p>
           <div className="space-y-1.5">
-            {STAGES.map(s => (
-              <label key={s.value} className="flex items-center gap-2 cursor-pointer">
+            {subCategories.map(sc => (
+              <label key={sc.slug} className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={filters.stages.includes(s.value)}
-                  onChange={() => toggleStage(s.value)}
+                  checked={activeSubCat === sc.slug}
+                  onChange={() => setActiveSubCat(activeSubCat === sc.slug ? '' : sc.slug)}
                   className="h-3.5 w-3.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 accent-blue-600"
                 />
-                <span className="text-[12px] text-gray-600">{s.label}</span>
+                <span className="text-[12px] text-gray-600">{sc.name}</span>
               </label>
             ))}
           </div>
         </div>
+      )}
 
-        {/* Service Type (sub-categories) */}
-        {subCategories.length > 0 && (
-          <div>
-            <p className="text-[12px] font-semibold text-gray-700 mb-2">Service Type</p>
-            <div className="space-y-1.5">
-              {subCategories.map(sc => (
-                <label key={sc.slug} className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={activeSubCat === sc.slug}
-                    onChange={() => setActiveSubCat(activeSubCat === sc.slug ? '' : sc.slug)}
-                    className="h-3.5 w-3.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 accent-blue-600"
-                  />
-                  <span className="text-[12px] text-gray-600">{sc.name}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Location */}
-        <div>
-          <p className="text-[12px] font-semibold text-gray-700 mb-2">Location</p>
-          <div className="relative">
-            <select
-              value={filters.location}
-              onChange={e => setFilters({ ...filters, location: e.target.value })}
-              className="w-full appearance-none text-[12px] bg-white border border-gray-200 rounded-lg px-3 py-2 pr-7 text-gray-600 focus:outline-none focus:border-blue-400"
-            >
-              <option value="">All Locations</option>
-              <option value="Delhi">Delhi, India</option>
-              <option value="Mumbai">Mumbai, India</option>
-              <option value="Bangalore">Bangalore, India</option>
-              <option value="Chennai">Chennai, India</option>
-              <option value="Hyderabad">Hyderabad, India</option>
-            </select>
-            <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
-          </div>
+      {/* Location */}
+      <div>
+        <p className="text-[12px] font-semibold text-gray-700 mb-2">Location</p>
+        <div className="relative">
+          <select
+            value={filters.location}
+            onChange={e => setFilters({ ...filters, location: e.target.value })}
+            className="w-full appearance-none text-[12px] bg-white border border-gray-200 rounded-lg px-3 py-2 pr-7 text-gray-600 focus:outline-none focus:border-blue-400"
+          >
+            <option value="">All Locations</option>
+            <option value="Delhi">Delhi, India</option>
+            <option value="Mumbai">Mumbai, India</option>
+            <option value="Bangalore">Bangalore, India</option>
+            <option value="Chennai">Chennai, India</option>
+            <option value="Hyderabad">Hyderabad, India</option>
+          </select>
+          <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
         </div>
+      </div>
 
-        {/* Budget Range */}
-        <div>
-          <p className="text-[12px] font-semibold text-gray-700 mb-2">Budget Range</p>
-          <div className="relative">
-            <select
-              value={filters.budgetIdx}
-              onChange={e => setFilters({ ...filters, budgetIdx: Number(e.target.value) })}
-              className="w-full appearance-none text-[12px] bg-white border border-gray-200 rounded-lg px-3 py-2 pr-7 text-gray-600 focus:outline-none focus:border-blue-400"
-            >
-              {BUDGET_OPTIONS.map((b, i) => (
-                <option key={i} value={i}>{b.label}</option>
-              ))}
-            </select>
-            <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
-          </div>
+      {/* Budget Range */}
+      <div>
+        <p className="text-[12px] font-semibold text-gray-700 mb-2">Budget Range</p>
+        <div className="relative">
+          <select
+            value={filters.budgetIdx}
+            onChange={e => setFilters({ ...filters, budgetIdx: Number(e.target.value) })}
+            className="w-full appearance-none text-[12px] bg-white border border-gray-200 rounded-lg px-3 py-2 pr-7 text-gray-600 focus:outline-none focus:border-blue-400"
+          >
+            {BUDGET_OPTIONS.map((b, i) => (
+              <option key={i} value={i}>{b.label}</option>
+            ))}
+          </select>
+          <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
         </div>
+      </div>
 
-        {/* Sort by */}
-        <div>
-          <p className="text-[12px] font-semibold text-gray-700 mb-2">Sort by</p>
-          <div className="relative">
-            <select
-              value={filters.sort}
-              onChange={e => setFilters({ ...filters, sort: e.target.value })}
-              className="w-full appearance-none text-[12px] bg-white border border-gray-200 rounded-lg px-3 py-2 pr-7 text-gray-600 focus:outline-none focus:border-blue-400"
-            >
-              {SORT_OPTIONS.map(o => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
-            <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
-          </div>
+      {/* Sort by */}
+      <div>
+        <p className="text-[12px] font-semibold text-gray-700 mb-2">Sort by</p>
+        <div className="relative">
+          <select
+            value={filters.sort}
+            onChange={e => setFilters({ ...filters, sort: e.target.value })}
+            className="w-full appearance-none text-[12px] bg-white border border-gray-200 rounded-lg px-3 py-2 pr-7 text-gray-600 focus:outline-none focus:border-blue-400"
+          >
+            {SORT_OPTIONS.map(o => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+          <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
         </div>
+      </div>
 
-        {/* Apply button */}
-        <button className="w-full bg-gray-900 hover:bg-gray-800 text-white text-[13px] font-medium py-2.5 rounded-xl transition-colors">
-          Apply Filters
-        </button>
+      {/* Apply button */}
+      <button className="w-full bg-gray-900 hover:bg-gray-800 text-white text-[13px] font-medium py-2.5 rounded-xl transition-colors">
+        Apply Filters
+      </button>
+    </div>
+  );
+}
+
+function FilterSidebar(props: Parameters<typeof FilterSidebarContent>[0]) {
+  return (
+    <aside className="w-[220px] shrink-0 hidden lg:block">
+      <div className="sticky top-24">
+        <FilterSidebarContent {...props} />
       </div>
     </aside>
+  );
+}
+
+// ─── Mobile filter drawer ──────────────────────────────────────────────────────
+function MobileFilterDrawer({
+  open,
+  onClose,
+  ...rest
+}: { open: boolean; onClose: () => void } & Parameters<typeof FilterSidebarContent>[0]) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 lg:hidden">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="absolute right-0 top-0 h-full w-[85%] max-w-[320px] bg-gray-50 overflow-y-auto p-4">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-[14px] font-semibold text-gray-900">Filters</span>
+          <button onClick={onClose} className="text-[12px] text-gray-500 px-2 py-1">Close</button>
+        </div>
+        <FilterSidebarContent {...rest} />
+        <button
+          onClick={onClose}
+          className="w-full mt-3 bg-blue-600 hover:bg-blue-500 text-white text-[13px] font-medium py-2.5 rounded-xl transition-colors"
+        >
+          Show Results
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -386,7 +421,7 @@ function RightSidebar({
   );
 }
 
-// ─── Provider card — thrust-forward + macOS liquid hover ─────────────────────
+// ─── Provider card — thrust-forward + macOS liquid hover, mobile-stacked ──────
 function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProviders>['data'] extends (infer T)[] | undefined ? T : never }) {
   const [saved, setSaved] = useState(false);
   const sendInquiry = useSendServiceInquiry();
@@ -459,26 +494,32 @@ function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProv
         {/* Single grey top border accent */}
         <div className="h-px w-full bg-gray-200" />
 
-        <div className="p-5">
-          <div className="flex gap-4">
+        <div className="p-4 sm:p-5">
 
-            {/* Logo */}
+          {/* Top block: logo + name/rating/tags/meta (always a row), save button pinned top-right */}
+          <div className="flex gap-3 sm:gap-4">
             <ProviderLogo name={provider.name} logoUrl={provider.logo_url} />
 
-            {/* Middle: name, rating, tags, meta */}
             <div className="flex-1 min-w-0">
-
               {/* Name row */}
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <h3 className="text-[14px] font-semibold text-gray-900 leading-snug">
-                  {provider.name}
-                </h3>
-                {provider.is_verified && <VerifiedBadge />}
-                {provider.is_top_rated && (
-                  <span className="text-[10px] font-semibold px-2 py-0.5 bg-orange-50 text-orange-500 border border-orange-200 rounded-full ml-1">
-                    Top Rated
-                  </span>
-                )}
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <h3 className="text-[14px] font-semibold text-gray-900 leading-snug">
+                    {provider.name}
+                  </h3>
+                  {provider.is_verified && <VerifiedBadge />}
+                  {provider.is_top_rated && (
+                    <span className="text-[10px] font-semibold px-2 py-0.5 bg-orange-50 text-orange-500 border border-orange-200 rounded-full">
+                      Top Rated
+                    </span>
+                  )}
+                </div>
+
+                {/* Save button — visible here on mobile only */}
+                <button onClick={() => setSaved(s => !s)}
+                  className={`p-1.5 rounded-lg border transition-colors shrink-0 sm:hidden ${saved ? 'border-rose-300 bg-rose-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                  <Heart className={`h-4 w-4 ${saved ? 'fill-rose-500 text-rose-500' : 'text-gray-400'}`} />
+                </button>
               </div>
 
               {/* Rating row */}
@@ -512,7 +553,7 @@ function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProv
               )}
 
               {/* Meta row */}
-              <div className="flex flex-wrap items-center gap-3 mt-2.5">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2.5">
                 {provider.stage_focus_label && (
                   <span className="inline-flex items-center gap-1 text-[11px] text-gray-500">
                     <Users className="h-3 w-3" />{provider.stage_focus_label}
@@ -531,8 +572,8 @@ function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProv
               </div>
             </div>
 
-            {/* Right: price + save + actions */}
-            <div className="flex flex-col items-end shrink-0 gap-2 min-w-[130px]">
+            {/* Desktop-only right column: save + price, buttons separated below */}
+            <div className="hidden sm:flex flex-col items-end shrink-0 gap-2 min-w-[130px]">
               <button onClick={() => setSaved(s => !s)}
                 className={`p-1.5 rounded-lg border transition-colors ${saved ? 'border-rose-300 bg-rose-50' : 'border-gray-200 hover:border-gray-300'}`}>
                 <Heart className={`h-4 w-4 ${saved ? 'fill-rose-500 text-rose-500' : 'text-gray-400'}`} />
@@ -561,6 +602,30 @@ function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProv
               </div>
             </div>
           </div>
+
+          {/* Mobile-only bottom bar: price + full-width action buttons below content */}
+          <div className="sm:hidden mt-3 pt-3 border-t border-gray-100">
+            {provider.starting_price && (
+              <div className="flex items-baseline gap-1 mb-2">
+                <p className="text-[10px] text-gray-400">Starting from</p>
+                <p className="text-[15px] font-bold text-gray-900">
+                  ₹{Number(provider.starting_price).toLocaleString('en-IN')}
+                </p>
+              </div>
+            )}
+            <div className="flex gap-2">
+              <Link to={`/network/provider/${provider.slug}`}
+                className="flex-1 text-center bg-blue-600 hover:bg-blue-500 text-white text-[12px] font-medium py-2.5 rounded-xl transition-colors">
+                View Profile
+              </Link>
+              <button
+                onClick={handleBook}
+                disabled={sendInquiry.isPending}
+                className="flex-1 text-center border border-gray-300 hover:bg-gray-50 text-gray-700 text-[12px] font-medium py-2.5 rounded-xl transition-colors disabled:opacity-60">
+                Book Consultation
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -569,9 +634,9 @@ function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProv
 
 function CardSkeleton() {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-5 animate-pulse">
-      <div className="flex gap-4">
-        <div className="w-[72px] h-[72px] rounded-xl bg-gray-200 shrink-0" />
+    <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 animate-pulse">
+      <div className="flex gap-3 sm:gap-4">
+        <div className="w-14 h-14 sm:w-[72px] sm:h-[72px] rounded-xl bg-gray-200 shrink-0" />
         <div className="flex-1 space-y-2">
           <div className="h-4 w-36 bg-gray-200 rounded" />
           <div className="h-3 w-24 bg-gray-100 rounded" />
@@ -581,12 +646,16 @@ function CardSkeleton() {
             <div className="h-5 w-16 bg-gray-100 rounded-full" />
           </div>
         </div>
-        <div className="flex flex-col items-end gap-2 min-w-[130px]">
+        <div className="hidden sm:flex flex-col items-end gap-2 min-w-[130px]">
           <div className="h-8 w-8 bg-gray-100 rounded-lg" />
           <div className="h-4 w-20 bg-gray-100 rounded" />
           <div className="h-9 w-full bg-gray-200 rounded-xl mt-auto" />
           <div className="h-9 w-full bg-gray-100 rounded-xl" />
         </div>
+      </div>
+      <div className="sm:hidden mt-3 pt-3 border-t border-gray-100 flex gap-2">
+        <div className="h-9 flex-1 bg-gray-200 rounded-xl" />
+        <div className="h-9 flex-1 bg-gray-100 rounded-xl" />
       </div>
     </div>
   );
@@ -599,6 +668,7 @@ export default function ServiceCategoryPage() {
   const activeSubCat = searchParams.get('sub') ?? '';
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [search, setSearch] = useState('');
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     stages: [], sort: 'top_rated', budgetIdx: 0, location: '',
   });
@@ -630,12 +700,20 @@ export default function ServiceCategoryPage() {
     return Object.entries(freq).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([t]) => t);
   }, [providers]);
 
+  const filterSidebarProps = {
+    filters,
+    setFilters,
+    subCategories,
+    activeSubCat,
+    setActiveSubCat: (s: string) => setSearchParams(s ? { sub: s } : {}),
+  };
+
   return (
     <AppLayout showMobileHeader title={category?.name ?? 'Services'} showBottomNav>
       <div className="max-w-[1180px] mx-auto px-4 md:px-6 py-5 md:py-6">
 
         {/* Breadcrumb */}
-        <nav className="flex justify-start items-center gap-2 text-[12px] text-gray-400 mb-4">
+        <nav className="flex justify-start items-center gap-2 text-[12px] text-gray-400 mb-4 overflow-x-auto whitespace-nowrap">
           <span><Link to="/" className="hover:text-gray-600">Home</Link></span>
           <span>›</span>
           <span><Link to="/network/services" className="hover:text-gray-600">Services</Link></span>
@@ -645,23 +723,23 @@ export default function ServiceCategoryPage() {
 
         {/* Category hero banner */}
         {category && (
-          <div className="bg-white border border-gray-200 rounded-xl p-5 mb-5 flex items-center gap-5">
-            <div className="h-16 w-16 rounded-2xl bg-blue-50 flex items-center justify-center shrink-0 p-3">
+          <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 mb-5 flex items-center gap-4 sm:gap-5">
+            <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-2xl bg-blue-50 flex items-center justify-center shrink-0 p-2.5 sm:p-3">
               {getCategoryIcon(category.icon)}
             </div>
             <div className="flex-1 min-w-0">
-              <h1 className="text-[22px] font-bold text-gray-900">{category.name}</h1>
-              <p className="text-[13px] text-gray-500 mt-0.5">{category.description}</p>
-              <div className="flex flex-wrap items-center gap-5 mt-2">
-                <span className="inline-flex items-center gap-1.5 text-[12px] text-gray-600">
+              <h1 className="text-[18px] sm:text-[22px] font-bold text-gray-900">{category.name}</h1>
+              <p className="text-[12px] sm:text-[13px] text-gray-500 mt-0.5">{category.description}</p>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 sm:gap-5 mt-2">
+                <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-[12px] text-gray-600">
                   <ShieldCheck className="h-3.5 w-3.5 text-green-500" />
                   {category.provider_count}+ Verified Providers
                 </span>
-                <span className="inline-flex items-center gap-1.5 text-[12px] text-gray-600">
+                <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-[12px] text-gray-600">
                   <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
                   4.8 Avg. Rating
                 </span>
-                <span className="inline-flex items-center gap-1.5 text-[12px] text-gray-600">
+                <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-[12px] text-gray-600">
                   <Users className="h-3.5 w-3.5 text-blue-500" />
                   10K+ Startups Served
                 </span>
@@ -681,7 +759,7 @@ export default function ServiceCategoryPage() {
                 <button
                   key={sc.slug}
                   onClick={() => setSearchParams(activeSubCat === sc.slug ? {} : { sub: sc.slug })}
-                  className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border text-center transition-all ${
+                  className={`flex flex-col items-center gap-1.5 p-2.5 sm:p-3 rounded-xl border text-center transition-all ${
                     activeSubCat === sc.slug
                       ? 'border-blue-500 bg-blue-50 text-blue-600'
                       : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
@@ -701,21 +779,15 @@ export default function ServiceCategoryPage() {
         {/* 3-column layout: filter | providers | right sidebar */}
         <div className="flex gap-5">
 
-          {/* Left filter sidebar */}
-          <FilterSidebar
-            filters={filters}
-            setFilters={setFilters}
-            subCategories={subCategories}
-            activeSubCat={activeSubCat}
-            setActiveSubCat={s => setSearchParams(s ? { sub: s } : {})}
-          />
+          {/* Left filter sidebar — desktop only */}
+          <FilterSidebar {...filterSidebarProps} />
 
           {/* Provider list */}
           <div className="flex-1 min-w-0">
 
             {/* Toolbar */}
-            <div className="flex flex-wrap items-center justify-between space-y-2 mb-3">
-              <p className="text-[13px] text-gray-500">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <p className="text-[13px] text-gray-500 order-1">
                 Showing <span className="font-medium text-gray-800">{providers.length}</span> providers
                 {activeSubCat && (
                   <> for <span className="font-medium text-gray-800">
@@ -723,7 +795,8 @@ export default function ServiceCategoryPage() {
                   </span></>
                 )}
               </p>
-              <div className="flex items-center gap-2">
+
+              <div className="flex items-center gap-2 order-3 sm:order-2 w-full sm:w-auto">
                 <div className="relative hidden md:block">
                   <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
                   <input
@@ -733,19 +806,29 @@ export default function ServiceCategoryPage() {
                     className="pl-8 pr-3 py-1.5 text-[12px] border border-gray-200 rounded-lg bg-white focus:outline-none focus:border-blue-400 w-44"
                   />
                 </div>
-                <div className="flex items-center gap-1">
-                  <span className="text-[12px] text-gray-500 mr-1">Sort by:</span>
+
+                {/* Mobile filter trigger */}
+                <button
+                  onClick={() => setMobileFilterOpen(true)}
+                  className="lg:hidden flex items-center gap-1 text-[12px] border border-gray-200 rounded-lg px-2.5 py-1.5 bg-white text-gray-700"
+                >
+                  Filters
+                </button>
+
+                <div className="flex items-center gap-1 flex-1 sm:flex-initial">
+                  <span className="hidden sm:inline text-[12px] text-gray-500 mr-1">Sort by:</span>
                   <select
                     value={filters.sort}
                     onChange={e => setFilters({ ...filters, sort: e.target.value })}
-                    className="text-[12px] border border-gray-200 rounded-lg px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:border-blue-400"
+                    className="text-[12px] border border-gray-200 rounded-lg px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:border-blue-400 flex-1 sm:flex-initial"
                   >
                     {SORT_OPTIONS.map(o => (
                       <option key={o.value} value={o.value}>{o.label}</option>
                     ))}
                   </select>
                 </div>
-                <div className="flex border border-gray-200 rounded-lg overflow-hidden">
+
+                <div className="flex border border-gray-200 rounded-lg overflow-hidden shrink-0">
                   <button
                     onClick={() => setViewMode('grid')}
                     className={`p-1.5 ${viewMode === 'grid' ? 'bg-gray-100 text-gray-800' : 'text-gray-400 hover:text-gray-600'}`}>
@@ -789,6 +872,13 @@ export default function ServiceCategoryPage() {
           />
         </div>
       </div>
+
+      {/* Mobile filter drawer */}
+      <MobileFilterDrawer
+        open={mobileFilterOpen}
+        onClose={() => setMobileFilterOpen(false)}
+        {...filterSidebarProps}
+      />
     </AppLayout>
   );
 }
