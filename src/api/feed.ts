@@ -11,11 +11,13 @@ export interface Post {
   post_type: string;
   tags: string[] | string;
   image: string | null;           // backend uses "image", not "image_url"
+  image_url?: string | null;       // optional field for compatibility with older code
   link: string;
   is_published: boolean;
   like_count: number;
   comment_count: number;
   liked_by_me: boolean;
+  user_has_liked: boolean;  // added for clarity, same as liked_by_me
   created_at: string;
   updated_at: string;
 }
@@ -37,6 +39,19 @@ export interface FeedFilters {
   author__role?: string;
   search?: string;
   ordering?: string;
+  page?: number;        
+  page_size?: number;
+}
+
+interface PaginatedResponse<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+}
+
+function unwrapPaginated<T>(response: T[] | PaginatedResponse<T>): T[] {
+  return Array.isArray(response) ? response : (response.results ?? []);
 }
 
 export async function getFeed(filters?: FeedFilters): Promise<Post[]> {
@@ -45,24 +60,13 @@ export async function getFeed(filters?: FeedFilters): Promise<Post[]> {
   if (filters?.author__role) params.set('author__role', filters.author__role);
   if (filters?.search) params.set('search', filters.search);
   if (filters?.ordering) params.set('ordering', filters.ordering);
+  if (filters?.page) params.set('page', String(filters.page));
+  params.set('page_size', String(filters?.page_size ?? 10));
   const query = params.toString() ? `?${params.toString()}` : '';
-  return apiFetch<Post[]>(`/feed/${query}`);
+  const response = await apiFetch<Post[] | PaginatedResponse<Post>>(`/feed/${query}`);
+  return unwrapPaginated(response);
 }
 
-// export async function createPost(data: {
-//   title: string;
-//   content: string;
-//   post_type?: string;
-//   tags?: string;
-//   image_url?: string;
-// }): Promise<Post> {
-//   return apiFetch<Post>('/feed/create/', {
-//     method: 'POST',
-//     body: JSON.stringify(data),
-//   });
-// }
-
-// After
 export async function createPost(data: {
   title: string;
   content: string;
@@ -115,5 +119,6 @@ export async function createComment(postId: number, content: string, parent?: nu
 }
 
 export async function getMyPosts(): Promise<Post[]> {
-  return apiFetch<Post[]>('/feed/my/');
+  const response = await apiFetch<Post[] | PaginatedResponse<Post>>('/feed/my/');
+  return unwrapPaginated(response);
 }

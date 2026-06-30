@@ -42,7 +42,7 @@ export function TopStoryCard({ item }: { item: NewsItem }) {
           </div>
         </div>
         <div className="aspect-[4/3] md:aspect-auto bg-muted overflow-hidden order-first md:order-last">
-          <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
+          <img src={item.imageUrl} alt={item.title} loading="lazy" className="w-full h-full object-cover" />
         </div>
       </div>
     </article>

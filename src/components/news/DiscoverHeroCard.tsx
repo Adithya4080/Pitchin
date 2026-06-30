@@ -14,7 +14,7 @@ export function DiscoverHeroCard({ item }: Props) {
       className="block rounded-2xl overflow-hidden bg-card border border-border/60"
     >
       <div className="relative aspect-[16/10] w-full overflow-hidden">
-        <img src={item.imageUrl} alt={item.title} className="h-full w-full object-cover" />
+        <img src={item.imageUrl} alt={item.title} loading="lazy" className="h-full w-full object-cover" />
         <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent" />
         <div className="absolute bottom-3 left-3 flex items-center gap-2">
           <span className="inline-flex items-center h-6 px-2 rounded-full bg-white/95 text-[11px] font-medium text-foreground">

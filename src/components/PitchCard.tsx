@@ -330,15 +330,12 @@ export function PitchCard({ pitch, hideBorder = false }: PitchCardProps) {
         </div>
 
         {/* ── Media ────────────────────────────────────────────── */}
-        {(p.image || pitch.image) && (
-          <div className="w-[calc(100%+2rem)] -mx-4 mb-3 overflow-hidden bg-muted/30">
-            <img
-              src={p.image || pitch.image}
-              alt="Post attachment"
-              className="w-full h-auto object-cover max-h-[70vh]"
-            />
-          </div>
-        )}
+        <img
+          src={p.image || pitch.image}
+          alt="Post attachment"
+          loading="lazy"
+          className="w-full h-auto object-cover max-h-[70vh]"
+        />
 
         {/* ── Link Preview Card ─────────────────────────────────── */}
         {showLinkCard && (

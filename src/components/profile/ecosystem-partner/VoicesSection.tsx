@@ -16,7 +16,7 @@ function VoiceCard({ voice, isMobile = false }: { voice: VoiceEntry; isMobile?: 
   return (
     <div className={`flex-shrink-0 overflow-hidden rounded-lg relative ${isMobile ? 'w-[160px] h-[200px] snap-center' : 'w-[170px] h-[220px]'}`}>
       {voice.portrait_url ? (
-        <img src={voice.portrait_url} alt={voice.name} className="absolute inset-0 w-full h-full object-cover" />
+        <img src={voice.portrait_url} alt={voice.name} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
       ) : (
         <div className="absolute inset-0 w-full h-full bg-muted flex items-center justify-center">
           <span className="text-3xl font-semibold text-muted-foreground">{voice.name?.charAt(0)?.toUpperCase() || '?'}</span>
