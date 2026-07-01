@@ -134,6 +134,51 @@ const SUB_CAT_ICONS: Record<string, JSX.Element> = {
       <path d="M9 3v12M5 7l4-4 4 4" /><path d="M5 13h8" />
     </svg>
   ),
+  'web-development': (
+    <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+      <rect x="2" y="3" width="14" height="12" rx="1.5" /><path d="M2 6.5h14" />
+      <path d="M6 10l-1.5 1.5L6 13M10 10l1.5 1.5L10 13" />
+    </svg>
+  ),
+  'app-development': (
+    <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+      <rect x="5" y="1.5" width="8" height="15" rx="1.5" /><line x1="8" y1="14" x2="10" y2="14" />
+    </svg>
+  ),
+  'cloud-infrastructure': (
+    <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 13a3 3 0 0 1 .3-6 4 4 0 0 1 7.6 1.3A2.6 2.6 0 0 1 12.6 13H5z" />
+    </svg>
+  ),
+  'ai-automation': (
+    <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="4" y="5" width="10" height="8" rx="2" /><circle cx="7" cy="9" r="0.8" fill="currentColor" />
+      <circle cx="11" cy="9" r="0.8" fill="currentColor" /><path d="M9 5V2M6 2h6" />
+    </svg>
+  ),
+  'cybersecurity': (
+    <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 2l6 2.5v4c0 4-2.5 6.5-6 7.5-3.5-1-6-3.5-6-7.5v-4L9 2z" />
+      <path d="M6.5 9l1.8 1.8L11.5 7" />
+    </svg>
+  ),
+  'enterprise-software-saas': (
+    <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="4" width="14" height="10" rx="1.5" /><line x1="2" y1="7.5" x2="16" y2="7.5" />
+      <line x1="5" y1="11" x2="9" y2="11" />
+    </svg>
+  ),
+  'it-consulting-strategy': (
+    <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="9" cy="9" r="6.5" /><path d="M9 5.5v4l2.5 1.5" />
+    </svg>
+  ),
+  'devops-qa-testing': (
+    <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 4l3 3-3 3M9 10h5" />
+      <path d="M11 4l3 10" />
+    </svg>
+  ),
 };
 
 function getSubCatIcon(slug: string) {
