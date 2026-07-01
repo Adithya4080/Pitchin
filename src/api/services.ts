@@ -26,9 +26,7 @@ export type ServiceProvider = {
   category: number;
   category_name: string;
   category_slug: string;
-  sub_category: number | null;
-  sub_category_name: string | null;
-  sub_category_slug: string | null;
+  sub_categories: ServiceSubCategory[];
   name: string;
   tagline: string;
   description: string;
