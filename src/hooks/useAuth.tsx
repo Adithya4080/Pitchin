@@ -1,12 +1,15 @@
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
+import { useGoogleLogin } from '@react-oauth/google';
 import {
   login as apiLogin,
   register as apiRegister,
   logout as apiLogout,
   getMe,
+  loginWithGoogle,
   AuthUser,
 } from '@/api/auth';
 import { getAccessToken, getRefreshToken, clearTokens } from '@/api/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -30,6 +33,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isOnboarded, setIsOnboarded] = useState<boolean | null>(null);
   const [isOnboardingChecked, setIsOnboardingChecked] = useState(false);
+  const { toast } = useToast();
 
   const checkOnboarding = useCallback((u: AuthUser | null) => {
     if (!u) {
@@ -99,15 +103,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     const refresh = getRefreshToken() ?? '';
-    await apiLogout(refresh).catch(() => { });
+    await apiLogout(refresh).catch(() => {});
     setUser(null);
     setIsOnboarded(null);
     setIsOnboardingChecked(false);
   };
 
-  const signInWithGoogle = async () => ({
-    error: new Error('Google sign-in is not configured for this backend.'),
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (response) => {
+      try {
+        const data = await loginWithGoogle(response.access_token);
+        localStorage.setItem('access_token', data.access);
+        localStorage.setItem('refresh_token', data.refresh);
+        setUser(data.user);
+        checkOnboarding(data.user);
+      } catch (e) {
+        toast({ title: 'Google sign-in failed', variant: 'destructive' });
+      }
+    },
+    onError: () => {
+      toast({ title: 'Google sign-in was cancelled', variant: 'destructive' });
+    },
   });
+
+  const signInWithGoogle = async (): Promise<{ error: Error | null }> => {
+    return new Promise((resolve) => {
+      googleLogin();
+      resolve({ error: null });
+    });
+  };
+
   const signInWithLinkedIn = async () => ({
     error: new Error('LinkedIn sign-in is not configured for this backend.'),
   });

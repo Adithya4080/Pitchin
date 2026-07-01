@@ -66,3 +66,11 @@ export async function changePassword(oldPassword: string, newPassword: string): 
     body: JSON.stringify({ old_password: oldPassword, new_password: newPassword }),
   });
 }
+
+export async function loginWithGoogle(token: string) {
+  const res = await apiFetch('/auth/google/', {
+    method: 'POST',
+    body: JSON.stringify({ token }),
+  });
+  return res as { user: AuthUser; access: string; refresh: string };
+}
