@@ -1,14 +1,15 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Search, Bell, Users } from 'lucide-react';
+// import { Home, Search, Bell, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useUnreadCount } from '@/hooks/useNotifications';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Home, Search, Bell, Users, type LucideIcon } from 'lucide-react';
 
 interface NavItem {
-  icon: React.ComponentType<{ className?: string }>;
+  icon: LucideIcon;
   label: string;
   path: string;
   requiresAuth?: boolean;
@@ -54,78 +55,12 @@ export function BottomNavigation() {
     navigate(item.path);
   };
 
+  const allItems = [...navItems];
+
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-card backdrop-blur-lg border-t border-border safe-area-bottom w-full max-w-full">
-      <div className="flex items-center justify-around h-16 px-1 w-full max-w-full">
-        {/* First two nav items */}
-        {navItems.slice(0, 2).map((item) => {
-          const isActive = location.pathname === item.path;
-          return (
-            <button
-              key={item.path}
-              onClick={() => handleNavClick(item)}
-              className="flex flex-col items-center justify-center flex-1 h-full min-w-[64px] touch-manipulation"
-            >
-              <motion.div
-                whileTap={{ scale: 0.9 }}
-                className="flex flex-col items-center"
-              >
-                <item.icon
-                  className={cn(
-                    "h-6 w-6 transition-colors",
-                    isActive ? "text-primary" : "text-muted-foreground"
-                  )}
-                />
-                <span
-                  className={cn(
-                    "text-[10px] mt-1 font-medium transition-colors",
-                    isActive ? "text-primary" : "text-muted-foreground"
-                  )}
-                >
-                  {item.label}
-                </span>
-              </motion.div>
-            </button>
-          );
-        })}
-
-        {/* Center - Network Button (raised, matches reference design) */}
-        {(() => {
-          const item = navItems[2]; // Network
-          const isActive = location.pathname === item.path;
-          return (
-            <button
-              key={item.path}
-              onClick={() => handleNavClick(item)}
-              className="flex flex-col items-center justify-center flex-1 h-full min-w-[64px] touch-manipulation"
-            >
-              <motion.div
-                whileTap={{ scale: 0.9 }}
-                className="flex flex-col items-center -mt-7"
-              >
-                <div
-                  className={cn(
-                    "h-12 w-12 rounded-full flex items-center justify-center shadow-lg shadow-primary/30 transition-colors",
-                    isActive ? "bg-primary" : "bg-primary/90"
-                  )}
-                >
-                  <item.icon className="h-6 w-6 text-primary-foreground" />
-                </div>
-                <span
-                  className={cn(
-                    "text-[10px] mt-1 font-medium transition-colors",
-                    isActive ? "text-primary" : "text-muted-foreground"
-                  )}
-                >
-                  {item.label}
-                </span>
-              </motion.div>
-            </button>
-          );
-        })()}
-
-        {/* Alerts */}
-        {navItems.slice(3).map((item) => {
+    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden px-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] pointer-events-none">
+      <div className="liquid-glass pointer-events-auto mx-auto flex max-w-md items-center justify-around rounded-full px-2 py-2">
+        {allItems.map((item) => {
           const isActive = location.pathname === item.path;
           const showBadge = item.path === '/notifications' && unreadCount > 0;
 
@@ -133,29 +68,40 @@ export function BottomNavigation() {
             <button
               key={item.path}
               onClick={() => handleNavClick(item)}
-              className="flex flex-col items-center justify-center flex-1 h-full min-w-[64px] touch-manipulation relative"
+              aria-label={item.label}
+              className="relative flex h-12 min-w-[56px] flex-1 touch-manipulation items-center justify-center"
             >
+              {isActive && (
+                <motion.div
+                  layoutId="liquid-nav-active"
+                  className="liquid-glass-active absolute inset-0 rounded-full"
+                  initial={{ scale: 0.6, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: 'spring', stiffness: 480, damping: 30 }}
+                />
+              )}
               <motion.div
-                whileTap={{ scale: 0.9 }}
-                className="flex flex-col items-center relative"
+                whileTap={{ scale: 0.88 }}
+                className="relative flex flex-col items-center justify-center gap-0.5"
               >
                 <div className="relative">
                   <item.icon
                     className={cn(
-                      "h-6 w-6 transition-colors",
-                      isActive ? "text-primary" : "text-muted-foreground"
+                      'h-[22px] w-[22px] transition-colors duration-200',
+                      isActive ? 'text-primary' : 'text-muted-foreground'
                     )}
+                    strokeWidth={isActive ? 2.4 : 2}
                   />
                   {showBadge && (
-                    <span className="absolute -top-1 -right-1 h-4 min-w-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
+                    <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[9px] font-bold text-destructive-foreground ring-2 ring-background">
                       {unreadCount > 9 ? '9+' : unreadCount}
                     </span>
                   )}
                 </div>
                 <span
                   className={cn(
-                    "text-[10px] mt-1 font-medium transition-colors",
-                    isActive ? "text-primary" : "text-muted-foreground"
+                    'text-[10px] font-medium leading-none transition-colors duration-200',
+                    isActive ? 'text-primary' : 'text-muted-foreground'
                   )}
                 >
                   {item.label}
@@ -168,16 +114,20 @@ export function BottomNavigation() {
         {/* Profile avatar */}
         <button
           onClick={handleAvatarClick}
-          className="flex flex-col items-center justify-center flex-1 h-full min-w-[64px] touch-manipulation"
+          aria-label="Profile"
+          className="relative flex h-12 min-w-[56px] flex-1 touch-manipulation items-center justify-center"
         >
-          <motion.div whileTap={{ scale: 0.9 }} className="flex flex-col items-center">
-            <Avatar className="h-6 w-6 ring-2 ring-primary/20">
+          <motion.div
+            whileTap={{ scale: 0.88 }}
+            className="flex flex-col items-center justify-center gap-0.5"
+          >
+            <Avatar className="h-[22px] w-[22px] ring-2 ring-primary/25">
               <AvatarImage src={profile?.avatar ?? user?.avatar_url} />
-              <AvatarFallback className="bg-primary/10 text-primary text-[9px] font-semibold">
+              <AvatarFallback className="bg-primary/10 text-[8px] font-semibold text-primary">
                 {initials}
               </AvatarFallback>
             </Avatar>
-            <span className="text-[10px] mt-1 font-medium text-muted-foreground">
+            <span className="text-[10px] font-medium leading-none text-muted-foreground">
               Profile
             </span>
           </motion.div>

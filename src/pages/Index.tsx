@@ -206,7 +206,7 @@ function DesktopLanding() {
       {/* <WhoWeAre /> */}
 
       {/* The Problem */}
-      <TheProblem />
+      {/* <TheProblem /> */}
 
       {/* The Solution */}
       {/* <TheSolution /> */}

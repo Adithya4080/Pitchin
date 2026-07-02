@@ -63,13 +63,9 @@ export function MobileHeader({ title, showNotifications = true }: MobileHeaderPr
 
         {/* Center — Page title or Logo */}
         <div className="absolute left-1/2 -translate-x-1/2">
-          {title ? (
-            <h1 className="font-display font-semibold text-base">{title}</h1>
-          ) : (
             <Link to="/feed">
               <span className="font-display font-bold text-xl tracking-tight text-sky-400">Pitchin</span>
             </Link>
-          )}
         </div>
 
         {/* Right — Bell with unread badge */}

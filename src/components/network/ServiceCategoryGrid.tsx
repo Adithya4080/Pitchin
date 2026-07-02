@@ -1,7 +1,8 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Scale, Megaphone, FileText, Layout, Palette, Code2, TrendingUp, Shield, Users, HelpCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useServiceCategories } from '@/hooks/useServices';
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { motion } from 'framer-motion';
 
 const ICON_MAP: Record<string, { icon: React.ReactNode; bg: string; text: string; accent: string; lightBg: string }> = {
   scale:          { icon: <Scale className="h-6 w-6" />,      bg: 'bg-blue-50',    text: 'text-blue-600',   accent: '#2563EB', lightBg: '#EFF6FF' },
@@ -38,10 +39,12 @@ function CategorySkeleton() {
 // ─── Thrust-forward + macOS liquid hover card ─────────────────────────────────
 function CategoryCard({ cat }: { cat: any }) {
   const cfg = getIconConfig(cat.icon);
+  const navigate = useNavigate();
   const cardRef = useRef<HTMLAnchorElement>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [glowPos, setGlowPos] = useState({ x: 50, y: 50 });
   const [hovered, setHovered] = useState(false);
+  const [pressed, setPressed] = useState(false);
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
     const card = cardRef.current;
@@ -61,15 +64,43 @@ function CategoryCard({ cat }: { cat: any }) {
     setHovered(false);
   }, []);
 
+  // Touch equivalent — no cursor position, so glow radiates from touch point
+  const handleTouchStart = useCallback((e: React.TouchEvent<HTMLAnchorElement>) => {
+    const card = cardRef.current;
+    if (card) {
+      const rect = card.getBoundingClientRect();
+      const touch = e.touches[0];
+      setGlowPos({
+        x: ((touch.clientX - rect.left) / rect.width) * 100,
+        y: ((touch.clientY - rect.top) / rect.height) * 100,
+      });
+    }
+    setPressed(true);
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    // Let the glow/tint linger briefly so it reads as a tap response, not a flash
+    window.setTimeout(() => setPressed(false), 220);
+  }, []);
+
+  const active = hovered || pressed;
+
   return (
     <div style={{ perspective: "800px" }} className="h-full">
-      <Link
+      <motion.a
         ref={cardRef}
-        to={`/network/services/${cat.slug}`}
+        href={`/network/services/${cat.slug}`}
+        onClick={(e) => {
+          e.preventDefault();
+          navigate(`/network/services/${cat.slug}`);
+        }}
         onMouseMove={handleMouseMove}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={handleMouseLeave}
-        className="group relative flex flex-col rounded-xl bg-white overflow-hidden h-full"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        whileTap={{ scale: 0.97 }}
+        className="group relative flex flex-col rounded-xl bg-white overflow-hidden h-full touch-manipulation"
         style={{
           border: '1px solid #e5e7eb',
           transform: hovered
@@ -78,15 +109,15 @@ function CategoryCard({ cat }: { cat: any }) {
           transition: hovered
             ? 'transform 0.08s ease-out, box-shadow 0.2s ease-out'
             : 'transform 0.45s cubic-bezier(0.23,1,0.32,1), box-shadow 0.45s ease-out',
-          boxShadow: hovered
+          boxShadow: active
             ? '0 18px 50px -8px rgba(0,0,0,0.16), 0 6px 16px -4px rgba(0,0,0,0.09), 0 0 0 1px rgba(0,0,0,0.04)'
             : '0 1px 3px rgba(0,0,0,0.05)',
           willChange: 'transform',
           textDecoration: 'none',
         }}
       >
-        {/* macOS liquid glow — follows cursor */}
-        {hovered && (
+        {/* macOS liquid glow — follows cursor (or last touch point) */}
+        {active && (
           <div
             className="absolute inset-0 pointer-events-none rounded-xl z-10"
             style={{
@@ -99,12 +130,12 @@ function CategoryCard({ cat }: { cat: any }) {
         {/* Single grey top border accent line */}
         <div className="h-px w-full bg-gray-200" />
 
-        {/* Subtle colour tint on hover */}
+        {/* Subtle colour tint on hover/press */}
         <div
           className="absolute inset-0 pointer-events-none rounded-xl transition-opacity duration-300"
           style={{
             background: `linear-gradient(135deg, ${cfg.lightBg} 0%, white 60%)`,
-            opacity: hovered ? 1 : 0,
+            opacity: active ? 1 : 0,
           }}
         />
 
@@ -114,7 +145,7 @@ function CategoryCard({ cat }: { cat: any }) {
             className={`inline-flex items-center justify-center h-12 w-12 rounded-xl ${cfg.bg} ${cfg.text} mb-3 shrink-0`}
             style={{
               transition: 'transform 0.3s cubic-bezier(0.23,1,0.32,1)',
-              transform: hovered ? 'scale(1.12)' : 'scale(1)',
+              transform: active ? 'scale(1.12)' : 'scale(1)',
             }}
           >
             {cfg.icon}
@@ -136,20 +167,20 @@ function CategoryCard({ cat }: { cat: any }) {
           <div className="flex items-center justify-between mt-auto">
             <p
               className="text-[11px] font-medium transition-colors duration-200"
-              style={{ color: hovered ? cfg.accent : 'rgba(0,0,0,0.25)' }}
+              style={{ color: active ? cfg.accent : 'rgba(0,0,0,0.25)' }}
             >
               {cat.provider_count > 0 ? `${cat.provider_count}+` : '—'}
             </p>
             <ArrowRight
               className="h-3.5 w-3.5 transition-all duration-200"
               style={{
-                color: hovered ? cfg.accent : 'rgba(0,0,0,0.2)',
-                transform: hovered ? 'translateX(2px)' : 'translateX(0)',
+                color: active ? cfg.accent : 'rgba(0,0,0,0.2)',
+                transform: active ? 'translateX(2px)' : 'translateX(0)',
               }}
             />
           </div>
         </div>
-      </Link>
+      </motion.a>
     </div>
   );
 }
