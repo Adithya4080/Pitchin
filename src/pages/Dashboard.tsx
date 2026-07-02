@@ -136,9 +136,6 @@ export default function Dashboard() {
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // New dashboard sections state (funding, traction, trust/press)
-  // These are stored in roleProfileData.funding_data / traction_data / trust_press_data
-  // and loaded from the profile API. Local state mirrors them for immediate UI updates.
 
   // Role profile state
   const { role: hookRole, roleProfile, saveRoleProfile } = useRoleProfile(user?.id);
@@ -534,6 +531,7 @@ export default function Dashboard() {
             description: roleProfileData?.intro_video_description,
             thumbnailUrl: roleProfileData?.intro_video_thumbnail_url,
           } : undefined}
+          shareSection={(role === 'innovator' || role === 'startup') ? <ShareDashboardButton /> : undefined}
           roleSection={role !== 'ecosystem_partner' ? renderRoleSection(false, true) : undefined}
           portfolioSection={(role === 'startup' || role === 'innovator') ? (
             <StartupPortfolioSection
