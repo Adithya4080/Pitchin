@@ -1,4 +1,4 @@
-export const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://pitchin-backend-production-79da.up.railway.app/api';
+export const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://api.pichin.in/api';
 
 // ─── Token Management ──────────────────────────────────────────────────────────
 

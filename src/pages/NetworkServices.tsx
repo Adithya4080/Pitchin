@@ -22,9 +22,9 @@ const QUICK_ACTIONS = [
 
 function QuickActionsPanel() {
   return (
-    <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
-      <div className="px-4 pt-4 pb-2 border-b border-gray-50">
-        <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-gray-300">Quick Actions</p>
+    <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08),0_2px_8px_-2px_rgba(0,0,0,0.04)]">
+      <div className="px-4 pt-4 pb-2 border-b border-gray-100">
+        <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400">Quick Actions</p>
       </div>
       <div className="p-2">
         {QUICK_ACTIONS.map(a => {

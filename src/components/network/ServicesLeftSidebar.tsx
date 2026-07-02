@@ -276,37 +276,38 @@ export function ServicesLeftSidebar() {
       </aside>
 
       {/* Desktop full sidebar (lg+) */}
-      <aside className="w-[205px] shrink-0 hidden lg:flex flex-col gap-2 sticky top-20 self-start max-h-[calc(100vh-88px)] overflow-y-auto">
-        <div className="bg-white border border-gray-100 rounded-2xl p-2 shadow-sm">
-          <SectionLabel label="Discover" />
-          {DISCOVER_NAV.map(item => (
-            <NavItem key={item.label} icon={item.icon} label={item.label}
-              sub={item.sub} path={item.path} active={isActive(item.path)} />
-          ))}
-        </div>
-        <div className="bg-white border border-gray-100 rounded-2xl p-2 shadow-sm">
-          <SectionLabel label="My Space" />
-          {MY_SPACE_NAV.map(item => (
-            <NavItem key={item.label} icon={item.icon} label={item.label}
-              sub={item.sub} path={item.path} active={isActive(item.path)}
-              badge={item.badgeKey === 'messages' ? unreadCount : undefined} />
-          ))}
-        </div>
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-700 p-4 text-white shadow-sm">
-          <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-white/10 pointer-events-none" />
-          <Sparkles className="h-5 w-5 text-yellow-300 mb-2 relative" strokeWidth={1.75} />
-          <p className="text-[13px] font-bold leading-snug relative">Upgrade to Premium</p>
-          <p className="text-[11px] text-indigo-200 mt-1 leading-snug relative">
-            Boost visibility, unlock priority features and grow faster.
-          </p>
-          <button
-            onClick={() => navigate('/coming-soon')}
-            className="mt-3 w-full flex items-center justify-center gap-1.5 bg-white text-indigo-700 text-[12px] font-bold py-2 rounded-xl hover:bg-indigo-50 transition-colors relative"
-          >
-            Upgrade Now <ArrowRight className="h-3.5 w-3.5" />
-          </button>
-        </div>
-      </aside>
+{/* Desktop full sidebar (lg+) */}
+<aside className="w-[205px] shrink-0 hidden lg:flex flex-col gap-2 sticky top-20 self-start max-h-[calc(100vh-88px)] overflow-y-auto">
+  <div className="bg-white border border-gray-200 rounded-2xl p-2 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08),0_2px_8px_-2px_rgba(0,0,0,0.04)]">
+    <SectionLabel label="Discover" />
+    {DISCOVER_NAV.map(item => (
+      <NavItem key={item.label} icon={item.icon} label={item.label}
+        sub={item.sub} path={item.path} active={isActive(item.path)} />
+    ))}
+  </div>
+  <div className="bg-white border border-gray-200 rounded-2xl p-2 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08),0_2px_8px_-2px_rgba(0,0,0,0.04)]">
+    <SectionLabel label="My Space" />
+    {MY_SPACE_NAV.map(item => (
+      <NavItem key={item.label} icon={item.icon} label={item.label}
+        sub={item.sub} path={item.path} active={isActive(item.path)}
+        badge={item.badgeKey === 'messages' ? unreadCount : undefined} />
+    ))}
+  </div>
+  <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-700 p-4 text-white shadow-sm">
+    <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-white/10 pointer-events-none" />
+    <Sparkles className="h-5 w-5 text-yellow-300 mb-2 relative" strokeWidth={1.75} />
+    <p className="text-[13px] font-bold leading-snug relative">Upgrade to Premium</p>
+    <p className="text-[11px] text-indigo-200 mt-1 leading-snug relative">
+      Boost visibility, unlock priority features and grow faster.
+    </p>
+    <button
+      onClick={() => navigate('/coming-soon')}
+      className="mt-3 w-full flex items-center justify-center gap-1.5 bg-white text-indigo-700 text-[12px] font-bold py-2 rounded-xl hover:bg-indigo-50 transition-colors relative"
+    >
+      Upgrade Now <ArrowRight className="h-3.5 w-3.5" />
+    </button>
+  </div>
+</aside>
     </>
   );
 }
