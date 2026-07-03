@@ -157,16 +157,16 @@ function Drawer({ open, onClose, isActive, unreadCount, navigate }: {
             ))}
           </div>
 
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-700 p-4 text-white">
-            <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-white/10 pointer-events-none" />
-            <Sparkles className="h-5 w-5 text-yellow-300 mb-2 relative" strokeWidth={1.75} />
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-100 via-yellow-50 to-amber-100 border border-amber-300/60 p-4 text-amber-900">
+            <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-amber-300/20 pointer-events-none" />
+            <Sparkles className="h-5 w-5 text-amber-500 mb-2 relative" strokeWidth={1.75} />
             <p className="text-[13px] font-bold relative">Upgrade to Premium</p>
-            <p className="text-[11px] text-indigo-200 mt-1 leading-snug relative">
+            <p className="text-[11px] text-amber-700 mt-1 leading-snug relative">
               Boost visibility and grow faster.
             </p>
             <button
               onClick={() => { onClose(); navigate('/coming-soon'); }}
-              className="mt-3 w-full flex items-center justify-center gap-1.5 bg-white text-indigo-700 text-[12px] font-bold py-2 rounded-xl hover:bg-indigo-50 transition-colors relative"
+              className="mt-3 w-full flex items-center justify-center gap-1.5 bg-gradient-to-r from-amber-400 to-yellow-500 text-white text-[12px] font-bold py-2 rounded-xl hover:from-amber-500 hover:to-yellow-600 transition-colors relative shadow-sm"
             >
               Upgrade Now <ArrowRight className="h-3.5 w-3.5" />
             </button>
@@ -268,46 +268,45 @@ export function ServicesLeftSidebar() {
         <button
           title="Upgrade to Premium"
           onClick={() => navigate('/coming-soon')}
-          className="flex flex-col items-center gap-1 p-2.5 rounded-2xl bg-gradient-to-b from-indigo-600 to-violet-700 hover:from-indigo-500 hover:to-violet-600 transition-all"
+          className="flex flex-col items-center gap-1 p-2.5 rounded-2xl bg-gradient-to-b from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 transition-all"
         >
-          <Sparkles className="h-5 w-5 text-yellow-300" strokeWidth={1.75} />
+          <Sparkles className="h-5 w-5 text-white" strokeWidth={1.75} />
           <span className="text-[9px] font-bold text-white">Pro</span>
         </button>
       </aside>
 
       {/* Desktop full sidebar (lg+) */}
-{/* Desktop full sidebar (lg+) */}
-<aside className="w-[205px] shrink-0 hidden lg:flex flex-col gap-2 sticky top-20 self-start max-h-[calc(100vh-88px)] overflow-y-auto">
-  <div className="bg-white border border-gray-200 rounded-2xl p-2 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08),0_2px_8px_-2px_rgba(0,0,0,0.04)]">
-    <SectionLabel label="Discover" />
-    {DISCOVER_NAV.map(item => (
-      <NavItem key={item.label} icon={item.icon} label={item.label}
-        sub={item.sub} path={item.path} active={isActive(item.path)} />
-    ))}
-  </div>
-  <div className="bg-white border border-gray-200 rounded-2xl p-2 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08),0_2px_8px_-2px_rgba(0,0,0,0.04)]">
-    <SectionLabel label="My Space" />
-    {MY_SPACE_NAV.map(item => (
-      <NavItem key={item.label} icon={item.icon} label={item.label}
-        sub={item.sub} path={item.path} active={isActive(item.path)}
-        badge={item.badgeKey === 'messages' ? unreadCount : undefined} />
-    ))}
-  </div>
-  <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-700 p-4 text-white shadow-sm">
-    <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-white/10 pointer-events-none" />
-    <Sparkles className="h-5 w-5 text-yellow-300 mb-2 relative" strokeWidth={1.75} />
-    <p className="text-[13px] font-bold leading-snug relative">Upgrade to Premium</p>
-    <p className="text-[11px] text-indigo-200 mt-1 leading-snug relative">
-      Boost visibility, unlock priority features and grow faster.
-    </p>
-    <button
-      onClick={() => navigate('/coming-soon')}
-      className="mt-3 w-full flex items-center justify-center gap-1.5 bg-white text-indigo-700 text-[12px] font-bold py-2 rounded-xl hover:bg-indigo-50 transition-colors relative"
-    >
-      Upgrade Now <ArrowRight className="h-3.5 w-3.5" />
-    </button>
-  </div>
-</aside>
+      <aside className="w-[205px] shrink-0 hidden lg:flex flex-col gap-2 sticky top-20 self-start max-h-[calc(100vh-88px)] overflow-y-auto">
+        <div className="bg-white border border-gray-200 rounded-2xl p-2 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08),0_2px_8px_-2px_rgba(0,0,0,0.04)]">
+          <SectionLabel label="Discover" />
+          {DISCOVER_NAV.map(item => (
+            <NavItem key={item.label} icon={item.icon} label={item.label}
+              sub={item.sub} path={item.path} active={isActive(item.path)} />
+          ))}
+        </div>
+        <div className="bg-white border border-gray-200 rounded-2xl p-2 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08),0_2px_8px_-2px_rgba(0,0,0,0.04)]">
+          <SectionLabel label="My Space" />
+          {MY_SPACE_NAV.map(item => (
+            <NavItem key={item.label} icon={item.icon} label={item.label}
+              sub={item.sub} path={item.path} active={isActive(item.path)}
+              badge={item.badgeKey === 'messages' ? unreadCount : undefined} />
+          ))}
+        </div>
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-100 via-yellow-50 to-amber-100 border border-amber-300/60 p-4 text-amber-900 shadow-sm">
+          <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-amber-300/20 pointer-events-none" />
+          {/* <Sparkles className="h-5 w-5 text-amber-500 mb-2 relative" strokeWidth={1.75} /> */}
+          <p className="text-[13px] font-bold leading-snug relative">Upgrade to Premium</p>
+          <p className="text-[11px] text-amber-700 mt-1 leading-snug relative">
+            Boost visibility, unlock priority features and grow faster.
+          </p>
+          <button
+            onClick={() => navigate('/coming-soon')}
+            className="mt-3 w-full flex items-center justify-center gap-1.5 bg-gradient-to-r from-amber-200 to-yellow-300 text-white text-[12px] font-bold py-2 rounded-xl hover:from-amber-500 hover:to-yellow-600 transition-colors relative shadow-sm"
+          >
+            Upgrade Now <ArrowRight className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </aside>
     </>
   );
 }

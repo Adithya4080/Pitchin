@@ -9,6 +9,7 @@ import { AppLayout } from '@/components/layouts/AppLayout';
 import { Button } from '@/components/ui/button';
 import { useServiceCategories, useServiceProviders, useServiceProvider } from '@/hooks/useServices';
 import { useSendServiceInquiry } from '@/hooks/useServices';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import type { ProviderFilterParams } from '@/api/services';
 import { toast } from 'sonner';
 
@@ -92,6 +93,10 @@ function ProviderLogo({ name, logoUrl }: { name: string; logoUrl: string | null 
   if (logoUrl) {
     return (
       <img src={logoUrl} alt={name}
+        loading="lazy"
+        decoding="async"
+        width={72}
+        height={72}
         className="w-14 h-14 sm:w-[72px] sm:h-[72px] rounded-xl object-cover shrink-0 border border-gray-200"
       />
     );
@@ -721,11 +726,16 @@ export default function ServiceCategoryPage() {
   const { data: categories = [] } = useServiceCategories();
   const category = categories.find(c => c.slug === slug);
 
+  // Debounce the raw input so typing doesn't fire a request per keystroke.
+  // The input itself still updates `search` immediately (feels responsive),
+  // only the network request waits for a pause in typing.
+  const debouncedSearch = useDebouncedValue(search, 400);
+
   const budget = BUDGET_OPTIONS[filters.budgetIdx];
   const providerParams: ProviderFilterParams = {
     category: slug,
     sub_category: activeSubCat || undefined,
-    search: search || undefined,
+    search: debouncedSearch || undefined,
     stage: filters.stages.length === 1 ? filters.stages[0] : undefined,
     min_price: budget.min,
     max_price: budget.max,

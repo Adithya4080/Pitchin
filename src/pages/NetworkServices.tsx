@@ -11,6 +11,7 @@ import { ServiceHeroBanner } from '@/components/network/ServiceHeroBanner';
 import { ServiceCategoryGrid } from '@/components/network/ServiceCategoryGrid';
 import { NetworkingOpportunitiesSection } from '@/components/network/NetworkingOpportunitiesSection';
 import { useServiceProviders, useServiceCategories } from '@/hooks/useServices';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 
 // ─── Quick Actions ─────────────────────────────────────────────────────────────
 const QUICK_ACTIONS = [
@@ -61,7 +62,7 @@ const ACTIVITY = [
 function ProviderCTACard() {
   return (
     <div className="relative overflow-hidden rounded-2xl shadow-sm">
-      <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #0C0F1D 0%, #1E1B4B 100%)' }} />
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #fdfdfd 0%, #ffffff 100%)' }} />
       <div className="absolute inset-0 opacity-30">
         <svg className="w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -73,15 +74,14 @@ function ProviderCTACard() {
         </svg>
       </div>
       <div className="relative p-4">
-        <div className="h-8 w-8 rounded-lg bg-white/10 flex items-center justify-center mb-3">
-          <TrendingUp className="h-4 w-4 text-white" strokeWidth={1.75} />
+        <div className="h-8 w-8 rounded-lg text-black flex items-center justify-center mb-3">
         </div>
-        <p className="text-[13px] font-bold text-white leading-snug mb-1">List Your Services</p>
-        <p className="text-[11px] text-white/50 leading-relaxed mb-4">
+        <p className="text-[13px] font-bold text-black leading-snug mb-1">List Your Services</p>
+        <p className="text-[11px] text-black leading-relaxed mb-4">
           Get discovered by thousands of founders.
         </p>
         <Link to="/contact"
-          className="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-white text-gray-900 text-[12px] font-bold hover:bg-gray-100 transition-colors"
+          className="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-[#0950c3] text-white text-[12px] font-bold hover:bg-blue-400 transition-colors"
         >
           Apply to List <ArrowRight className="h-3.5 w-3.5" />
         </Link>
@@ -213,7 +213,7 @@ function ProviderMiniCard({ provider: p }: { provider: ProviderItem }) {
         <div className="p-4 flex flex-col gap-3">
           <div className="flex items-start gap-3">
             {p.logo_url
-              ? <img src={p.logo_url} alt={p.name} className="h-11 w-11 rounded-xl object-cover shrink-0 border border-gray-100" />
+              ? <img src={p.logo_url} alt={p.name} loading="lazy" decoding="async" width={44} height={44} className="h-11 w-11 rounded-xl object-cover shrink-0 border border-gray-100" />
               : <div className="h-11 w-11 rounded-xl bg-gray-950 flex items-center justify-center text-white text-sm font-bold shrink-0">{initials}</div>
             }
             <div className="min-w-0 flex-1">
@@ -258,12 +258,13 @@ function ProviderMiniCard({ provider: p }: { provider: ProviderItem }) {
 function AllProvidersView() {
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState('');
+  const debouncedSearch = useDebouncedValue(search, 400);
   const { data: categories = [] } = useServiceCategories();
   const { data: providers = [], isLoading } = useServiceProviders({
     category: activeCategory || undefined,
-    search: search || undefined,
+    search: debouncedSearch || undefined,
     sort: 'top_rated',
-  } as any);
+  });
 
   return (
     <div className="space-y-5">

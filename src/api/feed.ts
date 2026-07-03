@@ -108,7 +108,8 @@ export async function likePost(postId: number): Promise<{ liked: boolean; like_c
 }
 
 export async function getPostComments(postId: number): Promise<PostComment[]> {
-  return apiFetch<PostComment[]>(`/feed/${postId}/comments/`);
+  const response = await apiFetch<PostComment[] | PaginatedResponse<PostComment>>(`/feed/${postId}/comments/`);
+  return unwrapPaginated(response);
 }
 
 export async function createComment(postId: number, content: string, parent?: number): Promise<PostComment> {

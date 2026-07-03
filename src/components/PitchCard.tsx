@@ -6,6 +6,9 @@ import { motion } from 'framer-motion';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useComments, useAddComment } from '@/hooks/useComments';
 import { Badge } from '@/components/ui/badge';
+// import { useComments, useAddComment } from '@/hooks/useComments';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+
 import {
   Dialog,
   DialogContent,
@@ -409,34 +412,41 @@ export function PitchCard({ pitch, hideBorder = false }: PitchCardProps) {
             <Share2 className="h-5 w-5" />
           </Button>
         </div>
-
-        {/* ── Comments ─────────────────────────────────────────── */}
+{/* ── Comments ─────────────────────────────────────────── */}
         {showComments && (
-          <div className="mt-3 space-y-2 border-t pt-3">
-            {comments.map((c: any) => (
-              <div key={c.id} className="text-sm">
-                <span className="font-medium">{c.author_name}</span>{' '}
-                <span className="text-muted-foreground">{c.content}</span>
+          <ErrorBoundary
+            fallback={
+              <div className="mt-3 text-sm text-muted-foreground border-t pt-3">
+                Couldn't load comments. Please try again.
               </div>
-            ))}
-            <div className="flex gap-2">
-              <input
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                placeholder="Write a comment..."
-                className="flex-1 text-sm border rounded-md px-3 py-1.5"
-              />
-              <button
-                onClick={() => {
-                  if (!commentText.trim()) return;
-                  addComment.mutate(commentText, { onSuccess: () => setCommentText('') });
-                }}
-                className="text-sm font-medium text-primary"
-              >
-                Post
-              </button>
+            }
+          >
+            <div className="mt-3 space-y-2 border-t pt-3">
+              {comments.map((c: any) => (
+                <div key={c.id} className="text-sm">
+                  <span className="font-medium">{c.author_name}</span>{' '}
+                  <span className="text-muted-foreground">{c.content}</span>
+                </div>
+              ))}
+              <div className="flex gap-2">
+                <input
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  placeholder="Write a comment..."
+                  className="flex-1 text-sm border rounded-md px-3 py-1.5"
+                />
+                <button
+                  onClick={() => {
+                    if (!commentText.trim()) return;
+                    addComment.mutate(commentText, { onSuccess: () => setCommentText('') });
+                  }}
+                  className="text-sm font-medium text-primary"
+                >
+                  Post
+                </button>
+              </div>
             </div>
-          </div>
+          </ErrorBoundary>
         )}
       </motion.div>
 
