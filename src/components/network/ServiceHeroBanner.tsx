@@ -43,10 +43,10 @@ export function ServiceHeroBanner() {
             Explore. Connect. Grow.
           </p>
           <h1 className="text-xl md:text-2xl lg:text-3xl font-bold leading-tight mb-2">
-            Everything your startup needs,
+            Everything your startup needs, 
             <br />
             <span className="text-primary whitespace-nowrap">
-              all in one place.
+              all in one place..
             </span>
           </h1>
           <p className="text-sm text-foreground/70 mb-4 max-w-md">
