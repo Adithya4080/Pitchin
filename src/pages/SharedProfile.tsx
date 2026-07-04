@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { getPublicSharedDashboard } from "@/api/payment";
 import { AlertCircle, Link2Off, type LucideIcon } from "lucide-react";
 import { parseSharedProfile, avatarSrc } from "@/lib/parseSharedProfile";
-import { useLenisScroll } from "@/hooks/useLenisScroll";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import AuroraBackground from "@/components/shared-profile/AuroraBackground";
 import ScrollProgress from "@/components/shared-profile/ScrollProgress";
@@ -56,9 +55,6 @@ export default function SharedProfile() {
   const [searchParams] = useSearchParams();
   const accessToken = searchParams.get("access") ?? "";
   const reducedMotion = useReducedMotion();
-
-  useLenisScroll(!reducedMotion);
-
   const { data, isLoading, error } = useQuery({
     queryKey: ["public-shared-dashboard", shareId, accessToken],
     queryFn: () => getPublicSharedDashboard(shareId!, accessToken),
