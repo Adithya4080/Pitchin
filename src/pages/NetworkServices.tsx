@@ -12,6 +12,9 @@ import { ServiceCategoryGrid } from '@/components/network/ServiceCategoryGrid';
 import { NetworkingOpportunitiesSection } from '@/components/network/NetworkingOpportunitiesSection';
 import { useServiceProviders, useServiceCategories } from '@/hooks/useServices';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { ProfileStrengthCard } from '@/components/profile/ProfileStrengthCard';
+import { useMyProfile } from '@/hooks/useRoleProfile';
+import { useUserPitches } from '@/hooks/usePitches';
 
 // ─── Quick Actions ─────────────────────────────────────────────────────────────
 const QUICK_ACTIONS = [
@@ -61,7 +64,7 @@ const ACTIVITY = [
 // ─── Provider CTA ─────────────────────────────────────────────────────────────
 function ProviderCTACard() {
   return (
-    <div className="relative overflow-hidden rounded-2xl shadow-sm">
+    <div className="relative overflow-hidden rounded-2xl border border-gray-200 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08),0_2px_8px_-2px_rgba(0,0,0,0.04)]">
       <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #fdfdfd 0%, #ffffff 100%)' }} />
       <div className="absolute inset-0 opacity-30">
         <svg className="w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
@@ -317,12 +320,39 @@ function AllProvidersView() {
   );
 }
 
+// ─── Profile strength widget — reuses the dashboard's ProfileStrengthCard ─────
+// Pulls the signed-in user's own profile + pitches so the same completeness
+// logic used on the Dashboard applies here too.
+function MyProfileStrengthWidget() {
+  const { data: profile } = useMyProfile();
+  const { data: userPitches } = useUserPitches();
+
+  if (!profile) return null;
+
+  const p = profile as any;
+
+  return (
+    <ProfileStrengthCard
+      bio={p.bio}
+      hasIntroVideo={!!p.intro_video_url}
+      hasFunding={!!(p.funding_data?.stage || p.funding_data?.amount_raised)}
+      hasTraction={!!p.traction_data?.metrics?.length}
+      hasTrustPress={!!p.trust_press_data?.proofs?.length}
+      hasTeam={!!(p.team_members as any[])?.length}
+      hasCompanyPortfolio={!!(p.ecosystem_support as any[])?.length}
+      hasPitch={!!(userPitches && userPitches.length > 0)}
+      className="rounded-2xl border-gray-200 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08),0_2px_8px_-2px_rgba(0,0,0,0.04)]"
+    />
+  );
+}
+
 // ─── Right sidebar ─────────────────────────────────────────────────────────────
 function RightSidebar() {
   return (
     <aside className="w-[240px] shrink-0 hidden xl:flex flex-col gap-3 sticky top-20 self-start">
       <QuickActionsPanel />
       <ProviderCTACard />
+      <MyProfileStrengthWidget />
     </aside>
   );
 }

@@ -1,7 +1,8 @@
-import { ArrowLeft, Sparkles } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import comingSoonImage from '@/assets/coming-soon.webp';
 
 export default function ComingSoon() {
   const navigate = useNavigate();
@@ -12,18 +13,22 @@ export default function ComingSoon() {
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.4 }}
-        className="text-center max-w-sm"
+        className="text-center max-w-md"
       >
-        <div className="mx-auto w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mb-6">
-          <Sparkles className="h-10 w-10 text-primary" />
-        </div>
-        
+        <img
+          src={comingSoonImage}
+          alt="Feature under development"
+          className="mx-auto w-full max-w-[340px] h-auto select-none pointer-events-none mb-6"
+          draggable={false}
+        />
+
         <h1 className="font-display text-2xl font-bold text-foreground mb-3">
-          Coming Soon
+          Feature Under Development
         </h1>
-        
+
         <p className="text-muted-foreground text-sm mb-8">
-          This feature is currently under development. Stay tuned for updates!
+          We're working behind the scenes to bring you something valuable.
+          This feature will be available soon. Stay tuned!
         </p>
 
         <Button

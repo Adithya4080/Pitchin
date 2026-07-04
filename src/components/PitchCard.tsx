@@ -312,9 +312,28 @@ export function PitchCard({ pitch, hideBorder = false }: PitchCardProps) {
           </DropdownMenu>
         </div>
 
+        {/* ── Media ────────────────────────────────────────────── */}
+        {(p.image || pitch.image) && (
+          <div className="mb-3 -mx-4 md:mx-0 md:rounded-lg overflow-hidden">
+            <img
+              src={p.image || pitch.image}
+              alt={postTitle || 'Post attachment'}
+              loading="lazy"
+              className="w-full h-auto object-cover max-h-[70vh]"
+            />
+          </div>
+        )}
+
+        {/* ── Heading ──────────────────────────────────────────── */}
+        {postTitle && (
+          <h3 className="text-foreground text-[17px] font-semibold leading-snug mb-1.5 [overflow-wrap:anywhere]">
+            {postTitle}
+          </h3>
+        )}
+
         {/* ── Description ──────────────────────────────────────── */}
         <div className="mb-3">
-          <p className="text-foreground text-[15px] leading-relaxed whitespace-pre-wrap">
+          <p className="text-foreground text-[15px] leading-relaxed whitespace-pre-wrap [overflow-wrap:anywhere]">
             {displayText}
             {shouldTruncate && (
               <button
@@ -326,19 +345,11 @@ export function PitchCard({ pitch, hideBorder = false }: PitchCardProps) {
             )}
           </p>
           {pitch.supporting_line && (
-            <p className="text-muted-foreground text-sm mt-2 leading-relaxed">
+            <p className="text-muted-foreground text-sm mt-2 leading-relaxed [overflow-wrap:anywhere]">
               {pitch.supporting_line}
             </p>
           )}
         </div>
-
-        {/* ── Media ────────────────────────────────────────────── */}
-        <img
-          src={p.image || pitch.image}
-          alt="Post attachment"
-          loading="lazy"
-          className="w-full h-auto object-cover max-h-[70vh]"
-        />
 
         {/* ── Link Preview Card ─────────────────────────────────── */}
         {showLinkCard && (

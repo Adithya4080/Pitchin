@@ -108,92 +108,6 @@ function ProviderLogo({ name, logoUrl }: { name: string; logoUrl: string | null 
   );
 }
 
-// ─── Sub-category tab strip ───────────────────────────────────────────────────
-const SUB_CAT_ICONS: Record<string, JSX.Element> = {
-  'company-formation': (
-    <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-      <rect x="2" y="5" width="14" height="10" rx="1.5" />
-      <path d="M6 5V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" />
-      <line x1="9" y1="9" x2="9" y2="11" /><line x1="8" y1="10" x2="10" y2="10" />
-    </svg>
-  ),
-  'compliance-tax': (
-    <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-      <path d="M9 2L3 5v4c0 4 3 6.5 6 7 3-.5 6-3 6-7V5L9 2z" />
-    </svg>
-  ),
-  'legal-documents': (
-    <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-      <rect x="3" y="2" width="12" height="14" rx="1.5" />
-      <line x1="6" y1="6" x2="12" y2="6" /><line x1="6" y1="9" x2="12" y2="9" /><line x1="6" y1="12" x2="9" y2="12" />
-    </svg>
-  ),
-  'intellectual-property': (
-    <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-      <path d="M9 2a5 5 0 0 1 5 5c0 2.5-1.5 4.5-3.5 5.5V14h-3v-1.5C5.5 11.5 4 9.5 4 7a5 5 0 0 1 5-5z" />
-      <line x1="7" y1="16" x2="11" y2="16" />
-    </svg>
-  ),
-  'fundraising-legal': (
-    <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-      <path d="M9 3v12M5 7l4-4 4 4" /><path d="M5 13h8" />
-    </svg>
-  ),
-  'web-development': (
-    <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-      <rect x="2" y="3" width="14" height="12" rx="1.5" /><path d="M2 6.5h14" />
-      <path d="M6 10l-1.5 1.5L6 13M10 10l1.5 1.5L10 13" />
-    </svg>
-  ),
-  'app-development': (
-    <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-      <rect x="5" y="1.5" width="8" height="15" rx="1.5" /><line x1="8" y1="14" x2="10" y2="14" />
-    </svg>
-  ),
-  'cloud-infrastructure': (
-    <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M5 13a3 3 0 0 1 .3-6 4 4 0 0 1 7.6 1.3A2.6 2.6 0 0 1 12.6 13H5z" />
-    </svg>
-  ),
-  'ai-automation': (
-    <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="4" y="5" width="10" height="8" rx="2" /><circle cx="7" cy="9" r="0.8" fill="currentColor" />
-      <circle cx="11" cy="9" r="0.8" fill="currentColor" /><path d="M9 5V2M6 2h6" />
-    </svg>
-  ),
-  'cybersecurity': (
-    <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 2l6 2.5v4c0 4-2.5 6.5-6 7.5-3.5-1-6-3.5-6-7.5v-4L9 2z" />
-      <path d="M6.5 9l1.8 1.8L11.5 7" />
-    </svg>
-  ),
-  'enterprise-software-saas': (
-    <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="4" width="14" height="10" rx="1.5" /><line x1="2" y1="7.5" x2="16" y2="7.5" />
-      <line x1="5" y1="11" x2="9" y2="11" />
-    </svg>
-  ),
-  'it-consulting-strategy': (
-    <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="9" cy="9" r="6.5" /><path d="M9 5.5v4l2.5 1.5" />
-    </svg>
-  ),
-  'devops-qa-testing': (
-    <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 4l3 3-3 3M9 10h5" />
-      <path d="M11 4l3 10" />
-    </svg>
-  ),
-};
-
-function getSubCatIcon(slug: string) {
-  return SUB_CAT_ICONS[slug] ?? (
-    <svg viewBox="0 0 18 18" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <circle cx="9" cy="9" r="6" />
-    </svg>
-  );
-}
-
 // ─── Filter sidebar ───────────────────────────────────────────────────────────
 const STAGES = [
   { value: 'idea',   label: 'Idea Stage' },
@@ -742,7 +656,8 @@ export default function ServiceCategoryPage() {
     sort: filters.sort as ProviderFilterParams['sort'],
   };
 
-  const { data: providers = [], isLoading } = useServiceProviders(providerParams);
+  const { data: providers = [], isLoading, isFetching } = useServiceProviders(providerParams);
+  const showSkeleton = isLoading || isFetching;
 
   const subCategories = category?.sub_categories ?? [];
 
@@ -802,35 +717,6 @@ export default function ServiceCategoryPage() {
             </div>
           </div>
         )}
-
-        {/* Sub-category tabs */}
-        {subCategories.length > 0 && (
-          <div className="mb-5">
-            <p className="text-[13px] font-semibold text-gray-700 mb-3">
-              What do you need help with?
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
-              {subCategories.map(sc => (
-                <button
-                  key={sc.slug}
-                  onClick={() => setSearchParams(activeSubCat === sc.slug ? {} : { sub: sc.slug })}
-                  className={`flex flex-col items-center gap-1.5 p-2.5 sm:p-3 rounded-xl border text-center transition-all ${
-                    activeSubCat === sc.slug
-                      ? 'border-blue-500 bg-blue-50 text-blue-600'
-                      : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
-                  }`}
-                >
-                  <span className={activeSubCat === sc.slug ? 'text-blue-600' : 'text-gray-500'}>
-                    {getSubCatIcon(sc.slug)}
-                  </span>
-                  <span className="text-[11px] font-medium leading-snug">{sc.name}</span>
-                  <span className="text-[10px] text-gray-400">{sc.provider_count} providers</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* 3-column layout: filter | providers | right sidebar */}
         <div className="flex gap-5">
 
@@ -903,14 +789,14 @@ export default function ServiceCategoryPage() {
               ? 'space-y-3'
               : 'grid grid-cols-1 sm:grid-cols-2 gap-3'
             }>
-              {isLoading
+              {showSkeleton
                 ? Array.from({ length: 3 }).map((_, i) => <CardSkeleton key={i} />)
                 : providers.map(p => <ProviderCard key={p.id} provider={p} />)
               }
             </div>
 
             {/* Empty state */}
-            {!isLoading && providers.length === 0 && (
+            {!showSkeleton && providers.length === 0 && (
               <div className="flex flex-col items-center gap-2 py-16 text-center">
                 <ClipboardList className="h-10 w-10 text-gray-200" />
                 <p className="text-sm text-gray-400 font-medium">No providers found</p>
