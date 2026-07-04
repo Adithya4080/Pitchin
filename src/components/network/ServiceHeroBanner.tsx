@@ -46,7 +46,7 @@ export function ServiceHeroBanner() {
             Everything your startup needs, 
             <br />
             <span className="text-primary whitespace-nowrap">
-              all in one place..
+              all in one place.
             </span>
           </h1>
           <p className="text-sm text-foreground/70 mb-4 max-w-md">
