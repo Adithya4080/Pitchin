@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Bell, LogOut, User, HelpCircle, Home, Search, Users, Newspaper, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
-import pitchinLogo from '@/assets/pitchin-logo-new.png';
+import pitchinLogo from '@/assets/pitchin-logo-text.webp';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -11,11 +11,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Input } from '@/components/ui/input';
 import { NotificationList } from './NotificationList';
 import { CreatePitchModal } from './CreatePitchModal';
-import { OnboardingTutorial } from './OnboardingTutorial';
 import { useAuth } from '@/hooks/useAuth';
 import { useUnreadCount } from '@/hooks/useNotifications';
 import { useUserActivePitch } from '@/hooks/usePitches';
-import { getMediaUrl } from '@/lib/media';
 
 
 export function Header() {
@@ -92,7 +90,7 @@ export function Header() {
             </PopoverContent>
           </Popover>
 
-          <DropdownMenu>
+          <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                 <Avatar className="h-9 w-9 ring-2 ring-border">
@@ -103,7 +101,7 @@ export function Header() {
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end">
+            <DropdownMenuContent className="w-56 z-[100]" align="end">
               <div className="flex items-center justify-start gap-2 p-2">
                 <div className="flex flex-col space-y-0.5 leading-none">
                   <p className="font-medium text-sm">{displayName}</p>
@@ -141,27 +139,19 @@ export function Header() {
 
   return (
     <>
-      <header className="fixed top-0 z-50 w-full bg-card backdrop-blur supports-[backdrop-filter]:bg-card/95 hidden md:block">
+      <header className="fixed top-0 z-50 w-full bg-card border-b border-border backdrop-blur supports-[backdrop-filter]:bg-card/95 hidden md:block">
         <div className="container h-16">
           <div className="flex h-full items-center gap-6">
             {/* Left column — mirrors FeedLeftSidebar (lg+) */}
             <div className="hidden lg:flex w-[22rem] shrink-0 items-center">
               <Link to="/" className="flex items-center gap-2 group">
-                {isFeedPage ? (
-                  <span className="font-display font-bold text-2xl tracking-tight text-sky-400">Pitchin</span>
-                ) : (
-                  <img src={getMediaUrl("https://fymxcszzdpennpmgnstb.supabase.co/storage/v1/object/public/post-images/platform-official-image/logo-full.png")} alt="PitchIn" width="120" height="48" />
-                )}
+                <img src={pitchinLogo} alt="PitchIn" className="h-12 w-auto" />
               </Link>
             </div>
 
-            {/* Logo fallback below lg */}
+            {/* Logo fallback below lg (tablet/mobile) — same asset, same source */}
             <Link to="/" className="lg:hidden flex items-center gap-2 group shrink-0">
-              {isFeedPage ? (
-                <span className="font-display font-bold text-2xl tracking-tight text-sky-400">Pitchin</span>
-              ) : (
-                <img src={getMediaUrl(pitchinLogo)} alt="PitchIn" className="h-12" />
-              )}
+              <img src={pitchinLogo} alt="PitchIn" className="h-10 w-auto" />
             </Link>
 
             {/* Center column — mirrors PitchFeed (flex-1) */}
@@ -174,28 +164,32 @@ export function Header() {
                   className="pl-9 h-10 rounded-full bg-muted border-none focus-visible:ring-1"
                 />
               </div>
-              <nav className="flex items-center gap-1 shrink-0">
-                {[
-                  { to: '/feed', label: 'Home', icon: Home, active: isFeedPage },
-                  { to: '/network', label: 'Network', icon: Users, active: location.pathname === '/network' },
-                  { to: '/news', label: 'News', icon: Newspaper, active: location.pathname === '/news' },
-                ].map(({ to, label, icon: Icon, active }) => (
-                  <Link
-                    key={label}
-                    to={to}
-                    className={cn(
-                      "flex items-center gap-1.5 px-3 h-10 rounded-full text-sm font-medium transition-colors",
-                      active
-                        ? "text-sky-400"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                    )}
-                    aria-label={label}
-                  >
-                    <Icon className={cn("h-5 w-5", active && "fill-sky-400")} />
-                    <span className="hidden xl:inline">{label}</span>
-                  </Link>
-                ))}
-              </nav>
+
+              {/* Home / Feed / News nav — only shown to signed-in users, hidden on the logged-out landing page */}
+              {user && (
+                <nav className="flex items-center gap-1 shrink-0">
+                  {[
+                    { to: '/network', label: 'Home', icon: Users, active: location.pathname === '/network' },
+                    { to: '/feed', label: 'Feed', icon: Home, active: isFeedPage },
+                    { to: '/news', label: 'News', icon: Newspaper, active: location.pathname === '/news' },
+                  ].map(({ to, label, icon: Icon, active }) => (
+                    <Link
+                      key={label}
+                      to={to}
+                      className={cn(
+                        "flex items-center gap-1.5 px-3 h-10 rounded-full text-sm font-medium transition-colors",
+                        active
+                          ? "text-sky-400"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                      )}
+                      aria-label={label}
+                    >
+                      <Icon className={cn("h-5 w-5", active && "fill-sky-400")} />
+                      <span className="hidden xl:inline">{label}</span>
+                    </Link>
+                  ))}
+                </nav>
+              )}
             </div>
 
             {/* Right column — mirrors FeedRightSidebar (xl+) */}
@@ -214,12 +208,6 @@ export function Header() {
       <CreatePitchModal open={showCreateModal} onOpenChange={setShowCreateModal} />
       
       {/* Tutorial Overlay */}
-      {showTutorial && (
-        <OnboardingTutorial 
-          onComplete={() => setShowTutorial(false)} 
-          isOverlay 
-        />
-      )}
     </>
   );
 }

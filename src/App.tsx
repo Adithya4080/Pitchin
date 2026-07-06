@@ -4,61 +4,100 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
-import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import Dashboard from "./pages/Dashboard";
-import Feed from "./pages/Feed";
-import UserProfile from "./pages/UserProfile";
-import Onboarding from "./pages/Onboarding";
-import Notifications from "./pages/Notifications";
-import Search from "./pages/Search";
-import ComingSoon from "./pages/ComingSoon";
-import PitchDetail from "./pages/PitchDetail";
-import EditSection from "./pages/EditSection";
-import Settings from "./pages/Settings";
-import SharedProfile from "./pages/SharedProfile";
-import SharedPitchDetail from "./pages/SharedPitchDetail";
-import NotFound from "./pages/NotFound";
-import Admin from "./pages/Admin";
-import News from "./pages/News";
-import Messages from "./pages/Messages";
-import ResetPassword from '@/pages/ResetPassword';
+import { lazy, Suspense } from "react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
-const queryClient = new QueryClient();
+const Index = lazy(() => import("./pages/Index"));
+const Auth = lazy(() => import("./pages/Auth"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Feed = lazy(() => import("./pages/Feed"));
+const UserProfile = lazy(() => import("./pages/UserProfile"));
+const Onboarding = lazy(() => import("./pages/Onboarding"));
+const Notifications = lazy(() => import("./pages/Notifications"));
+const Search = lazy(() => import("./pages/Search"));
+const ComingSoon = lazy(() => import("./pages/ComingSoon"));
+const PitchDetail = lazy(() => import("./pages/PitchDetail"));
+const EditSection = lazy(() => import("./pages/EditSection"));
+const Settings = lazy(() => import("./pages/Settings"));
+const SharedProfile = lazy(() => import("./pages/SharedProfile"));
+const SharedPitchDetail = lazy(() => import("./pages/SharedPitchDetail"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const Admin = lazy(() => import("./pages/Admin"));
+const News = lazy(() => import("./pages/News"));
+const Messages = lazy(() => import("./pages/Messages"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const ContactUs = lazy(() => import("./pages/ContactUs"));
+const Network = lazy(() => import("./pages/network"));
+const NetworkServices = lazy(() => import("./pages/NetworkServices"));
+const ServiceCategoryPage = lazy(() => import("./pages/ServiceCategoryPage"));
+const ProviderDetail = lazy(() => import("./pages/ProviderDetail"));
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      retry: 1,
+    },
+  },
+});
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/feed" element={<Feed />} />
-            <Route path="/profile/:userId" element={<UserProfile />} />
-            <Route path="/pitch/:pitchId" element={<PitchDetail />} />
-            <Route path="/onboarding" element={<Onboarding />} />
-            <Route path="/notifications" element={<Notifications />} />
-            <Route path="/search" element={<Search />} />
-            <Route path="/coming-soon" element={<ComingSoon />} />
-            <Route path="/edit-section" element={<EditSection />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/shared/:userId" element={<SharedProfile />} />
-            <Route path="/shared/:userId/pitch/:pitchId" element={<SharedPitchDetail />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/news" element={<News />} />
-            <Route path="/messages" element={<Messages />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
+  <ErrorBoundary
+    fallback={
+      <div className="flex items-center justify-center min-h-screen text-center p-6">
+        <div>
+          <p className="text-lg font-medium mb-2">Something went wrong.</p>
+          <button className="text-primary underline" onClick={() => window.location.reload()}>
+            Reload the page
+          </button>
+        </div>
+      </div>
+    }
+    >
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Suspense fallback={null}>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/feed" element={<Feed />} />
+                <Route path="/profile/:userId" element={<UserProfile />} />
+                <Route path="/pitch/:pitchId" element={<PitchDetail />} />
+                <Route path="/onboarding" element={<Onboarding />} />
+                <Route path="/notifications" element={<Notifications />} />
+                <Route path="/search" element={<Search />} />
+                <Route path="/coming-soon" element={<ComingSoon />} />
+                <Route path="/edit-section" element={<EditSection />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/shared/:userId" element={<SharedProfile />} />
+                <Route path="/shared/:userId/pitch/:pitchId" element={<SharedPitchDetail />} />
+                <Route path="/admin" element={<Admin />} />
+                <Route path="/news" element={<News />} />
+                <Route path="/messages" element={<Messages />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/contact" element={<ContactUs />} />
+                <Route path="/network" element={<Network />} />
+                {/* <Route path="/network/services" element={<NetworkServices />} /> */}
+                <Route path="/network/services/:slug" element={<ServiceCategoryPage />} />
+                <Route path="/network/provider/:slug" element={<ProviderDetail />} />
+                <Route path="/network/provider/:slug/pitch/:pitchId" element={<PitchDetail />} />
+                <Route path="/network/services" element={<NetworkServices />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

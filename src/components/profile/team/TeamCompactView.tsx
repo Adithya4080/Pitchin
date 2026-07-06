@@ -68,7 +68,7 @@ export function TeamCompactView({
   }
 
   return (
-    <Card className="border-border/50">
+    <Card className="border-border/50 shadow-sm">
       <CardContent className="p-5">
         <h3 className="text-sm font-bold text-foreground mb-4">
           Team {members.length > 0 && `(${members.length})`}

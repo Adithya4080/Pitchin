@@ -7,12 +7,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PitchCard } from '@/components/PitchCard';
 import { CreatePitchModal } from '@/components/CreatePitchModal';
-import { OnboardingTutorial } from '@/components/OnboardingTutorial';
 import { SuggestedProfilesCard } from '@/components/mobile/SuggestedProfilesCard';
 import { usePitches } from '@/hooks/usePitches';
 import { useSuggestedProfiles } from '@/hooks/useSuggestedProfiles';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
+import { MobileSidebar } from '@/components/mobile/MobileSidebar';
 import { cn } from '@/lib/utils';
 
 const FEED_TABS = [
@@ -70,36 +70,30 @@ export function MobileFeedPage() {
       {/* App Bar */}
       <div className="sticky top-0 z-40 bg-card backdrop-blur-md border-b border-border/50">
         <div className="flex items-center justify-between px-4 py-3">
-          {/* Left - Profile Picture */}
-          <button
-            onClick={() => user ? navigate('/dashboard') : navigate('/auth')}
-            className="touch-manipulation"
-          >
-            <Avatar className="h-8 w-8 ring-2 ring-primary/20">
-              <AvatarImage src={profile?.avatar ?? user?.avatar_url} />
-              <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-          </button>
-
+          {/* Left - Avatar opens Sidebar */}
+          <MobileSidebar
+            trigger={
+              <button className="touch-manipulation flex-shrink-0">
+                <Avatar className="h-8 w-8 ring-2 ring-primary/20">
+                  <AvatarImage src={profile?.avatar ?? user?.avatar_url} />
+                  <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+              </button>
+            }
+          />
           {/* Center - Logo */}
-          <span className="font-display font-bold text-lg tracking-tight text-sky-400">Pitchin</span>
+          <span className="font-display font-bold text-xl tracking-tight text-sky-400">Pitchin</span>
 
           {/* Right - Tutorial & Mail Icons */}
           <div className="flex items-center gap-1">
-            <button
-              onClick={() => setShowTutorial(true)}
-              className="h-8 w-8 flex items-center justify-center rounded-full hover:bg-muted/50 transition-colors touch-manipulation"
-            >
-              <HelpCircle className="h-5 w-5 text-muted-foreground" />
-            </button>
-            <button
-              onClick={() => navigate('/coming-soon')}
-              className="h-8 w-8 flex items-center justify-center rounded-full hover:bg-muted/50 transition-colors touch-manipulation"
-            >
-              <Mail className="h-5 w-5 text-muted-foreground" />
-            </button>
+          <button
+            onClick={() => navigate('/contact')}
+            className="h-8 w-8 flex items-center justify-center rounded-full hover:bg-muted/50 transition-colors touch-manipulation"
+          >
+            <Mail className="h-5 w-5 text-muted-foreground" />
+          </button>
           </div>
         </div>
 
@@ -107,13 +101,13 @@ export function MobileFeedPage() {
         <div className="flex items-center gap-1 px-4 py-2">
           {FEED_TABS.map((tab) => {
             const actualActive = tab.id === 'newest' ? activeTab === 'newest' : 
-                                tab.id === 'trending' ? activeTab === 'trending' : false;
+            tab.id === 'trending' ? activeTab === 'trending' : false;
             return (
               <button
                 key={tab.id}
                 onClick={() => tab.id !== 'following' && setActiveTab(tab.id as 'newest' | 'trending')}
                 className={cn(
-                  "px-3 py-1.5 rounded-full text-xs font-medium transition-colors",
+                  "px-3 py-1 rounded-sm text-xs font-semibold transition-colors",
                   actualActive
                     ? "bg-foreground/10 text-foreground"
                     : "text-muted-foreground hover:text-foreground",
@@ -230,14 +224,6 @@ export function MobileFeedPage() {
         open={showCreateModal} 
         onOpenChange={setShowCreateModal} 
       />
-
-      {/* Tutorial Overlay */}
-      {showTutorial && (
-        <OnboardingTutorial 
-          onComplete={() => setShowTutorial(false)} 
-          isOverlay 
-        />
-      )}
     </div>
   );
 }

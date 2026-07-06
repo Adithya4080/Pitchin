@@ -14,9 +14,9 @@ export interface FollowRequest {
 
 export interface InterestMessage {
   id: number;
-  sender: number;
+  sender: number | { id: number; full_name: string; email: string; role: string };
   sender_name: string;
-  receiver: number;
+  receiver: number | { id: number; full_name: string; email: string; role: string };
   receiver_name: string;
   subject: string;
   message: string;
@@ -59,7 +59,7 @@ export async function getFollowing(): Promise<FollowRequest[]> {
 }
 
 export async function sendInterest(data: {
-  receiver_id: number;
+  receiver_id: number;  // ← must be receiver_id to match backend serializer
   subject: string;
   message: string;
   tag?: string;

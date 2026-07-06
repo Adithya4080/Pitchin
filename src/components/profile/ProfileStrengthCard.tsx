@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Shield } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface ProfileStrengthItem {
   label: string;
@@ -19,6 +20,10 @@ interface ProfileStrengthCardProps {
   hasTeam?: boolean;
   hasCompanyPortfolio?: boolean;
   hasPitch?: boolean;
+  /** Optional style override so this card can match the surrounding page's
+   *  card chrome (e.g. NetworkServices' rounded-2xl + border-gray-200 look)
+   *  without changing how it renders on the Dashboard. */
+  className?: string;
 }
 
 export function ProfileStrengthCard({
@@ -30,6 +35,7 @@ export function ProfileStrengthCard({
   hasTeam,
   hasCompanyPortfolio,
   hasPitch,
+  className,
 }: ProfileStrengthCardProps) {
   const navigate = useNavigate();
 
@@ -50,7 +56,7 @@ export function ProfileStrengthCard({
   const nextItem = items.find((i) => !i.completed);
 
   return (
-    <Card className="border-border/50">
+    <Card className={cn('border-border/50', className)}>
       <CardContent className="p-5">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">

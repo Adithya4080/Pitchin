@@ -45,7 +45,7 @@ export function DiscoverListItem({ item }: Props) {
         </div>
       </div>
       <div className="shrink-0 h-[88px] w-[88px] rounded-xl overflow-hidden bg-muted">
-        <img src={item.imageUrl} alt={item.title} className="h-full w-full object-cover" />
+        <img src={item.imageUrl} alt={item.title} loading="lazy" className="h-full w-full object-cover" />
       </div>
     </a>
   );

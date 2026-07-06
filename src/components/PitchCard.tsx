@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Flame, Send, Trash2, MoreHorizontal, Share2, Repeat2, ExternalLink, Link2, Megaphone } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Flame, Send, Trash2, MoreHorizontal, Share2, Repeat2, ExternalLink, Link2, Megaphone, MessageCircle, ThumbsUp, } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useComments, useAddComment } from '@/hooks/useComments';
 import { Badge } from '@/components/ui/badge';
+// import { useComments, useAddComment } from '@/hooks/useComments';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+
 import {
   Dialog,
   DialogContent,
@@ -222,10 +226,16 @@ export function PitchCard({ pitch, hideBorder = false }: PitchCardProps) {
   const displayText = shouldTruncate
     ? (pitch.pitch_statement ?? '').slice(0, 200) + '…'
     : (pitch.pitch_statement ?? '');
+  
+  // Comment functionality
+  const [showComments, setShowComments] = useState(false);
+  const [commentText, setCommentText] = useState('');
+  const { data: comments = [] } = useComments(pitch.id);
+  const addComment = useAddComment(pitch.id);
 
   return (
     <>
-      <motion.div
+<motion.div
         initial={{ opacity: 0, y: 5 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2 }}
@@ -277,11 +287,11 @@ export function PitchCard({ pitch, hideBorder = false }: PitchCardProps) {
 
           {/* Menu */}
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            {/* <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-transparent">
                 <MoreHorizontal className="h-5 w-5" />
               </Button>
-            </DropdownMenuTrigger>
+            </DropdownMenuTrigger> */}
             <DropdownMenuContent align="end">
               {isOwner && (
                 <DropdownMenuItem
@@ -302,16 +312,28 @@ export function PitchCard({ pitch, hideBorder = false }: PitchCardProps) {
           </DropdownMenu>
         </div>
 
-        {/* ── Post Title ───────────────────────────────────────── */}
+        {/* ── Media ────────────────────────────────────────────── */}
+        {(p.image || pitch.image) && (
+          <div className="mb-3 -mx-4 md:mx-0 md:rounded-lg overflow-hidden">
+            <img
+              src={p.image || pitch.image}
+              alt={postTitle || 'Post attachment'}
+              loading="lazy"
+              className="w-full h-auto object-cover max-h-[70vh]"
+            />
+          </div>
+        )}
+
+        {/* ── Heading ──────────────────────────────────────────── */}
         {postTitle && (
-          <h3 className="text-base font-bold text-foreground mb-2 leading-snug">
+          <h3 className="text-foreground text-[17px] font-semibold leading-snug mb-1.5 [overflow-wrap:anywhere]">
             {postTitle}
           </h3>
         )}
 
         {/* ── Description ──────────────────────────────────────── */}
         <div className="mb-3">
-          <p className="text-foreground text-[15px] leading-relaxed whitespace-pre-wrap">
+          <p className="text-foreground text-[15px] leading-relaxed whitespace-pre-wrap [overflow-wrap:anywhere]">
             {displayText}
             {shouldTruncate && (
               <button
@@ -323,22 +345,11 @@ export function PitchCard({ pitch, hideBorder = false }: PitchCardProps) {
             )}
           </p>
           {pitch.supporting_line && (
-            <p className="text-muted-foreground text-sm mt-2 leading-relaxed">
+            <p className="text-muted-foreground text-sm mt-2 leading-relaxed [overflow-wrap:anywhere]">
               {pitch.supporting_line}
             </p>
           )}
         </div>
-
-        {/* ── Media ────────────────────────────────────────────── */}
-        {(p.image || pitch.image) && (
-          <div className="w-[calc(100%+2rem)] -mx-4 mb-3 overflow-hidden bg-muted/30">
-            <img
-              src={p.image || pitch.image}
-              alt="Post attachment"
-              className="w-full h-auto object-cover max-h-[70vh]"
-            />
-          </div>
-        )}
 
         {/* ── Link Preview Card ─────────────────────────────────── */}
         {showLinkCard && (
@@ -358,51 +369,37 @@ export function PitchCard({ pitch, hideBorder = false }: PitchCardProps) {
           </div>
         )}
 
-        {/* ── Engagement Stats ──────────────────────────────────── */}
-        <div className="flex items-center justify-between text-sm text-muted-foreground py-2 border-b border-border/50">
-          <div className="flex items-center gap-4">
-            {(reactionCounts?.fire || 0) > 0 && (
-              <div className="flex items-center gap-1">
-                <Flame className={cn("h-4 w-4", pitch.user_reaction === 'fire' ? "text-orange-500" : "text-muted-foreground")} />
-                <span>{reactionCounts?.fire}</span>
-              </div>
-            )}
-          </div>
-          <div className="flex items-center gap-4">
-            {pitch.save_count > 0 && <span>{pitch.save_count} saves</span>}
-          </div>
-        </div>
-
         {/* ── Action Bar ───────────────────────────────────────── */}
-        <div className="flex items-center justify-between pt-2">
+        <div className="flex items-center justify-between">
           <Button
             variant="ghost"
             size="sm"
             className={cn(
-              "h-10 px-4 gap-2 text-muted-foreground hover:bg-muted/50 rounded-lg",
-              pitch.user_reaction === 'fire' && "text-orange-500"
+              "h-10 px-4 gap-2 text-muted-foreground  rounded-lg",
+              pitch.user_reaction === 'fire' && "text-blue-500"
             )}
             onClick={() => handleReaction('fire')}
             disabled={!user || isOwner}
           >
-            <Flame className={cn("h-5 w-5", pitch.user_reaction === 'fire' && "fill-current")} />
+            <ThumbsUp className={cn("h-5 w-5", pitch.user_reaction === 'fire' && "fill-current")} />
             <span className="text-sm">{(reactionCounts?.fire || 0) > 0 ? reactionCounts?.fire : ''}</span>
           </Button>
 
           <Button
             variant="ghost"
             size="sm"
-            className="h-10 px-4 gap-2 text-muted-foreground hover:bg-muted/50 rounded-lg"
-            disabled
+            className="h-10 px-4 gap-2 text-muted-foreground  rounded-lg"
+            onClick={() => setShowComments((s) => !s)}
           >
-            <Repeat2 className="h-5 w-5" />
+            <MessageCircle className="h-5 w-5" />
+            <span className="text-sm">{pitch.comment_count > 0 ? pitch.comment_count : ''}</span>
           </Button>
 
           {!isOwner && !hasPendingOrApproved ? (
             <Button
               variant="ghost"
               size="sm"
-              className="h-10 px-4 gap-2 text-muted-foreground hover:bg-muted/50 rounded-lg"
+              className="h-10 px-4 gap-2 text-muted-foreground  rounded-lg"
               onClick={() => setShowInterestDialog(true)}
               disabled={!user}
             >
@@ -421,11 +418,47 @@ export function PitchCard({ pitch, hideBorder = false }: PitchCardProps) {
           <Button
             variant="ghost"
             size="sm"
-            className="h-10 px-4 gap-2 text-muted-foreground hover:bg-muted/50 rounded-lg"
+            className="h-10 px-4 gap-2 text-muted-foreground  rounded-lg"
           >
             <Share2 className="h-5 w-5" />
           </Button>
         </div>
+{/* ── Comments ─────────────────────────────────────────── */}
+        {showComments && (
+          <ErrorBoundary
+            fallback={
+              <div className="mt-3 text-sm text-muted-foreground border-t pt-3">
+                Couldn't load comments. Please try again.
+              </div>
+            }
+          >
+            <div className="mt-3 space-y-2 border-t pt-3">
+              {comments.map((c: any) => (
+                <div key={c.id} className="text-sm">
+                  <span className="font-medium">{c.author_name}</span>{' '}
+                  <span className="text-muted-foreground">{c.content}</span>
+                </div>
+              ))}
+              <div className="flex gap-2">
+                <input
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  placeholder="Write a comment..."
+                  className="flex-1 text-sm border rounded-md px-3 py-1.5"
+                />
+                <button
+                  onClick={() => {
+                    if (!commentText.trim()) return;
+                    addComment.mutate(commentText, { onSuccess: () => setCommentText('') });
+                  }}
+                  className="text-sm font-medium text-primary"
+                >
+                  Post
+                </button>
+              </div>
+            </div>
+          </ErrorBoundary>
+        )}
       </motion.div>
 
       {/* Interest Dialog */}

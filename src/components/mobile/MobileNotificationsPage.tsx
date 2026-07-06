@@ -5,9 +5,12 @@ import { Bell, Bookmark, Flame, MessageSquare, Check, CheckCheck, X, UserCheck, 
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
+import { MobileSidebar } from '@/components/mobile/MobileSidebar';
 import { useNotifications, useMarkAsRead, useMarkAllAsRead } from '@/hooks/useNotifications';
 import { useIncomingContactRequests, useRespondToContactRequest } from '@/hooks/useContactRequests';
 import { useIncomingFollowRequests, useRespondToFollowRequest } from '@/hooks/useFollow';
+import { useAuth } from '@/hooks/useAuth';
+import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 
 const NOTIFICATION_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -30,6 +33,25 @@ const NOTIFICATION_COLORS: Record<string, string> = {
 
 export function MobileNotificationsPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  // Logged-in user's own avatar for the sidebar trigger
+  const { data: profile } = useQuery({
+    queryKey: ['profile', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      return await (await import('@/api/profiles')).getUserProfile(user.id);
+    },
+    enabled: !!user?.id,
+  });
+
+  const initials = (profile?.full_name || user?.email || '?')
+    .split(' ')
+    .map((n: string) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+
   const { data: notifications = [], isLoading } = useNotifications();
   const { data: pendingContactRequests = [] } = useIncomingContactRequests();
   const { data: pendingFollowRequests = [] } = useIncomingFollowRequests();
@@ -46,7 +68,7 @@ export function MobileNotificationsPage() {
   const pendingFollowRequestMap = new Map(
     pendingFollowRequests.map(req => [req.receiver, req])
   );
-
+  
   const handleAcceptContact = (notification: any) => {
     const request = pendingContactRequestMap.get(notification.actor_id);
     if (request) {
@@ -97,10 +119,24 @@ export function MobileNotificationsPage() {
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      {/* Header with Mark All Read */}
+      {/* Header */}
       <div className="sticky top-0 z-40 bg-card backdrop-blur-md border-b border-border/50">
         <div className="flex items-center justify-between px-4 py-3">
+
+          {/* Left — Avatar opens Sidebar + title + unread badge */}
           <div className="flex items-center gap-2">
+            <MobileSidebar
+              trigger={
+                <button className="touch-manipulation flex-shrink-0">
+                  <Avatar className="h-8 w-8 ring-2 ring-primary/20">
+                    <AvatarImage src={profile?.avatar ?? user?.avatar_url} />
+                    <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                </button>
+              }
+            />
             <span className="font-display text-lg font-semibold text-foreground">Activity</span>
             {unreadNotifications.length > 0 && (
               <span className="h-5 min-w-5 px-1.5 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
@@ -108,6 +144,8 @@ export function MobileNotificationsPage() {
               </span>
             )}
           </div>
+
+          {/* Right — Mark all read */}
           {unreadNotifications.length > 0 && (
             <Button
               variant="ghost"
@@ -165,7 +203,7 @@ export function MobileNotificationsPage() {
               const iconColors = NOTIFICATION_COLORS[notification.type] || 'bg-muted text-muted-foreground';
               const actorInitials = notification.actor?.full_name
                 ?.split(' ')
-                .map(n => n[0])
+                .map((n: string) => n[0])
                 .join('')
                 .toUpperCase() || '?';
 
@@ -199,7 +237,7 @@ export function MobileNotificationsPage() {
                   )}
                   onClick={handleNotificationClick}
                 >
-                  {/* Avatar with icon overlay */}
+                  {/* Notification actor avatar with icon overlay */}
                   <div className="relative">
                     <Avatar className="h-12 w-12">
                       <AvatarImage src={notification.actor?.avatar_url || undefined} />
@@ -224,16 +262,13 @@ export function MobileNotificationsPage() {
                       {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
                     </p>
 
-                    {/* Accept/Decline for contact requests */}
+                    {/* Accept / Decline for contact requests */}
                     {hasPendingContactRequest && (
                       <div className="flex gap-2 mt-3">
                         <Button
                           size="sm"
                           className="h-8 flex-1 text-xs rounded-full"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleAcceptContact(notification);
-                          }}
+                          onClick={(e) => { e.stopPropagation(); handleAcceptContact(notification); }}
                           disabled={respondToContactRequest.isPending}
                         >
                           <Check className="h-3.5 w-3.5 mr-1" />
@@ -243,10 +278,7 @@ export function MobileNotificationsPage() {
                           size="sm"
                           variant="outline"
                           className="h-8 flex-1 text-xs rounded-full"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeclineContact(notification);
-                          }}
+                          onClick={(e) => { e.stopPropagation(); handleDeclineContact(notification); }}
                           disabled={respondToContactRequest.isPending}
                         >
                           <X className="h-3.5 w-3.5 mr-1" />
@@ -255,16 +287,13 @@ export function MobileNotificationsPage() {
                       </div>
                     )}
 
-                    {/* Accept/Decline for follow requests */}
+                    {/* Accept / Decline for follow requests */}
                     {hasPendingFollowRequest && (
                       <div className="flex gap-2 mt-3">
                         <Button
                           size="sm"
                           className="h-8 flex-1 text-xs rounded-full"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleAcceptFollow(notification);
-                          }}
+                          onClick={(e) => { e.stopPropagation(); handleAcceptFollow(notification); }}
                           disabled={respondToFollowRequest.isPending}
                         >
                           <Check className="h-3.5 w-3.5 mr-1" />
@@ -274,10 +303,7 @@ export function MobileNotificationsPage() {
                           size="sm"
                           variant="outline"
                           className="h-8 flex-1 text-xs rounded-full"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeclineFollow(notification);
-                          }}
+                          onClick={(e) => { e.stopPropagation(); handleDeclineFollow(notification); }}
                           disabled={respondToFollowRequest.isPending}
                         >
                           <X className="h-3.5 w-3.5 mr-1" />
@@ -287,7 +313,7 @@ export function MobileNotificationsPage() {
                     )}
                   </div>
 
-                  {/* Unread indicator */}
+                  {/* Unread dot */}
                   {!notification.is_read && (
                     <div className="h-2.5 w-2.5 rounded-full bg-primary flex-shrink-0 mt-1" />
                   )}
