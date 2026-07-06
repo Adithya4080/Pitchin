@@ -22,24 +22,39 @@ export function clearTokens() {
 
 // ─── Core Fetch Helper ────────────────────────────────────────────────────────
 
+let refreshPromise: Promise<string | null> | null = null;
+
 async function refreshAccessToken(): Promise<string | null> {
-  const refresh = getRefreshToken();
-  if (!refresh) return null;
+  if (refreshPromise) return refreshPromise; // reuse in-flight refresh
 
-  const res = await fetch(`${API_BASE}/auth/token/refresh/`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ refresh }),
-  });
+  refreshPromise = (async () => {
+    const refresh = getRefreshToken();
+    if (!refresh) return null;
 
-  if (!res.ok) {
-    clearTokens();
-    return null;
+    const res = await fetch(`${API_BASE}/auth/token/refresh/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh }),
+    });
+
+    if (!res.ok) {
+      clearTokens();
+      return null;
+    }
+
+    const data = await res.json();
+    localStorage.setItem('access_token', data.access);
+    if (data.refresh) {
+      localStorage.setItem('refresh_token', data.refresh); 
+    }
+    return data.access;
+  })();
+
+  try {
+    return await refreshPromise;
+  } finally {
+    refreshPromise = null;
   }
-
-  const data = await res.json();
-  localStorage.setItem('access_token', data.access);
-  return data.access;
 }
 
 export async function apiFetch<T = any>(
@@ -59,7 +74,7 @@ const headers: Record<string, string> = {
 
 if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  const res = await fetch(url, { ...options, headers });
+const res = await fetch(url, { ...options, headers });
 
   if (res.status === 401 && retry) {
     const newToken = await refreshAccessToken();

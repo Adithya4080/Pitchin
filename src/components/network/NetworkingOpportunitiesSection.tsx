@@ -4,6 +4,7 @@ import { ArrowRight, Globe } from 'lucide-react';
 import { useNetworkDiscover } from '@/hooks/useNetworkDiscover';
 import type { NetworkTab } from '@/api/profiles';
 import { useSendInterest } from '@/hooks/useSendInterest';
+import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
 const TAB_ICONS: Record<NetworkTab, JSX.Element> = {
@@ -229,8 +230,12 @@ function DotPagination({ total, current, onChange }: {
 export function NetworkingOpportunitiesSection() {
   const [activeTab, setActiveTab] = useState<NetworkTab>('investor');
   const [page, setPage] = useState(1);
-
-  const { data, isLoading, isError } = useNetworkDiscover({ tab: activeTab, page });
+  const { user, loading: authLoading } = useAuth(); 
+  const { data, isLoading, isError } = useNetworkDiscover({ 
+    tab: activeTab, 
+    page,
+    enabled: !!user && !authLoading, 
+  });
 
   const profiles = data?.results ?? [];
   const numPages  = data?.num_pages ?? 1;
