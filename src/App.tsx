@@ -70,7 +70,7 @@ const App = () => (
 							<Route path="/reset-password" element={<ResetPassword />} />
 							<Route path="/shared/:userId" element={<SharedProfile />} />
 							<Route path="/shared/:userId/pitch/:pitchId" element={<SharedPitchDetail />} />
-							<Route element={<ProtectedRoute />}>
+							{/* <Route element={<ProtectedRoute />}> */}
 								<Route path="/" element={<Index />} />
 								<Route path="/dashboard" element={<Dashboard />} />
 								<Route path="/feed" element={<Feed />} />
@@ -91,7 +91,7 @@ const App = () => (
 								<Route path="/network/provider/:slug" element={<ProviderDetail />} />
 								<Route path="/network/provider/:slug/pitch/:pitchId" element={<PitchDetail />} />
 								<Route path="/network/services" element={<NetworkServices />} />
-							</Route>
+							{/* </Route> */}
 							{/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
 							<Route path="*" element={<NotFound />} />
 						</Routes>
