@@ -23,7 +23,7 @@ import ProfileLoader from "@/components/shared-profile/Profileloader";
 
 const API_BASE =
   (import.meta as any).env?.VITE_API_BASE_URL?.replace("/api", "") ||
-  "https://pitchin-backend-production.up.railway.app";
+  "https://api.pichin.in";
 
 function ErrorScreen({
   icon: Icon,

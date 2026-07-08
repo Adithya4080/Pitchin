@@ -160,7 +160,9 @@ export function useNetworkDiscover(params: {
   search?: string;
   stage?: string;
   page?: number;
+  enabled?: boolean;
 }) {
+  const { enabled = true, ...queryParams } = params;
   return useQuery({
     queryKey: ['network-discover', params],
     queryFn: async () => {
@@ -181,6 +183,7 @@ export function useNetworkDiscover(params: {
         };
       }
     },
+    enabled,
     staleTime: 1000 * 60 * 2,
   });
 }
