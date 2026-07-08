@@ -8,6 +8,15 @@ import { AppLayout } from '@/components/layouts/AppLayout';
 import { useServiceProvider, useSendServiceInquiry } from '@/hooks/useServices';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import { TrustSnapshot } from '@/components/network/provider-profile/TrustSnapshot';
+import { ExpertiseSection } from '@/components/network/provider-profile/ExpertiseSection';
+import { ServicesGrid } from '@/components/network/provider-profile/ServicesGrid';
+import { BestFitFor } from '@/components/network/provider-profile/BestFitFor';
+import { PortfolioGrid } from '@/components/network/provider-profile/PortfolioGrid';
+import { CollaboratorsSection } from '@/components/network/provider-profile/CollaboratorsSection';
+import { ProcessSteps } from '@/components/network/provider-profile/ProcessSteps';
+import { CertificationsGrid } from '@/components/network/provider-profile/CertificationsGrid';
+import { FaqSection } from '@/components/network/provider-profile/FaqSection';
 
 // ─── Category color map ───────────────────────────────────────────────────────
 const CATEGORY_COLORS: Record<string, { accent: string; avatarBg: string }> = {
@@ -108,6 +117,93 @@ const PAGE_STYLES = `
   }
   .pd-cs-card:hover { border-color: #d1d5db; }
 
+  /* Trust snapshot */
+  .pd-trust-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+  }
+  .pd-trust-item {
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    gap: 4px; padding: 12px 8px;
+    background: #fafafa; border: 1px solid #f1f1f1; border-radius: 12px;
+  }
+  .pd-trust-val { font-size: 15px; font-weight: 700; color: #111827; margin: 0; }
+  .pd-trust-label { font-size: 10.5px; color: #9ca3af; margin: 0; line-height: 1.3; }
+
+  /* Service cards (sub-categories) */
+  .pd-service-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+  }
+  .pd-service-card {
+    border: 1px solid #f0f0f0; border-radius: 12px; padding: 14px;
+    transition: border-color 0.15s;
+  }
+  .pd-service-card:hover { border-color: #d1d5db; }
+
+  /* Portfolio — project showcase cards */
+  .pd-project-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+  }
+  .pd-project-card {
+    display: block; border-radius: 12px; overflow: hidden;
+    border: 1px solid #f0f0f0; background: #fff; text-decoration: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  a.pd-project-card:hover { border-color: #d1d5db; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+  .pd-project-image {
+    aspect-ratio: 16/10; background: #fafafa;
+  }
+  .pd-project-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .pd-project-body { padding: 12px 14px; }
+  .pd-project-title { font-size: 13px; font-weight: 700; color: #111827; margin: 0 0 4px; }
+  .pd-project-desc { font-size: 12px; color: #6b7280; margin: 0; line-height: 1.5; }
+  .pd-project-link {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11.5px; font-weight: 600; margin-top: 8px;
+  }
+
+  /* Collaborators / "Trusted by" strip */
+  .pd-collab-strip { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pd-collab-item {
+    display: flex; align-items: center; gap: 8px;
+    border: 1px solid #f0f0f0; border-radius: 10px; padding: 8px 12px;
+    text-decoration: none; transition: border-color 0.15s;
+  }
+  a.pd-collab-item:hover { border-color: #d1d5db; }
+  .pd-collab-logo { width: 24px; height: 24px; border-radius: 6px; object-fit: cover; display: block; }
+  .pd-collab-logo-fallback {
+    display: flex; align-items: center; justify-content: center;
+    background: #f4f4f5; color: #9ca3af;
+  }
+  .pd-collab-name { font-size: 12.5px; font-weight: 600; color: #374151; }
+
+  /* Process timeline */
+  .pd-process-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  }
+  .pd-process-step { display: flex; flex-direction: column; gap: 6px; }
+  .pd-process-icon {
+    width: 30px; height: 30px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    background: #f4f4f5; flex-shrink: 0;
+  }
+
+  /* Certifications */
+  .pd-cert-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .pd-cert-item {
+    display: flex; align-items: center; gap: 10px;
+    border: 1px solid #f0f0f0; border-radius: 12px; padding: 12px;
+  }
+
+  /* FAQ */
+  .pd-faq-item { border-bottom: 1px solid #f3f4f6; }
+  .pd-faq-item:last-child { border-bottom: none; }
+  .pd-faq-question {
+    width: 100%; display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 0; background: none; border: none; cursor: pointer;
+    font-size: 13px; font-weight: 600; color: #111827; text-align: left;
+  }
+  .pd-faq-answer { padding: 0 0 14px; font-size: 13px; color: #6b7280; line-height: 1.6; margin: 0; }
+
   /* ── Responsive ── */
   @media (max-width: 768px) {
     .pd-two-col { flex-direction: column !important; }
@@ -116,9 +212,17 @@ const PAGE_STYLES = `
     .pd-hero-actions button, .pd-hero-actions a { width: 100% !important; justify-content: center !important; }
     .pd-cs-grid { grid-template-columns: 1fr !important; }
     .pd-identity-row { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; }
+    .pd-trust-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .pd-service-grid { grid-template-columns: 1fr !important; }
+    .pd-project-grid { grid-template-columns: 1fr !important; }
+    .pd-process-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .pd-cert-grid { grid-template-columns: 1fr !important; }
   }
   @media (max-width: 480px) {
     .pd-stat-row { grid-template-columns: 1fr !important; }
+    .pd-trust-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .pd-process-grid { grid-template-columns: 1fr !important; }
+    .pd-project-grid { grid-template-columns: 1fr !important; }
   }
 `;
 
@@ -137,17 +241,6 @@ function ProviderAvatar({
       fontSize: size * 0.30, fontWeight: 700, color: '#fff', letterSpacing: '1px',
     }}>
       {initials}
-    </div>
-  );
-}
-
-// ─── Stars ────────────────────────────────────────────────────────────────────
-function Stars({ count = 5 }: { count?: number }) {
-  return (
-    <div style={{ display: 'flex', gap: 2 }}>
-      {Array.from({ length: count }).map((_, i) => (
-        <Star key={i} size={14} style={{ fill: '#f59e0b', color: '#f59e0b' }} />
-      ))}
     </div>
   );
 }
@@ -423,19 +516,25 @@ export default function ProviderDetail() {
     ? `${Math.max(3, Math.floor(provider.startups_served / 30))}+ years`
     : null;
 
-  const caseStudies: { title: string; desc: string }[] = [];
-  if (provider.tags?.length >= 2) {
-    caseStudies.push({ title: provider.tags[0], desc: `End-to-end ${provider.tags[0].toLowerCase()} for a Series A startup.` });
-    caseStudies.push({ title: provider.tags[1], desc: `Full ${provider.tags[1].toLowerCase()} engagement completed in under 3 weeks.` });
-  }
-
-  const reviews: { rating: number; text: string; author: string }[] = [];
-  if (provider.review_count > 0) {
-    reviews.push({ rating: 5, text: `${provider.name} responded within hours and resolved our issue quickly.`, author: 'Startup Founder' });
-    if (provider.review_count > 1) {
-      reviews.push({ rating: 5, text: 'Professional, transparent pricing. Felt like working with an in-house team.', author: 'CEO, Early-stage startup' });
-    }
-  }
+  // Generic fallback FAQs — only used if the provider hasn't written their own yet.
+  const faqs: { question: string; answer: string }[] = [
+    {
+      question: 'How does pricing work?',
+      answer: provider.starting_price
+        ? `Starting at ₹${Number(provider.starting_price).toLocaleString('en-IN')}${pricingLabel}. Final pricing depends on your specific scope — request a proposal for an exact quote.`
+        : 'Pricing is scoped per project — send a proposal request with your requirement for a quote.',
+    },
+    {
+      question: 'What stage of startup do you work with?',
+      answer: provider.stage_focus_label
+        ? `${provider.name} primarily works with startups at the ${provider.stage_focus_label.replace(' Focus', '').toLowerCase()}.`
+        : `${provider.name} works with startups across stages — reach out to confirm fit for yours.`,
+    },
+    {
+      question: 'How do I get started?',
+      answer: 'Use "Request proposal" below to share your requirement, or "Book consultation" to schedule a call first.',
+    },
+  ];
 
   const tabPlaceholder = activeTab === 'consultation'
     ? `Hi ${provider.name}, I'd like to book a call to discuss...`
@@ -482,8 +581,23 @@ export default function ProviderDetail() {
           marginBottom: 16,
           /* NO overflow: hidden here — that was clipping the avatar */
         }}>
-          {/* Banner illustration — has its own overflow:hidden scoped to itself */}
-          <HeroIllustration accent={accent} avatarBg={avatarBg} categorySlug={provider.category_slug} />
+          {/* Banner — real uploaded banner if the provider set one, else generated illustration */}
+          {provider.banner_url ? (
+            <div style={{
+              height: 180,
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+              overflow: 'hidden',
+            }}>
+              <img
+                src={provider.banner_url}
+                alt={`${provider.name} banner`}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              />
+            </div>
+          ) : (
+            <HeroIllustration accent={accent} avatarBg={avatarBg} categorySlug={provider.category_slug} />
+          )}
 
           {/* Identity section */}
           <div style={{ padding: '0 20px 20px' }}>
@@ -515,7 +629,15 @@ export default function ProviderDetail() {
                 position: 'relative',
                 zIndex: 1,
               }}>
-                <ProviderAvatar name={provider.name} avatarBg={avatarBg} size={72} />
+                {provider.logo_url ? (
+                  <img
+                    src={provider.logo_url}
+                    alt={`${provider.name} logo`}
+                    style={{ width: 72, height: 72, borderRadius: 14, objectFit: 'cover', display: 'block' }}
+                  />
+                ) : (
+                  <ProviderAvatar name={provider.name} avatarBg={avatarBg} size={72} />
+                )}
               </div>
 
               {/* Action buttons — sit in the white area, aligned top-right */}
@@ -621,81 +743,32 @@ export default function ProviderDetail() {
               </div>
             </div>
 
-            {/* Services */}
-            {provider.tags?.length > 0 && (
-              <div className="pd-section">
-                <p className="pd-section-title">Services offered</p>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
-                  {provider.tags.map((tag: string) => (
-                    <span key={tag} className="pd-tag">{tag}</span>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* Trust snapshot */}
+            <TrustSnapshot provider={provider} accent={accent} />
 
-            {/* Industries */}
-            <div className="pd-section">
-              <p className="pd-section-title">Industries served</p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
-                {['SaaS', 'Fintech', 'Marketplaces', 'D2C', 'EdTech'].slice(0, 4).map(ind => (
-                  <span key={ind} className="pd-tag">{ind}</span>
-                ))}
-              </div>
-            </div>
+            {/* Expertise / skills */}
+            <ExpertiseSection tags={provider.tags} />
 
-            {/* Case studies */}
-            {caseStudies.length > 0 && (
-              <div className="pd-section">
-                <p className="pd-section-title">Case studies</p>
-                <div className="pd-cs-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                  {caseStudies.map((cs, i) => (
-                    <div key={i} className="pd-cs-card">
-                      <div style={{
-                        height: 120,
-                        background: `linear-gradient(135deg, ${avatarBg} 0%, #0f172a 100%)`,
-                        display: 'flex', flexDirection: 'column',
-                        alignItems: 'center', justifyContent: 'center',
-                        position: 'relative', overflow: 'hidden',
-                      }}>
-                        <div style={{ position: 'absolute', inset: 0, opacity: 0.06 }}>
-                          <svg width="100%" height="100%">
-                            <defs>
-                              <pattern id={`cs-grid-${i}`} x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="white" strokeWidth="0.5" />
-                              </pattern>
-                            </defs>
-                            <rect width="100%" height="100%" fill={`url(#cs-grid-${i})`} />
-                          </svg>
-                        </div>
-                        <span style={{ fontSize: 11, fontWeight: 700, color: accent, letterSpacing: '0.1em', textTransform: 'uppercase', position: 'relative' }}>
-                          Case Study
-                        </span>
-                      </div>
-                      <div style={{ padding: '12px 14px' }}>
-                        <p style={{ fontSize: 13, fontWeight: 700, color: '#111827', margin: '0 0 4px' }}>{cs.title}</p>
-                        <p style={{ fontSize: 12, color: '#6b7280', margin: 0, lineHeight: 1.5 }}>{cs.desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* Services grid — real sub-categories set by the provider */}
+            <ServicesGrid subCategories={provider.sub_categories} />
 
-            {/* Reviews */}
-            {reviews.length > 0 && (
-              <div className="pd-section">
-                <p className="pd-section-title">Reviews</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {reviews.map((r, i) => (
-                    <div key={i} className="pd-review">
-                      <Stars count={r.rating} />
-                      <p style={{ fontSize: 13, color: '#374151', margin: '8px 0 6px', lineHeight: 1.6 }}>"{r.text}"</p>
-                      <p style={{ fontSize: 11, color: '#9ca3af', margin: 0 }}>— {r.author}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* Best fit for — real stage focus, not a fabricated industry list */}
+            <BestFitFor stageFocusLabel={provider.stage_focus_label} />
+
+            {/* Portfolio — real work-sample uploads from the provider's own dashboard */}
+            <PortfolioGrid media={provider.media || []} accent={accent} />
+
+            {/* Trusted by — real companies/brands the provider has worked with */}
+            <CollaboratorsSection collaborators={provider.collaborators || []} />
+
+            {/* How we work */}
+            <ProcessSteps accent={accent} />
+
+            {/* Certifications — real verified / top-rated flags only */}
+            <CertificationsGrid isVerified={provider.is_verified} isTopRated={provider.is_top_rated} accent={accent} />
+
+            {/* FAQ — provider's own written FAQs, falling back to generic ones */}
+            <FaqSection faqs={provider.faqs} fallback={faqs} />
           </div>
 
           {/* RIGHT SIDEBAR */}

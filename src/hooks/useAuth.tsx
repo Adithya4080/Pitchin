@@ -17,8 +17,8 @@ interface AuthContextType {
   isOnboarded: boolean | null;
   isOnboardingChecked: boolean;
   setIsOnboarded: (value: boolean) => void;
-  signInWithEmail: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUpWithEmail: (email: string, password: string, password2: string, fullName: string) => Promise<{ error: Error | null }>;
+  signInWithEmail: (email: string, password: string) => Promise<{ error: Error | null; user?: AuthUser }>;
+  signUpWithEmail: (email: string, password: string, password2: string, fullName: string) => Promise<{ error: Error | null; user?: AuthUser }>;
   signOut: () => Promise<void>;
   refreshUser: () => Promise<void>;
   signInWithGoogle: () => Promise<{ error: Error | null }>;
@@ -84,7 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = await apiLogin(email, password);
       setUser(data.user);
       checkOnboarding(data.user);
-      return { error: null };
+      return { error: null, user: data.user };
     } catch (e) {
       return { error: e as Error };
     }
@@ -95,7 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = await apiRegister({ email, password, password2, full_name: fullName });
       setUser(data.user);
       checkOnboarding(data.user);
-      return { error: null };
+      return { error: null, user: data.user };
     } catch (e) {
       return { error: e as Error };
     }

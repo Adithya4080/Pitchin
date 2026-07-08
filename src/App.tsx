@@ -31,6 +31,7 @@ const Network = lazy(() => import("./pages/network"));
 const NetworkServices = lazy(() => import("./pages/NetworkServices"));
 const ServiceCategoryPage = lazy(() => import("./pages/ServiceCategoryPage"));
 const ProviderDetail = lazy(() => import("./pages/ProviderDetail"));
+const ProviderDashboard = lazy(() => import("./pages/ProviderDashboard"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -87,6 +88,7 @@ const App = () => (
                 {/* <Route path="/network/services" element={<NetworkServices />} /> */}
                 <Route path="/network/services/:slug" element={<ServiceCategoryPage />} />
                 <Route path="/network/provider/:slug" element={<ProviderDetail />} />
+                <Route path="/provider/dashboard" element={<ProviderDashboard />} />
                 <Route path="/network/provider/:slug/pitch/:pitchId" element={<PitchDetail />} />
                 <Route path="/network/services" element={<NetworkServices />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

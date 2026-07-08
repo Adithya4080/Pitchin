@@ -61,10 +61,12 @@ export default function Auth() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await signInWithEmail(loginEmail, loginPassword);
+    const { error, user } = await signInWithEmail(loginEmail, loginPassword);
     setLoading(false);
     if (error) {
       toast({ title: 'Sign in failed', description: error.message, variant: 'destructive' });
+    } else if (user?.role === 'consultant') {
+      navigate('/provider/dashboard');
     } else {
       navigate('/network');
     }
