@@ -405,7 +405,7 @@ export default function ProviderDashboard() {
           </div>
           <CardContent className="pt-0 -mt-8 flex items-end gap-4">
             <div className="relative">
-              <div className="h-20 w-20 rounded-xl bg-background border-4 border-background shadow-sm overflow-hidden flex items-center justify-center bg-muted">
+              <div className="h-20 w-20 rounded-xl  border-4 border-background shadow-sm overflow-hidden flex items-center justify-center bg-muted">
                 {currentLogo ? (
                   <img src={currentLogo} alt="Logo" className="h-full w-full object-cover" />
                 ) : (
