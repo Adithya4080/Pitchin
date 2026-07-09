@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { isProviderRole } from '@/hooks/useRoleProfile';
 import {
   useServiceCategories,
   useMyProvider,
@@ -99,9 +100,10 @@ export default function ProviderDashboard() {
 
   const exists = myProvider && 'exists' in myProvider && myProvider.exists;
 
-  // Gate: only consultant-role accounts belong here.
+  // Gate: only provider-type accounts (consultant, ecosystem service
+  // provider) belong here.
   useEffect(() => {
-    if (!authLoading && user && user.role !== 'consultant') {
+    if (!authLoading && user && !isProviderRole(user.role)) {
       navigate('/network');
     }
     if (!authLoading && !user) {
