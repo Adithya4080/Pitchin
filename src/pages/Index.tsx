@@ -200,10 +200,10 @@ function DesktopLanding() {
           </div>
         </div>
       </section>
+            <WhoWeAre />
 
       {/* Features */}
       {/* <Features /> */}
-      {/* <WhoWeAre /> */}
 
       {/* The Problem */}
       {/* <TheProblem /> */}

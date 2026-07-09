@@ -240,6 +240,7 @@ export function MobileLandingPage() {
             </div>
           </div>
         </section>
+        <WhoWeAre />
         {/* Footer */}
         <div className="w-full overflow-hidden">
           <SiteFooter />
