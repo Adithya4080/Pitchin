@@ -1,30 +1,19 @@
 import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Zap, Flame, Sparkles, Users, Mail, HelpCircle } from 'lucide-react';
+import { Plus, Zap, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PitchCard } from '@/components/PitchCard';
 import { CreatePitchModal } from '@/components/CreatePitchModal';
 import { SuggestedProfilesCard } from '@/components/mobile/SuggestedProfilesCard';
+import { MobileSearchHeader } from '@/components/mobile/MobileSearchHeader';
 import { usePitches } from '@/hooks/usePitches';
 import { useSuggestedProfiles } from '@/hooks/useSuggestedProfiles';
 import { useAuth } from '@/hooks/useAuth';
-import { useQuery } from '@tanstack/react-query';
-import { MobileSidebar } from '@/components/mobile/MobileSidebar';
-import { cn } from '@/lib/utils';
-
-const FEED_TABS = [
-  { id: 'newest', label: 'For You', icon: Sparkles },
-  { id: 'trending', label: 'Trending', icon: Flame },
-  { id: 'following', label: 'Following', icon: Users },
-] as const;
 
 export function MobileFeedPage() {
-  const navigate = useNavigate();
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<'newest' | 'trending'>('newest');
+  const activeTab = 'newest' as const;
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
 
@@ -50,76 +39,10 @@ export function MobileFeedPage() {
     return insertAt;
   }, [pitches?.length, suggestedProfiles.length]);
 
-  const { data: profile } = useQuery({
-    queryKey: ['profile', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      return await (await import('@/api/profiles')).getUserProfile(user.id);
-    },
-    enabled: !!user?.id,
-  });
-
-  const initials = profile?.full_name
-    ?.split(' ')
-    .map(n => n[0])
-    .join('')
-    .toUpperCase() || user?.email?.charAt(0).toUpperCase() || '?';
-
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* App Bar */}
-      <div className="sticky top-0 z-40 bg-card backdrop-blur-md border-b border-border/50">
-        <div className="flex items-center justify-between px-4 py-3">
-          {/* Left - Avatar opens Sidebar */}
-          <MobileSidebar
-            trigger={
-              <button className="touch-manipulation flex-shrink-0">
-                <Avatar className="h-8 w-8 ring-2 ring-primary/20">
-                  <AvatarImage src={profile?.avatar ?? user?.avatar_url} />
-                  <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
-                    {initials}
-                  </AvatarFallback>
-                </Avatar>
-              </button>
-            }
-          />
-          {/* Center - Logo */}
-          <span className="font-display font-bold text-xl tracking-tight text-sky-400">Pitchin</span>
-
-          {/* Right - Tutorial & Mail Icons */}
-          <div className="flex items-center gap-1">
-          <button
-            onClick={() => navigate('/contact')}
-            className="h-8 w-8 flex items-center justify-center rounded-full hover:bg-muted/50 transition-colors touch-manipulation"
-          >
-            <Mail className="h-5 w-5 text-muted-foreground" />
-          </button>
-          </div>
-        </div>
-
-        {/* Tab Navigation */}
-        <div className="flex items-center gap-1 px-4 py-2">
-          {FEED_TABS.map((tab) => {
-            const actualActive = tab.id === 'newest' ? activeTab === 'newest' : 
-            tab.id === 'trending' ? activeTab === 'trending' : false;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => tab.id !== 'following' && setActiveTab(tab.id as 'newest' | 'trending')}
-                className={cn(
-                  "px-3 py-1 rounded-sm text-xs font-semibold transition-colors",
-                  actualActive
-                    ? "bg-foreground/10 text-foreground"
-                    : "text-muted-foreground hover:text-foreground",
-                  tab.id === 'following' && "opacity-40"
-                )}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <MobileSearchHeader />
 
 
       {/* Feed Content */}

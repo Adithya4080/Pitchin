@@ -10,7 +10,6 @@ import { ContentTransition, StaggeredList, StaggeredItem } from '@/components/tr
 import { usePitches } from '@/hooks/usePitches';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
-import { useQuery } from '@tanstack/react-query';
 import { Database } from '@/integrations/supabase/types';
 
 type PitchCategory = Database['public']['Enums']['pitch_category'];
@@ -27,18 +26,7 @@ export function PitchFeed() {
     categoryFilter === 'all' ? undefined : categoryFilter,
   );
 
-  // Fetch user profile for the create post area
-  const { data: profile } = useQuery({
-    queryKey: ['profile', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      // TODO: connect to backend API
-      // return data;
-    },
-    enabled: !!user?.id,
-  });
-
-  const initials = profile?.full_name
+  const initials = user?.full_name
     ?.split(' ')
     .map(n => n[0])
     .join('')
@@ -53,11 +41,7 @@ export function PitchFeed() {
           <div className="flex-1 flex items-center gap-3 bg-card border border-border/40 rounded-full pl-2 pr-3 py-2 shadow-sm">
             <Avatar className="h-10 w-10 shrink-0">
               <AvatarImage
-                src={
-                  profile?.avatar_url ||
-                  profile?.avatar ||
-                  ""
-                }
+                src={user?.avatar_url || ""}
               />
               <AvatarFallback className="bg-muted text-muted-foreground font-semibold">
                 {initials}

@@ -1,11 +1,12 @@
 import { useAuth } from '@/hooks/useAuth';
-import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { useState } from 'react';
 import { CreatePitchModal } from './CreatePitchModal';
 import { useUserRole, UserRole } from '@/hooks/useUserRole';
+import { useMyProfile } from '@/hooks/useRoleProfile';
+import { useMyPostsStats } from '@/hooks/usePitches';
 import {
   User,
   Users,
@@ -73,28 +74,12 @@ export function FeedLeftSidebar() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const { data: userRoleData } = useUserRole(user?.id);
 
-  const { data: profile } = useQuery({
-    queryKey: ['profile', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      return (await import('@/api/profiles')).getUserProfile(user.id);
-    },
-    enabled: !!user?.id,
-  });
-
-  const { data: userStats } = useQuery({
-    queryKey: ['userStats', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      const { getMyPosts } = await import('@/api/feed');
-      const posts = await getMyPosts();
-      return {
-        totalReactions: posts.reduce((sum: number, p: any) => sum + (p.like_count || 0), 0),
-        pitchCount: posts.length,
-      };
-    },
-    enabled: !!user?.id,
-  });
+  // Shared with Header.tsx (same ['my-profile', user?.id] queryKey) and
+  // with the "userStats" data below (same ['my-posts', user?.id] queryKey
+  // as Header's useUserActivePitch()) — avoids each sidebar/header firing
+  // its own duplicate GET /profiles/... and GET /api/feed/my/ requests.
+  const { data: profile } = useMyProfile();
+  const { data: userStats } = useMyPostsStats();
 
   const handleNavClick = (path: string) => {
     if (path === '/profile') {

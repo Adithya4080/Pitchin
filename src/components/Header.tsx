@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Bell, LogOut, User, HelpCircle, Home, Search, Users, Newspaper, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useQuery } from '@tanstack/react-query';
 import pitchinLogo from '@/assets/pitchin-logo-text.webp';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -14,6 +13,7 @@ import { CreatePitchModal } from './CreatePitchModal';
 import { useAuth } from '@/hooks/useAuth';
 import { useUnreadCount } from '@/hooks/useNotifications';
 import { useUserActivePitch } from '@/hooks/usePitches';
+import { useMyProfile } from '@/hooks/useRoleProfile';
 
 
 export function Header() {
@@ -33,17 +33,10 @@ export function Header() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
 
-  // Fetch profile from Django API
-  const { data: profile } = useQuery({
-    queryKey: ['header-profile', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      const { getMyProfile } = await import('@/api/profiles');
-      return getMyProfile();
-    },
-    enabled: !!user?.id,
-    staleTime: 0,
-  });
+  // Shared with FeedLeftSidebar.tsx (same ['my-profile', user?.id]
+  // queryKey) — avoids fetching two separate profile endpoints for the
+  // same user on the same page load.
+  const { data: profile } = useMyProfile();
 
   const displayName = profile?.full_name || user?.full_name || user?.email || '?';
   const avatarUrl = profile?.avatar || user?.avatar_url;

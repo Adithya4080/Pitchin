@@ -363,7 +363,7 @@ export default function NetworkServices() {
   const isViewAll = searchParams.get('view') === 'all';
 
   return (
-    <AppLayout showMobileHeader title="Services" showBottomNav>
+    <AppLayout showMobileHeader title="Services" showBottomNav mobileHeaderVariant="search">
       <div className="max-w-[1400px] mx-auto">
         {/* Mobile/tablet sticky nav bar — lives above the flex row, full width */}
         <ServicesTopBar />

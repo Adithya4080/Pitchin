@@ -5,12 +5,11 @@ import { Bell, Bookmark, Flame, MessageSquare, Check, CheckCheck, X, UserCheck, 
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
-import { MobileSidebar } from '@/components/mobile/MobileSidebar';
+import { MobileSearchHeader } from '@/components/mobile/MobileSearchHeader';
 import { useNotifications, useMarkAsRead, useMarkAllAsRead } from '@/hooks/useNotifications';
 import { useIncomingContactRequests, useRespondToContactRequest } from '@/hooks/useContactRequests';
 import { useIncomingFollowRequests, useRespondToFollowRequest } from '@/hooks/useFollow';
 import { useAuth } from '@/hooks/useAuth';
-import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 
 const NOTIFICATION_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -34,23 +33,6 @@ const NOTIFICATION_COLORS: Record<string, string> = {
 export function MobileNotificationsPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-
-  // Logged-in user's own avatar for the sidebar trigger
-  const { data: profile } = useQuery({
-    queryKey: ['profile', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      return await (await import('@/api/profiles')).getUserProfile(user.id);
-    },
-    enabled: !!user?.id,
-  });
-
-  const initials = (profile?.full_name || user?.email || '?')
-    .split(' ')
-    .map((n: string) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
 
   const { data: notifications = [], isLoading } = useNotifications();
   const { data: pendingContactRequests = [] } = useIncomingContactRequests();
@@ -120,45 +102,28 @@ export function MobileNotificationsPage() {
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-card backdrop-blur-md border-b border-border/50">
-        <div className="flex items-center justify-between px-4 py-3">
+      <MobileSearchHeader />
 
-          {/* Left — Avatar opens Sidebar + title + unread badge */}
+      {/* Activity title + Mark all read (kept as a slim row so this action isn't lost) */}
+      {(unreadNotifications.length > 0) && (
+        <div className="flex items-center justify-between px-4 py-2 border-b border-border/50 bg-card">
           <div className="flex items-center gap-2">
-            <MobileSidebar
-              trigger={
-                <button className="touch-manipulation flex-shrink-0">
-                  <Avatar className="h-8 w-8 ring-2 ring-primary/20">
-                    <AvatarImage src={profile?.avatar ?? user?.avatar_url} />
-                    <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
-                      {initials}
-                    </AvatarFallback>
-                  </Avatar>
-                </button>
-              }
-            />
-            <span className="font-display text-lg font-semibold text-foreground">Activity</span>
-            {unreadNotifications.length > 0 && (
-              <span className="h-5 min-w-5 px-1.5 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
-                {unreadNotifications.length}
-              </span>
-            )}
+            <span className="font-display text-sm font-semibold text-foreground">Activity</span>
+            <span className="h-5 min-w-5 px-1.5 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
+              {unreadNotifications.length}
+            </span>
           </div>
-
-          {/* Right — Mark all read */}
-          {unreadNotifications.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 text-xs text-primary"
-              onClick={() => markAllAsRead.mutate()}
-            >
-              <CheckCheck className="h-4 w-4 mr-1" />
-              Mark all read
-            </Button>
-          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 text-xs text-primary"
+            onClick={() => markAllAsRead.mutate()}
+          >
+            <CheckCheck className="h-3.5 w-3.5 mr-1" />
+            Mark all read
+          </Button>
         </div>
-      </div>
+      )}
 
       {/* Content */}
       {isLoading ? (

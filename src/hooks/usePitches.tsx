@@ -61,13 +61,35 @@ export function usePitches(
 export function useUserActivePitch() {
   const { user } = useAuth();
   return useQuery({
-    queryKey: ['user-active-pitch', user?.id],
-    queryFn: async (): Promise<PitchWithProfile | null> => {
-      if (!user) return null;
-      const posts = await getMyPosts();
-      return posts.length ? adaptPost(posts[0]) : null;
+    // Shared cache key with useMyPostsStats() below — both derive from the
+    // same underlying "my posts" list instead of each firing their own
+    // GET /api/feed/my/ request.
+    queryKey: ['my-posts', user?.id],
+    queryFn: async (): Promise<Post[]> => {
+      if (!user) return [];
+      return getMyPosts();
     },
     enabled: !!user,
+    select: (posts): PitchWithProfile | null =>
+      posts.length ? adaptPost(posts[0]) : null,
+  });
+}
+
+export function useMyPostsStats() {
+  const { user } = useAuth();
+  return useQuery({
+    // Same queryKey/queryFn as useUserActivePitch() — React Query dedupes
+    // these into a single network request and shares the cached result.
+    queryKey: ['my-posts', user?.id],
+    queryFn: async (): Promise<Post[]> => {
+      if (!user) return [];
+      return getMyPosts();
+    },
+    enabled: !!user,
+    select: (posts) => ({
+      totalReactions: posts.reduce((sum, p: any) => sum + (p.like_count || 0), 0),
+      pitchCount: posts.length,
+    }),
   });
 }
 
@@ -130,11 +152,35 @@ export function useReactToPitch() {
   return useMutation({
     mutationFn: ({ pitchId }: { pitchId: number | string; reactionType: string; currentReaction: string | null }) =>
       likePost(Number(pitchId)),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['pitches'] });
+    // Optimistic update: flip the button and count immediately, in every
+    // cached 'pitches' list this post appears in, instead of waiting for
+    // the request to finish and then refetching the entire feed.
+    onMutate: async ({ pitchId, currentReaction }) => {
+      await qc.cancelQueries({ queryKey: ['pitches'] });
+      const previous = qc.getQueriesData<PitchWithProfile[]>({ queryKey: ['pitches'] });
+
+      const nowLiked = currentReaction !== 'fire';
+      qc.setQueriesData<PitchWithProfile[]>({ queryKey: ['pitches'] }, (old) =>
+        old?.map((p) =>
+          String(p.id) === String(pitchId)
+            ? {
+                ...p,
+                user_reaction: nowLiked ? 'fire' : null,
+                like_count: Math.max(0, (p.like_count || 0) + (nowLiked ? 1 : -1)),
+              }
+            : p
+        )
+      );
+
+      return { previous };
     },
-    onError: (e: Error) =>
-      toast({ title: 'Failed to react', description: e.message, variant: 'destructive' }),
+    onError: (e: Error, _vars, context) => {
+      // Roll back every list we optimistically touched.
+      context?.previous?.forEach(([key, data]) => qc.setQueryData(key, data));
+      toast({ title: 'Failed to react', description: e.message, variant: 'destructive' });
+    },
+    // No onSuccess refetch of the whole feed — the optimistic update already
+    // reflects the real outcome, and the like endpoint is a simple toggle.
   });
 }
 
