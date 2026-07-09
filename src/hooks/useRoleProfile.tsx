@@ -5,6 +5,14 @@ import { getMyProfile, updateMyProfile, getUserProfile, AnyProfile } from '@/api
 
 export type UserRole = 'innovator' | 'startup' | 'investor' | 'consultant' | 'ecosystem_partner';
 
+// Roles that are onboarded by an admin (never via public sign-up) and land
+// on the Provider Dashboard instead of the regular Startup Dashboard.
+export const PROVIDER_ROLES: UserRole[] = ['consultant', 'ecosystem_partner'];
+
+export function isProviderRole(role: string | undefined | null): boolean {
+  return !!role && (PROVIDER_ROLES as string[]).includes(role);
+}
+
 export function useMyProfile() {
   const { user } = useAuth();
   return useQuery({

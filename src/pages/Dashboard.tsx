@@ -42,6 +42,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { PaywallGate } from '@/components/PaywallGate';
 import { ShareDashboardButton } from '@/components/ShareDashboardButton';
+import { isProviderRole } from '@/hooks/useRoleProfile';
 
 // Wrapper component for ProfilePitchSection with hooks
 function ProfilePitchSectionWrapper({ 
@@ -120,6 +121,14 @@ export default function Dashboard() {
       navigate('/onboarding');
     }
   }, [user, isOnboarded, isOnboardingChecked, navigate]);
+
+  // Provider-type roles (consultant, ecosystem service provider) are onboarded
+  // by an admin and always use the Provider Dashboard, never this page.
+  useEffect(() => {
+    if (user && isProviderRole(user.role)) {
+      navigate('/provider/dashboard', { replace: true });
+    }
+  }, [user, navigate]);
 
   const [fullName, setFullName] = useState('');
   const [bio, setBio] = useState('');
@@ -328,20 +337,6 @@ export default function Dashboard() {
     setBannerPreview(null);
   };
   
-  // Fields owned by the shared BaseProfile (name/bio/location/socials/media).
-  // These are saved by the first updateMyProfile() call below. They must be
-  // stripped out of roleProfileData before the second call, otherwise the
-  // second PATCH re-sends the *stale* values captured when roleProfileData
-  // was first loaded (before this edit session), silently overwriting the
-  // changes the first call just saved.
-  const BASE_PROFILE_FIELDS = [
-    'user_name', 'full_name', 'bio', 'location', 'linkedin', 'linkedin_url',
-    'twitter', 'twitter_url', 'website', 'website_url', 'avatar', 'avatar_url',
-    'banner', 'banner_url', 'id', 'user_email', 'user_id', 'created_at',
-    'updated_at', 'is_profile_complete', 'profile_strength', 'role',
-    'subscription_tier', 'subscription_expires_at', 'is_pro',
-  ];
-
   const handleSave = async () => {
     if (!user?.id) return;
     
@@ -361,15 +356,9 @@ export default function Dashboard() {
         ...(!bannerFile && bannerPreview === null ? { banner: null } : {}),
       } as any);
 
-      // Save role-specific profile if data exists.
-      // Strip shared base-profile fields first (see comment above) so this
-      // call can't clobber what the first call just saved.
+      // Save role-specific profile if data exists
       if (roleProfileData && role) {
-        const roleOnlyData = { ...roleProfileData } as Record<string, any>;
-        for (const field of BASE_PROFILE_FIELDS) {
-          delete roleOnlyData[field];
-        }
-        await saveRoleProfile.mutateAsync(roleOnlyData as any);
+        await saveRoleProfile.mutateAsync(roleProfileData);
       }
 
       queryClient.invalidateQueries({ queryKey: ['profile', user.id] });

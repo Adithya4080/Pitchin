@@ -59,7 +59,7 @@ const roles: {
   },
   {
     id: 'ecosystem_partner',
-    title: 'Ecosystem Partner',
+    title: 'Ecosystem Service Provider',
     description: 'I represent an accelerator, incubator, or support organization',
     icon: <Users className="h-5 w-5" />,
     color: 'bg-teal-50 text-teal-700',

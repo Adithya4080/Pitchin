@@ -20,7 +20,7 @@ interface AuthContextType {
   signInWithEmail: (email: string, password: string) => Promise<{ error: Error | null; user?: AuthUser }>;
   signUpWithEmail: (email: string, password: string, password2: string, fullName: string) => Promise<{ error: Error | null; user?: AuthUser }>;
   signOut: () => Promise<void>;
-  refreshUser: () => Promise<void>;
+  refreshUser: () => Promise<AuthUser | null>;
   signInWithGoogle: () => Promise<{ error: Error | null }>;
   signInWithLinkedIn: () => Promise<{ error: Error | null }>;
   session: { user: AuthUser } | null;
@@ -52,16 +52,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(null);
       setLoading(false);
       setIsOnboardingChecked(true);
-      return;
+      return null;
     }
     try {
       const me = await getMe();
       setUser(me);
       checkOnboarding(me);
+      return me;
     } catch {
       clearTokens();
       setUser(null);
       checkOnboarding(null);
+      return null;
     } finally {
       setLoading(false);
     }

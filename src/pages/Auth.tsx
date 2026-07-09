@@ -12,6 +12,7 @@ import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { apiFetch, setTokens } from '@/api/client';
 import { useGoogleLogin } from '@react-oauth/google';
 import { loginWithGoogle } from '@/api/auth';
+import { isProviderRole } from '@/hooks/useRoleProfile';
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -45,8 +46,8 @@ export default function Auth() {
       try {
         const data = await loginWithGoogle(response.access_token);
         setTokens(data.access, data.refresh);
-        await refreshUser();
-        navigate('/network');
+        const refreshedUser = await refreshUser();
+        navigate(isProviderRole(refreshedUser?.role) ? '/provider/dashboard' : '/network');
       } catch {
         toast({ title: 'Google sign-in failed', description: 'Please try again.', variant: 'destructive' });
       } finally {
@@ -65,7 +66,7 @@ export default function Auth() {
     setLoading(false);
     if (error) {
       toast({ title: 'Sign in failed', description: error.message, variant: 'destructive' });
-    } else if (user?.role === 'consultant') {
+    } else if (isProviderRole(user?.role)) {
       navigate('/provider/dashboard');
     } else {
       navigate('/network');

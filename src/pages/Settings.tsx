@@ -60,7 +60,8 @@ export default function Settings() {
       case 'innovator': return 'Innovator';
       case 'startup': return 'Startup';
       case 'investor': return 'Investor';
-      case 'consultant': return 'Ecosystem Partner';
+      case 'consultant': return 'Consultant';
+      case 'ecosystem_partner': return 'Ecosystem Service Provider';
       default: return 'Not set';
     }
   };

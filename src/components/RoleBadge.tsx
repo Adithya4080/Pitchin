@@ -38,7 +38,7 @@ const roleConfig: Record<BadgeRole, { label: string; icon: React.ElementType; gr
     gradient: "from-purple-500 to-pink-500",
   },
   ecosystem_partner: {
-    label: "Ecosystem Partner",
+    label: "Ecosystem Service Provider",
     icon: Handshake,
     gradient: "from-cyan-500 to-blue-500",
   },
