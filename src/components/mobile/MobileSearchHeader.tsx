@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { Menu, Search } from 'lucide-react';
+import { AppMenuDrawer } from '@/components/mobile/AppMenuDrawer';
 
 /**
- * Shared mobile header: "Pitchin" logo on the left + a tappable search bar
- * (with animated typing placeholder) filling the rest of the row. Tapping
- * the search bar navigates to /search.
+ * Shared mobile header: hamburger (opens the app menu drawer) + "Pitchin"
+ * logo on the left, and a tappable search bar (with animated typing
+ * placeholder) filling the rest of the row. Tapping the search bar
+ * navigates to /search.
  *
  * Used by: Feed, Network, and Alerts (Notifications) mobile pages.
  * NOTE: this is intentionally separate from MobileHeader.tsx, which is
@@ -18,10 +20,22 @@ export function MobileSearchHeader() {
   return (
     <div className="sticky top-0 z-40 bg-card backdrop-blur-md border-b border-border/50">
       <div className="flex items-center gap-3 px-4 py-3">
-        {/* Left - Logo */}
-        <span className="font-display font-bold text-xl tracking-tight text-sky-400 flex-shrink-0">
-          Pitchin
-        </span>
+        {/* Left - Hamburger (opens the shared app menu drawer) + Logo */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <AppMenuDrawer
+            trigger={
+              <button
+                aria-label="Open menu"
+                className="h-8 w-8 flex items-center justify-center rounded-full hover:bg-muted/50 transition-colors touch-manipulation"
+              >
+                <Menu className="h-5 w-5 text-foreground" />
+              </button>
+            }
+          />
+          <span className="font-display font-bold text-xl tracking-tight text-sky-400">
+            Pitchin
+          </span>
+        </div>
 
         {/* Right - Search bar with animated typing placeholder */}
         <button

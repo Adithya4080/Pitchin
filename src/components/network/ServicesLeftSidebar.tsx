@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useUnreadCount } from '@/hooks/useNotifications';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard, Building2, MessageSquare, Bookmark,
   Activity, Briefcase, Users, Target, CalendarDays,
-  ArrowRight, Sparkles, X, Menu, ChevronRight,
+  ArrowRight, Sparkles, ChevronRight,
 } from 'lucide-react';
 
 const DISCOVER_NAV = [
@@ -99,90 +98,11 @@ function RailItem({ icon: Icon, label, path, active, badge }: {
   );
 }
 
-// ─── Slide-in Drawer (mobile) ─────────────────────────────────────────────────
-function Drawer({ open, onClose, isActive, unreadCount, navigate }: {
-  open: boolean; onClose: () => void;
-  isActive: (p: string) => boolean; unreadCount: number;
-  navigate: (p: string) => void;
-}) {
-  useEffect(() => {
-    document.body.style.overflow = open ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [open]);
-
-  return (
-    <>
-      {/* Backdrop */}
-      <div
-        onClick={onClose}
-        className={cn(
-          'fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px] transition-opacity duration-300',
-          open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        )}
-      />
-      {/* Panel */}
-      <div className={cn(
-        'fixed top-0 left-0 bottom-0 z-50 w-[285px] flex flex-col bg-white shadow-2xl transition-transform duration-300 ease-out',
-        open ? 'translate-x-0' : '-translate-x-full'
-      )}>
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
-          <div>
-            <p className="text-[15px] font-bold text-gray-900 leading-none">PitchIn</p>
-            <p className="text-[11px] text-gray-400 mt-0.5">Growth Network</p>
-          </div>
-          <button onClick={onClose}
-            className="h-8 w-8 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors">
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-
-        {/* Scrollable nav */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-2.5">
-          <div className="bg-gray-50/80 rounded-2xl p-2">
-            <SectionLabel label="Discover" />
-            {DISCOVER_NAV.map(item => (
-              <NavItem key={item.label} icon={item.icon} label={item.label} sub={item.sub}
-                path={item.path} active={isActive(item.path)} onClick={onClose} />
-            ))}
-          </div>
-
-          <div className="bg-gray-50/80 rounded-2xl p-2">
-            <SectionLabel label="My Space" />
-            {MY_SPACE_NAV.map(item => (
-              <NavItem key={item.label} icon={item.icon} label={item.label} sub={item.sub}
-                path={item.path} active={isActive(item.path)}
-                badge={item.badgeKey === 'messages' ? unreadCount : undefined}
-                onClick={onClose} />
-            ))}
-          </div>
-
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-100 via-yellow-50 to-amber-100 border border-amber-300/60 p-4 text-amber-900">
-            <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-amber-300/20 pointer-events-none" />
-            <Sparkles className="h-5 w-5 text-amber-500 mb-2 relative" strokeWidth={1.75} />
-            <p className="text-[13px] font-bold relative">Upgrade to Premium</p>
-            <p className="text-[11px] text-amber-700 mt-1 leading-snug relative">
-              Boost visibility and grow faster.
-            </p>
-            <button
-              onClick={() => { onClose(); navigate('/coming-soon'); }}
-              className="mt-3 w-full flex items-center justify-center gap-1.5 bg-gradient-to-r from-amber-400 to-yellow-500 text-white text-[12px] font-bold py-2 rounded-xl hover:from-amber-500 hover:to-yellow-600 transition-colors relative shadow-sm"
-            >
-              Upgrade Now <ArrowRight className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-}
-
 // ─── Hook: shared active + unread state ───────────────────────────────────────
 function useSidebarState() {
   const location = useLocation();
   const navigate = useNavigate();
   const { data: unreadCount = 0 } = useUnreadCount();
-  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const isActive = (path: string) => {
     if (path === '/network/services') return location.pathname.startsWith('/network/services');
@@ -193,54 +113,36 @@ function useSidebarState() {
 
   const activeLabel = ALL_NAV.find(n => isActive(n.path))?.label ?? 'Services';
 
-  return { isActive, activeLabel, unreadCount, navigate, drawerOpen, setDrawerOpen };
+  return { isActive, activeLabel, unreadCount, navigate };
 }
 
 // ─── Export 1: Mobile top bar (rendered ABOVE the flex row) ──────────────────
 export function ServicesTopBar() {
-  const { isActive, activeLabel, unreadCount, navigate, drawerOpen, setDrawerOpen } = useSidebarState();
+  const { isActive, activeLabel } = useSidebarState();
 
   return (
-    <>
-      {/* Sticky mobile bar */}
-      <div className="lg:hidden sticky top-14 z-30 bg-white/95 backdrop-blur-sm border-b border-gray-100 px-4 py-2.5 flex items-center gap-3">
-        <button
-          onClick={() => setDrawerOpen(true)}
-          className="h-8 w-8 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-colors shrink-0"
-        >
-          <Menu className="h-4 w-4" />
-        </button>
-        <div className="flex items-center gap-1.5 text-[13px] min-w-0 flex-1">
-          <span className="text-gray-400 font-medium shrink-0">Network</span>
-          <ChevronRight className="h-3.5 w-3.5 text-gray-300 shrink-0" />
-          <span className="font-bold text-gray-900 truncate">{activeLabel}</span>
-        </div>
-        {/* Quick nav pills on sm+ */}
-        <div className="hidden sm:flex items-center gap-1.5 overflow-x-auto scrollbar-none">
-          {DISCOVER_NAV.map(item => (
-            <Link key={item.label} to={item.path}
-              className={cn(
-                'text-[11px] font-semibold px-2.5 py-1 rounded-full border whitespace-nowrap transition-all',
-                isActive(item.path)
-                  ? 'bg-gray-950 text-white border-gray-950'
-                  : 'border-gray-200 text-gray-500 hover:bg-gray-50'
-              )}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </div>
+    <div className="lg:hidden sticky top-14 z-30 bg-white/95 backdrop-blur-sm border-b border-gray-100 px-4 py-2.5 flex items-center gap-3">
+      <div className="flex items-center gap-1.5 text-[13px] min-w-0 flex-1">
+        <span className="text-gray-400 font-medium shrink-0">Network</span>
+        <ChevronRight className="h-3.5 w-3.5 text-gray-300 shrink-0" />
+        <span className="font-bold text-gray-900 truncate">{activeLabel}</span>
       </div>
-
-      {/* Drawer */}
-      <Drawer
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        isActive={isActive}
-        unreadCount={unreadCount}
-        navigate={navigate}
-      />
-    </>
+      {/* Quick nav pills on sm+ */}
+      <div className="hidden sm:flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+        {DISCOVER_NAV.map(item => (
+          <Link key={item.label} to={item.path}
+            className={cn(
+              'text-[11px] font-semibold px-2.5 py-1 rounded-full border whitespace-nowrap transition-all',
+              isActive(item.path)
+                ? 'bg-gray-950 text-white border-gray-950'
+                : 'border-gray-200 text-gray-500 hover:bg-gray-50'
+            )}
+          >
+            {item.label}
+          </Link>
+        ))}
+      </div>
+    </div>
   );
 }
 
