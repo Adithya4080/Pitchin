@@ -12,6 +12,7 @@ import TheSolution from '@/components/landing/solution';
 import { SiteFooter } from '@/components/landing/footer';
 import Features from '@/components/landing/features';
 import heroIllustration from '@/assets/hero-illusration.png';
+import HowItWorks from '@/components/landing/how-it-works';
 
 
 const TUTORIAL_COMPLETED_KEY = 'pitchnet_tutorial_completed';
@@ -141,7 +142,7 @@ function DesktopLanding() {
             </div>
 
             {/* Right Illustration — original size restored */}
-            <div className="absolute right-[-8%] top-0 w-[65%] lg:w-[58%] xl:w-[55%] h-full flex items-start justify-end pointer-events-none">
+            <div className="absolute right-[-8%] top-0 w-[65%] lg:w-[58%] xl:w-[55%] h-full flex items-start justify-end pointer-events-none ">
               <img
                 src={heroIllustration}
                 alt="Team collaborating on ideas"
@@ -153,6 +154,7 @@ function DesktopLanding() {
                 draggable={false}
                 className="
                   w-full
+                  mt-[-10%]
                   h-auto
                   object-contain
                   max-w-none
@@ -171,7 +173,7 @@ function DesktopLanding() {
           </div>
         </section>
 
-      <section className="relative z-10 bg-background py-10 sm:py-14">
+      <section className="relative z-10 bg-background py-10 sm:py-6 ">
         <div className="container">
           <div className="grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-12">
             {[
@@ -200,7 +202,8 @@ function DesktopLanding() {
           </div>
         </div>
       </section>
-            <WhoWeAre />
+        <WhoWeAre />
+        {/* <HowItWorks /> */}
 
       {/* Features */}
       {/* <Features /> */}
