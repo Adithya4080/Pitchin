@@ -18,7 +18,7 @@ export function MobileSearchHeader() {
   const navigate = useNavigate();
 
   return (
-    <div className="sticky top-0 z-40 bg-card backdrop-blur-md border-b border-border/50">
+    <div className="sticky top-0 z-40 bg-card backdrop-blur-md border-b border-border/50 md:hidden">
       <div className="flex items-center gap-3 px-4 py-3">
         {/* Left - Hamburger (opens the shared app menu drawer) + Logo */}
         <div className="flex items-center gap-2 flex-shrink-0">

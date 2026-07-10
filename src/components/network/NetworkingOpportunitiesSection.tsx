@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Globe } from 'lucide-react';
 import { useNetworkDiscover } from '@/hooks/useNetworkDiscover';
@@ -116,8 +116,31 @@ type NetworkProfile = {
   website: string;
 };
 
+// ─── Tilt + glow card — same "liquid glass" hover effect as ServiceCategoryGrid ──
 function ProfileCard({ profile }: { profile: NetworkProfile }) {
   const sendInterest = useSendInterest();
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const [glowPos, setGlowPos] = useState({ x: 50, y: 50 });
+  const [hovered, setHovered] = useState(false);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const card = cardRef.current;
+    if (!card) return;
+    const rect = card.getBoundingClientRect();
+    const cx = e.clientX - rect.left;
+    const cy = e.clientY - rect.top;
+    setTilt({
+      x: ((cy / rect.height) - 0.5) * -10,
+      y: ((cx / rect.width) - 0.5) * 10,
+    });
+    setGlowPos({ x: (cx / rect.width) * 100, y: (cy / rect.height) * 100 });
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setTilt({ x: 0, y: 0 });
+    setHovered(false);
+  }, []);
 
   const handleConnect = () => {
     sendInterest.mutate(
@@ -135,44 +158,76 @@ function ProfileCard({ profile }: { profile: NetworkProfile }) {
   };
 
   return (
-    <div className="flex flex-col bg-white border border-gray-200 rounded-xl p-4 gap-3 hover:shadow-md transition-shadow">
-      <div className="flex items-start gap-3">
-        <Avatar src={profile.avatar} name={profile.name} />
-        <div className="min-w-0 flex-1 pt-0.5">
-          <div className="flex items-center gap-1 flex-wrap">
-            <span className="text-[13px] font-semibold text-gray-900 leading-snug">{profile.name}</span>
-            {profile.is_verified && <VerifiedBadge />}
+    <div style={{ perspective: '900px' }}>
+      <div
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={handleMouseLeave}
+        className="relative flex flex-col bg-white rounded-xl p-4 gap-3 overflow-hidden"
+        style={{
+          border: '1px solid #e5e7eb',
+          transform: hovered
+            ? `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateZ(14px) scale(1.015)`
+            : 'rotateX(0deg) rotateY(0deg) translateZ(0px) scale(1)',
+          transition: hovered
+            ? 'transform 0.08s ease-out, box-shadow 0.2s ease-out'
+            : 'transform 0.45s cubic-bezier(0.23,1,0.32,1), box-shadow 0.45s ease-out',
+          boxShadow: hovered
+            ? '0 20px 60px -8px rgba(0,0,0,0.16), 0 8px 20px -4px rgba(0,0,0,0.09), 0 0 0 1px rgba(0,0,0,0.04)'
+            : '0 1px 3px rgba(0,0,0,0.05)',
+          willChange: 'transform',
+        }}
+      >
+        {/* macOS liquid glow */}
+        {hovered && (
+          <div
+            className="absolute inset-0 pointer-events-none rounded-xl z-10"
+            style={{
+              background: `radial-gradient(300px circle at ${glowPos.x}% ${glowPos.y}%, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.05) 50%, transparent 100%)`,
+              mixBlendMode: 'screen',
+            }}
+          />
+        )}
+
+        <div className="flex items-start gap-3">
+          <Avatar src={profile.avatar} name={profile.name} />
+          <div className="min-w-0 flex-1 pt-0.5">
+            <div className="flex items-center gap-1 flex-wrap">
+              <span className="text-[13px] font-semibold text-gray-900 leading-snug">{profile.name}</span>
+              {profile.is_verified && <VerifiedBadge />}
+            </div>
+            <p className="text-[11px] text-gray-400 mt-0.5 leading-none">{profile.role_label}</p>
           </div>
-          <p className="text-[11px] text-gray-400 mt-0.5 leading-none">{profile.role_label}</p>
         </div>
-      </div>
-      <p className="text-[12px] text-gray-500 leading-[1.55] line-clamp-3 min-h-[3.6rem]">
-        {profile.bio || 'No description yet.'}
-      </p>
-      {profile.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {profile.tags.slice(0, 3).map((tag) => (
-            <span key={tag} className="text-[11px] font-medium px-2.5 py-[3px] rounded-full bg-gray-100 text-gray-500 border border-gray-200">
-              {tag}
-            </span>
-          ))}
+        <p className="text-[12px] text-gray-500 leading-[1.55] line-clamp-3 min-h-[3.6rem]">
+          {profile.bio || 'No description yet.'}
+        </p>
+        {profile.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {profile.tags.slice(0, 3).map((tag) => (
+              <span key={tag} className="text-[11px] font-medium px-2.5 py-[3px] rounded-full bg-gray-100 text-gray-500 border border-gray-200">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+        <div className="flex gap-2 mt-auto pt-0.5">
+          <Link
+            to={`/profile/${profile.user_id}`}
+            className="flex-1 h-8 flex items-center justify-center rounded-lg border border-gray-300 text-[12px] font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+          >
+            View Profile
+          </Link>
+          <button
+            onClick={handleConnect}
+            disabled={sendInterest.isPending}
+            className="flex-1 h-8 flex items-center justify-center gap-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[12px] font-medium transition-colors disabled:opacity-60"
+          >
+            <RocketIcon />
+            Connect
+          </button>
         </div>
-      )}
-      <div className="flex gap-2 mt-auto pt-0.5">
-        <Link
-          to={`/profile/${profile.user_id}`}
-          className="flex-1 h-8 flex items-center justify-center rounded-lg border border-gray-300 text-[12px] font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-        >
-          View Profile
-        </Link>
-        <button
-          onClick={handleConnect}
-          disabled={sendInterest.isPending}
-          className="flex-1 h-8 flex items-center justify-center gap-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[12px] font-medium transition-colors disabled:opacity-60"
-        >
-          <RocketIcon />
-          Connect
-        </button>
       </div>
     </div>
   );
@@ -230,11 +285,11 @@ function DotPagination({ total, current, onChange }: {
 export function NetworkingOpportunitiesSection() {
   const [activeTab, setActiveTab] = useState<NetworkTab>('investor');
   const [page, setPage] = useState(1);
-  const { user, loading: authLoading } = useAuth(); 
-  const { data, isLoading, isError } = useNetworkDiscover({ 
-    tab: activeTab, 
+  const { user, loading: authLoading } = useAuth();
+  const { data, isLoading, isError } = useNetworkDiscover({
+    tab: activeTab,
     page,
-    enabled: !!user && !authLoading, 
+    enabled: !!user && !authLoading,
   });
 
   const profiles = data?.results ?? [];

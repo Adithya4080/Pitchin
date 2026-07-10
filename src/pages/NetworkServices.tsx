@@ -15,6 +15,7 @@ import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { ProfileStrengthCard } from '@/components/profile/ProfileStrengthCard';
 import { useMyProfile } from '@/hooks/useRoleProfile';
 import { useUserPitches } from '@/hooks/usePitches';
+import { NetworkingForOpportunitySection } from '@/components/network/OpportunitiesAndSurveysSection';
 
 // ─── Quick Actions ─────────────────────────────────────────────────────────────
 const QUICK_ACTIONS = [
@@ -65,8 +66,8 @@ const ACTIVITY = [
 function ProviderCTACard() {
   return (
     <div className="relative overflow-hidden rounded-2xl border border-gray-200 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08),0_2px_8px_-2px_rgba(0,0,0,0.04)]">
-      <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #fdfdfd 0%, #ffffff 100%)' }} />
-      <div className="absolute inset-0 opacity-30">
+      {/* <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #fdfdfd 0%, #ffffff 100%)' }} /> */}
+      {/* <div className="absolute inset-0 opacity-30">
         <svg className="w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="cta-grid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
@@ -75,7 +76,7 @@ function ProviderCTACard() {
           </defs>
           <rect width="100%" height="100%" fill="url(#cta-grid)" />
         </svg>
-      </div>
+      </div> */}
       <div className="relative p-4">
         <div className="h-8 w-8 rounded-lg text-black flex items-center justify-center mb-3">
         </div>
@@ -192,12 +193,12 @@ function ProviderMiniCard({ provider: p }: { provider: ProviderItem }) {
         className="group relative bg-white rounded-2xl overflow-hidden"
         style={{
           border: hovered ? '1px solid #d1d5db' : '1px solid #f3f4f6',
-          transform: hovered
-            ? `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateZ(14px) scale(1.015)`
-            : 'rotateX(0deg) rotateY(0deg) translateZ(0px) scale(1)',
-          transition: hovered
-            ? 'transform 0.08s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease-out'
-            : 'transform 0.45s cubic-bezier(0.23,1,0.32,1), box-shadow 0.45s ease-out, border-color 0.45s ease-out',
+          // transform: hovered
+          //   ? `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateZ(14px) scale(1.015)`
+          //   : 'rotateX(0deg) rotateY(0deg) translateZ(0px) scale(1)',
+          // transition: hovered
+          //   ? 'transform 0.08s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease-out'
+          //   : 'transform 0.45s cubic-bezier(0.23,1,0.32,1), box-shadow 0.45s ease-out, border-color 0.45s ease-out',
           boxShadow: hovered
             ? '0 20px 60px -8px rgba(0,0,0,0.16), 0 8px 20px -4px rgba(0,0,0,0.09), 0 0 0 1px rgba(0,0,0,0.04)'
             : '0 1px 3px rgba(0,0,0,0.05)',
@@ -374,7 +375,7 @@ export default function NetworkServices() {
             <ServicesLeftSidebar />
 
             {/* Main content */}
-            <div className="flex-1 min-w-0 space-y-6 md:space-y-8">
+            <div className="flex-1 min-w-0 space-y-6 ">
               {isViewAll ? (
                 <AllProvidersView />
               ) : (
@@ -382,7 +383,8 @@ export default function NetworkServices() {
                   <ServiceHeroBanner />
                   <ServiceCategoryGrid />
                   <NetworkingOpportunitiesSection />
-                  <TrustStrip />
+                  {/* <NetworkingForOpportunitySection /> */}
+                  {/* <TrustStrip /> */}
                 </>
               )}
             </div>

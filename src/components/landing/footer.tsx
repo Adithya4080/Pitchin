@@ -6,73 +6,72 @@ const LOGO_URL =
 export function SiteFooter() {
   return (
     <footer className="bg-[#1f1d1a] text-white">
-      <div className="mx-auto max-w-7xl px-6 py-16 sm:px-8 lg:px-12">
-        <div className="grid gap-12 md:grid-cols-[1.5fr_0.7fr_0.7fr]">
-          <div>
+      <div className="mx-auto max-w-7xl px-6 py-6 sm:px-8 sm:py-8 lg:px-12">
+        <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+          <div className="max-w-sm">
             <img
               src={LOGO_URL}
               alt="Pitchin"
-              className="h-12 w-auto object-contain"
+              className="h-8 w-auto object-contain"
             />
 
-            <p className="mt-8 max-w-md text-sm leading-relaxed text-white/75 sm:text-base">
+            <p className="mt-2 text-xs leading-relaxed text-white/60 sm:text-sm">
               A smarter ecosystem for ideas, people, and growth —
-              connecting innovators, investors, and experts to turn
-              ideas into real-world startups.
+              connecting innovators, investors, and experts.
             </p>
           </div>
 
-          <div>
-            <h3 className="text-xs font-semibold uppercase tracking-[0.25em] text-white/60">
-              Explore
-            </h3>
+          <div className="flex flex-wrap gap-x-10 gap-y-4">
+            <div>
+              <h3 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/50">
+                Explore
+              </h3>
 
-            <ul className="mt-8 space-y-5 text-sm sm:text-base">
-              <li>
-                <Link to="/#about">About</Link>
-              </li>
+              <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs sm:text-sm">
+                <li>
+                  <Link to="/#about">About</Link>
+                </li>
 
-              <li>
-                <Link to="/#problem">Problem</Link>
-              </li>
+                <li>
+                  <Link to="/#problem">Problem</Link>
+                </li>
 
-              <li>
-                <Link to="/#solution">Solution</Link>
-              </li>
+                <li>
+                  <Link to="/#solution">Solution</Link>
+                </li>
 
-              <li>
-                <Link to="/#features">Features</Link>
-              </li>
-            </ul>
-          </div>
+                <li>
+                  <Link to="/#features">Features</Link>
+                </li>
+              </ul>
+            </div>
 
-          <div>
-            <h3 className="text-xs font-semibold uppercase tracking-[0.25em] text-white/60">
-              Get Started
-            </h3>
+            <div>
+              <h3 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/50">
+                Get Started
+              </h3>
 
-            <ul className="mt-8 space-y-5 text-sm sm:text-base">
-              <li>
-                <Link to="/#waitlist">Join Waitlist</Link>
-              </li>
+              <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs sm:text-sm">
+                <li>
+                  <Link to="/#waitlist">Join Waitlist</Link>
+                </li>
 
-              <li>
-                <a href="mailto:hello@pitchin.app">
-                  Contact
-                </a>
-              </li>
-            </ul>
+                <li>
+                  <a href="mailto:hello@pitchin.app">
+                    Contact
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
 
-        <div className="mt-14 border-t border-white/10" />
-
-        <div className="mt-8 flex flex-col gap-4 text-sm text-white/60 md:flex-row md:items-center md:justify-between">
+        <div className="mt-6 border-t border-white/10 pt-4 flex flex-col gap-2 text-xs text-white/50 sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {new Date().getFullYear()} Pitchin. All rights reserved.
           </p>
 
-          <div className="flex gap-6">
+          <div className="flex gap-4">
             <Link to="/privacy">Privacy</Link>
             <Link to="/terms">Terms</Link>
           </div>
