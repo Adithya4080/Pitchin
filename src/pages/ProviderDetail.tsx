@@ -88,6 +88,12 @@ const PAGE_STYLES = `
     border-radius: 16px;
     padding: 22px;
   }
+  .pd-popup-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    box-shadow: 0 10px 32px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04);
+  }
   .pd-section-title {
     font-size: 14px; font-weight: 700;
     color: #0f172a; margin: 0 0 16px;
@@ -117,17 +123,21 @@ const PAGE_STYLES = `
   }
   .pd-cs-card:hover { border-color: #d1d5db; }
 
-  /* Trust snapshot */
+  /* Trust snapshot — standard proportional row, no boxes */
   .pd-trust-grid {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 20px;
   }
   .pd-trust-item {
-    display: flex; flex-direction: column; align-items: center; text-align: center;
-    gap: 4px; padding: 12px 8px;
-    background: #fafafa; border: 1px solid #f1f1f1; border-radius: 12px;
+    display: flex; align-items: center; gap: 10px;
+    padding-top: 14px; border-top: 1px solid #f3f4f6;
   }
-  .pd-trust-val { font-size: 15px; font-weight: 700; color: #111827; margin: 0; }
-  .pd-trust-label { font-size: 10.5px; color: #9ca3af; margin: 0; line-height: 1.3; }
+  .pd-trust-icon {
+    width: 32px; height: 32px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: #f9fafb;
+  }
+  .pd-trust-val { font-size: 14px; font-weight: 700; color: #111827; margin: 0; }
+  .pd-trust-label { font-size: 11.5px; color: #9ca3af; margin: 1px 0 0; line-height: 1.3; }
 
   /* Service cards (sub-categories) */
   .pd-service-grid {
@@ -256,201 +266,6 @@ function PageSkeleton() {
   );
 }
 
-// ─── hexToRgb ─────────────────────────────────────────────────────────────────
-function hexToRgb(hex: string) {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return `${r}, ${g}, ${b}`;
-}
-
-// ─── Shared hero sub-components ───────────────────────────────────────────────
-function GridOverlay() {
-  return (
-    <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.06 }}>
-      <defs>
-        <pattern id="pd-hero-grid" x="0" y="0" width="32" height="32" patternUnits="userSpaceOnUse">
-          <path d="M 32 0 L 0 0 0 32" fill="none" stroke="white" strokeWidth="0.5" />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#pd-hero-grid)" />
-    </svg>
-  );
-}
-
-function GlowBlob({ accent, top, right }: { accent: string; top: number; right: number }) {
-  return (
-    <div style={{
-      position: 'absolute', top, right,
-      width: 180, height: 180, borderRadius: '50%',
-      background: accent, opacity: 0.12,
-      filter: 'blur(55px)', pointerEvents: 'none',
-    }} />
-  );
-}
-
-function CategoryPill({ accent, label }: { accent: string; label: string }) {
-  return (
-    <div style={{
-      position: 'absolute', top: 16, left: 20,
-      display: 'inline-flex', alignItems: 'center', gap: 6,
-      background: 'rgba(255,255,255,0.07)',
-      border: '1px solid rgba(255,255,255,0.12)',
-      borderRadius: 20, padding: '4px 12px',
-      zIndex: 2,
-    }}>
-      <span style={{ width: 6, height: 6, borderRadius: '50%', background: accent, flexShrink: 0 }} />
-      <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.75)', letterSpacing: '0.05em', textTransform: 'capitalize' }}>
-        {label}
-      </span>
-    </div>
-  );
-}
-
-// ─── Hero illustration — banner only, NO overflow issues ──────────────────────
-// Note: borderRadius only on top corners; bottom is straight so the card below connects.
-// overflow:hidden is scoped here so avatar (rendered outside) is never clipped.
-function HeroIllustration({ accent, avatarBg, categorySlug }: {
-  accent: string; avatarBg: string; categorySlug?: string;
-}) {
-  const slug = (categorySlug ?? '').toLowerCase();
-  const wrapStyle: React.CSSProperties = {
-    position: 'relative', height: 180, overflow: 'hidden',
-    borderRadius: '20px 20px 0 0',
-  };
-
-  if (slug.includes('marketing')) return (
-    <div style={{ ...wrapStyle, background: `linear-gradient(135deg, #0a1628 0%, ${avatarBg} 100%)` }}>
-      <GridOverlay />
-      <GlowBlob accent={accent} top={-30} right={60} />
-      <svg viewBox="0 0 520 180" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
-        {[40, 70, 55, 90, 65, 80].map((h, i) => (
-          <rect key={i} x={80 + i * 44} y={160 - h} width={28} height={h} rx={4} fill={accent} opacity={0.15 + i * 0.1} />
-        ))}
-        <polyline points="80,140 124,110 168,120 212,80 256,95 300,55" fill="none" stroke={accent} strokeWidth="2" opacity="0.6" strokeLinecap="round" strokeLinejoin="round" />
-        {[{x:80,y:140},{x:124,y:110},{x:168,y:120},{x:212,y:80},{x:256,y:95},{x:300,y:55}].map((p,i) => (
-          <circle key={i} cx={p.x} cy={p.y} r={3} fill={accent} opacity="0.8" />
-        ))}
-        <g transform="translate(360,50)" opacity="0.55">
-          <polygon points="0,20 0,40 15,40 15,20 40,5 40,55 15,55 15,40" fill="none" stroke={accent} strokeWidth="1.5" strokeLinejoin="round" />
-          <path d="M15,55 Q12,70 5,72 Q0,72 0,65 L0,55" fill="none" stroke={accent} strokeWidth="1.5" />
-          <path d="M40,10 Q55,30 55,30 Q55,30 40,50" fill="none" stroke={accent} strokeWidth="1.5" opacity="0.5" />
-        </g>
-      </svg>
-      <CategoryPill accent={accent} label="Marketing" />
-    </div>
-  );
-
-  if (slug.includes('legal') || slug.includes('legel')) return (
-    <div style={{ ...wrapStyle, background: `linear-gradient(135deg, #0a0a14 0%, ${avatarBg} 100%)` }}>
-      <GridOverlay />
-      <GlowBlob accent={accent} top={-20} right={80} />
-      <svg viewBox="0 0 520 180" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
-        <g transform="translate(180,20)" opacity="0.65">
-          <line x1="70" y1="10" x2="70" y2="130" stroke={accent} strokeWidth="1.5" />
-          <line x1="20" y1="40" x2="120" y2="40" stroke={accent} strokeWidth="1.5" />
-          <circle cx="70" cy="10" r="4" fill={accent} />
-          <line x1="20" y1="40" x2="20" y2="80" stroke={accent} strokeWidth="1" opacity="0.6" />
-          <path d="M5,80 Q20,95 35,80" fill="none" stroke={accent} strokeWidth="1.5" />
-          <line x1="120" y1="40" x2="120" y2="95" stroke={accent} strokeWidth="1" opacity="0.6" />
-          <path d="M105,95 Q120,110 135,95" fill="none" stroke={accent} strokeWidth="1.5" />
-          <rect x="55" y="128" width="30" height="6" rx="3" fill={accent} opacity="0.4" />
-        </g>
-        <g transform="translate(360,40)" opacity="0.45">
-          <rect x="0" y="0" width="80" height="100" rx="6" fill="none" stroke={accent} strokeWidth="1.5" />
-          {[20,35,50,65,80].map((y,i) => (
-            <line key={i} x1="12" y1={y} x2={i===4?50:68} y2={y} stroke={accent} strokeWidth="1" opacity="0.6" />
-          ))}
-        </g>
-      </svg>
-      <CategoryPill accent={accent} label="Legal" />
-    </div>
-  );
-
-  if (slug.includes('web')) return (
-    <div style={{ ...wrapStyle, background: `linear-gradient(135deg, #060d1f 0%, ${avatarBg} 100%)` }}>
-      <GridOverlay />
-      <GlowBlob accent={accent} top={-20} right={40} />
-      <svg viewBox="0 0 520 180" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
-        <g transform="translate(70,25)" opacity="0.7">
-          <rect x="0" y="0" width="220" height="140" rx="8" fill="none" stroke={accent} strokeWidth="1.5" opacity="0.5" />
-          <rect x="0" y="0" width="220" height="28" rx="8" fill={accent} opacity="0.08" />
-          {[14,26,38].map((cx,i) => <circle key={i} cx={cx} cy={14} r={4} fill={accent} opacity={0.3 + i*0.1} />)}
-          <rect x="50" y="8" width="120" height="12" rx="6" fill={accent} opacity="0.1" />
-          {[{x:14,w:80,o:0.5},{x:24,w:120,o:0.35},{x:24,w:90,o:0.35},{x:14,w:60,o:0.5},{x:24,w:140,o:0.3},{x:34,w:70,o:0.25},{x:24,w:100,o:0.3},{x:14,w:40,o:0.5}].map((l,i)=>(
-            <rect key={i} x={l.x} y={42+i*11} width={l.w} height={5} rx={2.5} fill={accent} opacity={l.o} />
-          ))}
-        </g>
-        <text x="360" y="80" fontSize="48" fill={accent} opacity="0.15" fontFamily="monospace">{'{ }'}</text>
-        <text x="390" y="130" fontSize="24" fill={accent} opacity="0.1" fontFamily="monospace">{'</>'}</text>
-      </svg>
-      <CategoryPill accent={accent} label="Web Development" />
-    </div>
-  );
-
-  if (slug.includes('design') || slug.includes('brand')) return (
-    <div style={{ ...wrapStyle, background: `linear-gradient(135deg, #0d0822 0%, ${avatarBg} 100%)` }}>
-      <GridOverlay />
-      <GlowBlob accent={accent} top={-30} right={60} />
-      <svg viewBox="0 0 520 180" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
-        <circle cx="150" cy="90" r="55" fill="none" stroke={accent} strokeWidth="1.5" opacity="0.3" />
-        <circle cx="150" cy="90" r="35" fill={accent} opacity="0.08" />
-        <polygon points="260,35 305,120 215,120" fill="none" stroke={accent} strokeWidth="1.5" opacity="0.35" />
-        <rect x="330" y="40" width="80" height="80" rx="8" fill="none" stroke={accent} strokeWidth="1.5" opacity="0.3" transform="rotate(15,370,80)" />
-        {['#6366f1','#a855f7','#ec4899','#f59e0b','#10b981'].map((c,i)=>(
-          <circle key={i} cx={110+i*22} cy={158} r={7} fill={c} opacity="0.7" />
-        ))}
-      </svg>
-      <CategoryPill accent={accent} label="Design & Branding" />
-    </div>
-  );
-
-  if (slug.includes('book') || slug.includes('finance') || slug.includes('account')) return (
-    <div style={{ ...wrapStyle, background: `linear-gradient(135deg, #0c0a00 0%, ${avatarBg} 100%)` }}>
-      <GridOverlay />
-      <GlowBlob accent={accent} top={-20} right={50} />
-      <svg viewBox="0 0 520 180" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
-        <g transform="translate(150,90)">
-          <circle cx="0" cy="0" r="55" fill="none" stroke={accent} strokeWidth="12" strokeDasharray="173 173" opacity="0.5" />
-          <circle cx="0" cy="0" r="55" fill="none" stroke={accent} strokeWidth="12" strokeDasharray="86 260" strokeDashoffset="-173" opacity="0.25" />
-          <circle cx="0" cy="0" r="38" fill={avatarBg} />
-          <text x="0" y="6" textAnchor="middle" fill={accent} fontSize="14" fontWeight="700" opacity="0.8">₹</text>
-        </g>
-        <g transform="translate(290,30)" opacity="0.4">
-          <rect x="0" y="0" width="150" height="110" rx="6" fill="none" stroke={accent} strokeWidth="1" />
-          <line x1="0" y1="22" x2="150" y2="22" stroke={accent} strokeWidth="1" opacity="0.5" />
-          <line x1="90" y1="0" x2="90" y2="110" stroke={accent} strokeWidth="1" opacity="0.3" />
-          {['Revenue','Expense','Net'].map((t,i)=>(
-            <text key={i} x="8" y={42+i*26} fontSize="9" fill={accent} opacity="0.6" fontFamily="monospace">{t}</text>
-          ))}
-          {['₹4.2L','₹1.8L','₹2.4L'].map((v,i)=>(
-            <text key={i} x="98" y={42+i*26} fontSize="9" fill={accent} opacity="0.8" fontFamily="monospace">{v}</text>
-          ))}
-        </g>
-      </svg>
-      <CategoryPill accent={accent} label="Bookkeeping" />
-    </div>
-  );
-
-  // Default
-  return (
-    <div style={{ ...wrapStyle, background: `linear-gradient(135deg, #0c0f1d 0%, ${avatarBg} 100%)` }}>
-      <GridOverlay />
-      <GlowBlob accent={accent} top={-30} right={60} />
-      <svg viewBox="0 0 520 180" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
-        {[{x:160,y:90},{x:240,y:50},{x:240,y:130},{x:320,y:70},{x:320,y:110},{x:400,y:90}].map((n,i,arr)=>{
-          const next = arr[i+1];
-          return next ? <line key={i} x1={n.x} y1={n.y} x2={next.x} y2={next.y} stroke={accent} strokeWidth="1" opacity="0.25" /> : null;
-        })}
-        {[{x:160,y:90,r:8},{x:240,y:50,r:6},{x:240,y:130,r:5},{x:320,y:70,r:7},{x:320,y:110,r:5},{x:400,y:90,r:9}].map((n,i)=>(
-          <circle key={i} cx={n.x} cy={n.y} r={n.r} fill={accent} opacity={0.2+i*0.08} />
-        ))}
-      </svg>
-      <CategoryPill accent={accent} label={categorySlug ?? 'Services'} />
-    </div>
-  );
-}
-
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function ProviderDetail() {
   const { slug: rawSlug } = useParams<{ slug: string }>();
@@ -552,99 +367,67 @@ export default function ProviderDetail() {
     <AppLayout showMobileHeader title={provider.name} showBottomNav>
       <style>{PAGE_STYLES}</style>
 
-      <div style={{ maxWidth: 960, margin: '0 auto', padding: '20px 16px 48px' }}>
+      <div style={{ maxWidth: 1040, margin: '0 auto', padding: '16px 8px 48px' }}>
 
-        {/* Breadcrumb */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#9ca3af', marginBottom: 20, flexWrap: 'wrap' }}>
-          <span><Link to="/" style={{ color: '#9ca3af', textDecoration: 'none' }} onMouseEnter={e => (e.currentTarget.style.color = '#374151')} onMouseLeave={e => (e.currentTarget.style.color = '#9ca3af')}>Home</Link></span>
-          <span>›</span>
-          <span><Link to="/network/services" style={{ color: '#9ca3af', textDecoration: 'none' }} onMouseEnter={e => (e.currentTarget.style.color = '#374151')} onMouseLeave={e => (e.currentTarget.style.color = '#9ca3af')}>Services</Link></span>
-          <span>›</span>
-          <span><Link to={`/network/services/${provider.category_slug}`} style={{ color: '#9ca3af', textDecoration: 'none' }} onMouseEnter={e => (e.currentTarget.style.color = '#374151')} onMouseLeave={e => (e.currentTarget.style.color = '#9ca3af')}>{provider.category_name}</Link></span>
-          <span>›</span>
-          <span style={{ color: '#374151', fontWeight: 600 }}>{provider.name}</span>
-        </nav>
+          {/* Breadcrumb */}
+          <nav style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#9ca3af', marginBottom: 20, flexWrap: 'wrap' }}>
+            <span><Link to="/" style={{ color: '#9ca3af', textDecoration: 'none' }} onMouseEnter={e => (e.currentTarget.style.color = '#374151')} onMouseLeave={e => (e.currentTarget.style.color = '#9ca3af')}>Home</Link></span>
+            <span>›</span>
+            <span><Link to="/network/services" style={{ color: '#9ca3af', textDecoration: 'none' }} onMouseEnter={e => (e.currentTarget.style.color = '#374151')} onMouseLeave={e => (e.currentTarget.style.color = '#9ca3af')}>Services</Link></span>
+            <span>›</span>
+            <span><Link to={`/network/services/${provider.category_slug}`} style={{ color: '#9ca3af', textDecoration: 'none' }} onMouseEnter={e => (e.currentTarget.style.color = '#374151')} onMouseLeave={e => (e.currentTarget.style.color = '#9ca3af')}>{provider.category_name}</Link></span>
+            <span>›</span>
+            <span style={{ color: '#374151', fontWeight: 600 }}>{provider.name}</span>
+          </nav>
 
-        {/* ── HERO CARD ─────────────────────────────────────────────────────── */}
-        {/*
-          CRITICAL FIX:
-          The card wrapper has NO overflow:hidden and NO borderRadius that would
-          create a clipping stacking context. The illustration div handles its own
-          top-corner rounding. The avatar sits in the white area below the banner,
-          pushed UP visually by a negative marginTop on its wrapper — but since
-          the card itself never clips, it renders correctly on top of the banner.
-        */}
+        {/* ── IDENTITY CARD — big banner, small logo overlapping bottom-left ── */}
         <div style={{
           background: '#fff',
           border: '1px solid #f0f0f0',
           borderRadius: 20,
           marginBottom: 16,
-          /* NO overflow: hidden here — that was clipping the avatar */
+          overflow: 'hidden',
         }}>
-          {/* Banner — real uploaded banner if the provider set one, else generated illustration */}
-          {provider.banner_url ? (
-            <div style={{
-              height: 180,
-              borderTopLeftRadius: 20,
-              borderTopRightRadius: 20,
-              overflow: 'hidden',
-            }}>
+          {/* Big banner */}
+          <div style={{ height: 260, position: 'relative', background: avatarBg }}>
+            {provider.banner_url ? (
               <img
                 src={provider.banner_url}
                 alt={`${provider.name} banner`}
                 style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
               />
-            </div>
-          ) : (
-            <HeroIllustration accent={accent} avatarBg={avatarBg} categorySlug={provider.category_slug} />
-          )}
-
-          {/* Identity section */}
-          <div style={{ padding: '0 20px 20px' }}>
-
-            {/*
-              LAYOUT STRATEGY:
-              - Avatar floats up via negative marginTop, anchored left
-              - Name + meta live in the white area, indented to clear the avatar
-              - Action buttons sit top-right of the white area
-              This avoids any flex-end alignment fighting with the overlap.
-            */}
-
-            {/* Row 1: avatar (overlapping) + action buttons flush right */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              justifyContent: 'space-between',
-              marginTop: -40,
-              flexWrap: 'wrap',
-              gap: 8,
-            }}>
-              {/* Avatar with white border ring */}
+            ) : (
               <div style={{
-                padding: 3,
-                background: '#fff',
-                borderRadius: 17,
-                boxShadow: `0 0 0 1px rgba(${hexToRgb(accent)},0.35), 0 4px 16px rgba(0,0,0,0.12)`,
-                flexShrink: 0,
-                position: 'relative',
-                zIndex: 1,
+                width: '100%', height: '100%',
+                background: `linear-gradient(135deg, ${avatarBg} 0%, ${accent}33 100%)`,
+              }} />
+            )}
+          </div>
+
+          <div style={{ padding: '0 20px 20px', position: 'relative' }}>
+            {/* Small logo, overlapping the banner bottom-left */}
+            <div style={{
+              marginTop: -32,
+              display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
+              flexWrap: 'wrap', gap: 8,
+            }}>
+              <div style={{
+                padding: 3, background: '#fff', borderRadius: 14,
+                boxShadow: '0 2px 10px rgba(0,0,0,0.10)', flexShrink: 0,
               }}>
                 {provider.logo_url ? (
                   <img
                     src={provider.logo_url}
                     alt={`${provider.name} logo`}
-                    style={{ width: 72, height: 72, borderRadius: 14, objectFit: 'cover', display: 'block' }}
+                    style={{ width: 56, height: 56, borderRadius: 11, objectFit: 'cover', display: 'block' }}
                   />
                 ) : (
-                  <ProviderAvatar name={provider.name} avatarBg={avatarBg} size={72} />
+                  <ProviderAvatar name={provider.name} avatarBg={avatarBg} size={56} />
                 )}
               </div>
 
-              {/* Action buttons — sit in the white area, aligned top-right */}
-              <div className="pd-hero-actions" style={{
-                display: 'flex', gap: 8, alignItems: 'center',
-                flexWrap: 'wrap', marginTop: 48,
-              }}>
+              {/* Action buttons */}
+              <div className="pd-hero-actions" style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 4 }}>
                 <button className="pd-action-btn" onClick={() => setActiveTab('consultation')}>
                   <Calendar size={13} /> Book consultation
                 </button>
@@ -659,10 +442,10 @@ export default function ProviderDetail() {
               </div>
             </div>
 
-            {/* Row 2: name + meta below the avatar */}
+            {/* Name + meta below the logo */}
             <div style={{ marginTop: 10 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                <h1 style={{ fontSize: 20, fontWeight: 700, color: '#0f172a', margin: 0, letterSpacing: '-0.4px' }}>
+                <h1 style={{ fontSize: 19, fontWeight: 700, color: '#0f172a', margin: 0, letterSpacing: '-0.3px' }}>
                   {provider.name}
                 </h1>
                 {provider.is_verified && (
@@ -675,11 +458,33 @@ export default function ProviderDetail() {
                     <BadgeCheck size={12} /> Verified
                   </span>
                 )}
+                {provider.is_top_rated && (
+                  <span style={{
+                    fontSize: 10, fontWeight: 600, color: '#f97316',
+                    background: '#fff7ed', border: '1px solid #fed7aa',
+                    borderRadius: 20, padding: '3px 10px',
+                  }}>
+                    Top Rated
+                  </span>
+                )}
               </div>
-              {provider.tagline && (
-                <p style={{ fontSize: 13, color: '#6b7280', margin: '3px 0 0' }}>{provider.tagline}</p>
+
+              {provider.category_name && (
+                <span style={{
+                  display: 'inline-flex', marginTop: 6,
+                  fontSize: 11, fontWeight: 600, color: '#4b5563',
+                  background: '#f9fafb', border: '1px solid #f1f1f1',
+                  borderRadius: 20, padding: '3px 10px',
+                }}>
+                  {provider.category_name}
+                </span>
               )}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 6, flexWrap: 'wrap' }}>
+
+              {provider.tagline && (
+                <p style={{ fontSize: 13, color: '#6b7280', margin: '6px 0 0' }}>{provider.tagline}</p>
+              )}
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 8, flexWrap: 'wrap' }}>
                 {Number(provider.rating) > 0 && (
                   <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, color: '#374151' }}>
                     <Star size={14} style={{ fill: '#f59e0b', color: '#f59e0b' }} />
@@ -698,8 +503,8 @@ export default function ProviderDetail() {
               </div>
             </div>
 
-            {/* Accent divider */}
-            <div style={{ height: 1, background: `linear-gradient(90deg, ${accent}33 0%, transparent 100%)`, marginTop: 16 }} />
+            {/* Plain divider — no accent gradient */}
+            <div style={{ height: 1, background: '#f3f4f6', marginTop: 16 }} />
           </div>
         </div>
 
@@ -774,7 +579,9 @@ export default function ProviderDetail() {
           {/* RIGHT SIDEBAR */}
           <aside className="pd-sidebar" style={{ width: 272, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 12, position: 'sticky', top: 80 }}>
 
-            <div className="pd-section" style={{ padding: 18 }}>
+            <div className="pd-popup-card" style={{ padding: 0, overflow: 'hidden' }}>
+              <div style={{ height: 4, background: accent }} />
+              <div style={{ padding: 18 }}>
               <p style={{ fontSize: 14, fontWeight: 700, color: '#0f172a', margin: '0 0 4px' }}>Request a proposal</p>
               <p style={{ fontSize: 12, color: '#9ca3af', margin: '0 0 16px', lineHeight: 1.5 }}>
                 Share what you need — we'll route it to{' '}
@@ -833,6 +640,7 @@ export default function ProviderDetail() {
                   </button>
                 </div>
               )}
+              </div>
             </div>
 
             {/* Quick info */}

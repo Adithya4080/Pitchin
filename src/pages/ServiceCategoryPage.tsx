@@ -1,73 +1,17 @@
 import { useState, useMemo, useRef, useCallback } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import {
-  Star, ShieldCheck, MapPin, Users, Heart, Grid3X3,
+  Star, ShieldCheck, MapPin, Users, Grid3X3,
   List, ChevronDown, RotateCcw, Plus, Phone, ClipboardList,
   Search, ArrowRight,
 } from 'lucide-react';
 import { AppLayout } from '@/components/layouts/AppLayout';
-import { Button } from '@/components/ui/button';
+import { ServicesLeftSidebar, ServicesTopBar } from '@/components/network/ServicesLeftSidebar';
 import { useServiceCategories, useServiceProviders, useServiceProvider } from '@/hooks/useServices';
 import { useSendServiceInquiry } from '@/hooks/useServices';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import type { ProviderFilterParams } from '@/api/services';
 import { toast } from 'sonner';
-
-// ─── Category icon map ────────────────────────────────────────────────────────
-const CATEGORY_ICONS: Record<string, JSX.Element> = {
-  scale: (
-    <svg viewBox="0 0 32 32" className="w-full h-full" fill="none" stroke="#2563EB" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M16 4v24M8 8l-4 8h8l-4-8zM24 8l-4 8h8l-4-8z" />
-      <line x1="8" y1="28" x2="24" y2="28" />
-    </svg>
-  ),
-  megaphone: (
-    <svg viewBox="0 0 32 32" className="w-full h-full" fill="none" stroke="#F97316" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M6 12v8h4l10 6V6L10 12H6z" />
-      <path d="M24 10c2 1.5 3 3.5 3 6s-1 4.5-3 6" />
-    </svg>
-  ),
-  palette: (
-    <svg viewBox="0 0 32 32" className="w-full h-full" fill="none" stroke="#EC4899" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="16" cy="16" r="10" />
-      <circle cx="11" cy="13" r="1.5" fill="#EC4899" />
-      <circle cx="16" cy="10" r="1.5" fill="#EC4899" />
-      <circle cx="21" cy="13" r="1.5" fill="#EC4899" />
-      <circle cx="20" cy="19" r="1.5" fill="#EC4899" />
-      <circle cx="12" cy="19" r="1.5" fill="#EC4899" />
-    </svg>
-  ),
-  code: (
-    <svg viewBox="0 0 32 32" className="w-full h-full" fill="none" stroke="#7C3AED" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="10 10 4 16 10 22" />
-      <polyline points="22 10 28 16 22 22" />
-      <line x1="18" y1="8" x2="14" y2="24" />
-    </svg>
-  ),
-  calculator: (
-    <svg viewBox="0 0 32 32" className="w-full h-full" fill="none" stroke="#059669" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="6" y="4" width="20" height="24" rx="3" />
-      <rect x="10" y="8" width="12" height="5" rx="1" />
-      <circle cx="11" cy="19" r="1.2" fill="#059669" />
-      <circle cx="16" cy="19" r="1.2" fill="#059669" />
-      <circle cx="21" cy="19" r="1.2" fill="#059669" />
-      <circle cx="11" cy="24" r="1.2" fill="#059669" />
-      <circle cx="16" cy="24" r="1.2" fill="#059669" />
-      <circle cx="21" cy="24" r="1.2" fill="#059669" />
-    </svg>
-  ),
-  briefcase: (
-    <svg viewBox="0 0 32 32" className="w-full h-full" fill="none" stroke="#2563EB" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="4" y="11" width="24" height="16" rx="2" />
-      <path d="M21 11V9a2 2 0 0 0-2-2h-6a2 2 0 0 0-2 2v2" />
-      <line x1="4" y1="19" x2="28" y2="19" />
-    </svg>
-  ),
-};
-
-function getCategoryIcon(icon: string) {
-  return CATEGORY_ICONS[icon] ?? CATEGORY_ICONS['briefcase'];
-}
 
 // ─── Verified badge (solid blue circle + white tick) ─────────────────────────
 function VerifiedBadge() {
@@ -322,7 +266,7 @@ function RightSidebar({
   popularSearches: string[];
 }) {
   return (
-    <aside className="w-[240px] shrink-0 hidden xl:block space-y-4">
+    <aside className="w-[240px] shrink-0 hidden xl:block space-y-4 sticky top-24 self-start">
 
       {/* About category */}
       <div className="bg-white border border-gray-200 rounded-xl p-4">
@@ -385,9 +329,8 @@ function RightSidebar({
   );
 }
 
-// ─── Provider card — thrust-forward + macOS liquid hover, mobile-stacked ──────
+// ─── Provider card — no save/heart button, matches reference exactly ─────────
 function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProviders>['data'] extends (infer T)[] | undefined ? T : never }) {
-  const [saved, setSaved] = useState(false);
   const sendInquiry = useSendServiceInquiry();
   const cardRef = useRef<HTMLDivElement>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
@@ -432,12 +375,12 @@ function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProv
         className="relative bg-white rounded-xl overflow-hidden"
         style={{
           border: '1px solid #e5e7eb',
-          transform: hovered
-            ? `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateZ(14px) scale(1.015)`
-            : 'rotateX(0deg) rotateY(0deg) translateZ(0px) scale(1)',
-          transition: hovered
-            ? 'transform 0.08s ease-out, box-shadow 0.2s ease-out'
-            : 'transform 0.45s cubic-bezier(0.23,1,0.32,1), box-shadow 0.45s ease-out',
+          // transform: hovered
+          //   ? `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateZ(14px) scale(1.015)`
+          //   : 'rotateX(0deg) rotateY(0deg) translateZ(0px) scale(1)',
+          // transition: hovered
+          //   ? 'transform 0.08s ease-out, box-shadow 0.2s ease-out'
+          //   : 'transform 0.45s cubic-bezier(0.23,1,0.32,1), box-shadow 0.45s ease-out',
           boxShadow: hovered
             ? '0 20px 60px -8px rgba(0,0,0,0.16), 0 8px 20px -4px rgba(0,0,0,0.09), 0 0 0 1px rgba(0,0,0,0.04)'
             : '0 1px 3px rgba(0,0,0,0.05)',
@@ -455,35 +398,26 @@ function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProv
           />
         )}
 
-        {/* Single grey top border accent */}
         <div className="h-px w-full bg-gray-200" />
 
         <div className="p-4 sm:p-5">
 
-          {/* Top block: logo + name/rating/tags/meta (always a row), save button pinned top-right */}
+          {/* Top block: logo + name/rating/tags/meta, price + buttons pinned right on desktop */}
           <div className="flex gap-3 sm:gap-4">
             <ProviderLogo name={provider.name} logoUrl={provider.logo_url} />
 
             <div className="flex-1 min-w-0">
               {/* Name row */}
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <h3 className="text-[14px] font-semibold text-gray-900 leading-snug">
-                    {provider.name}
-                  </h3>
-                  {provider.is_verified && <VerifiedBadge />}
-                  {provider.is_top_rated && (
-                    <span className="text-[10px] font-semibold px-2 py-0.5 bg-orange-50 text-orange-500 border border-orange-200 rounded-full">
-                      Top Rated
-                    </span>
-                  )}
-                </div>
-
-                {/* Save button — visible here on mobile only */}
-                <button onClick={() => setSaved(s => !s)}
-                  className={`p-1.5 rounded-lg border transition-colors shrink-0 sm:hidden ${saved ? 'border-rose-300 bg-rose-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                  <Heart className={`h-4 w-4 ${saved ? 'fill-rose-500 text-rose-500' : 'text-gray-400'}`} />
-                </button>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <h3 className="text-[14px] font-semibold text-gray-900 leading-snug">
+                  {provider.name}
+                </h3>
+                {provider.is_verified && <VerifiedBadge />}
+                {provider.is_top_rated && (
+                  <span className="text-[10px] font-semibold px-2 py-0.5 bg-orange-50 text-orange-500 border border-orange-200 rounded-full">
+                    Top Rated
+                  </span>
+                )}
               </div>
 
               {/* Rating row */}
@@ -536,13 +470,8 @@ function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProv
               </div>
             </div>
 
-            {/* Desktop-only right column: save + price, buttons separated below */}
+            {/* Desktop-only right column: price + stacked buttons */}
             <div className="hidden sm:flex flex-col items-end shrink-0 gap-2 min-w-[130px]">
-              <button onClick={() => setSaved(s => !s)}
-                className={`p-1.5 rounded-lg border transition-colors ${saved ? 'border-rose-300 bg-rose-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                <Heart className={`h-4 w-4 ${saved ? 'fill-rose-500 text-rose-500' : 'text-gray-400'}`} />
-              </button>
-
               {provider.starting_price && (
                 <div className="text-right flex items-center justify-center gap-1 whitespace-nowrap">
                   <p className="text-[10px] text-gray-400">Starting from</p>
@@ -611,7 +540,6 @@ function CardSkeleton() {
           </div>
         </div>
         <div className="hidden sm:flex flex-col items-end gap-2 min-w-[130px]">
-          <div className="h-8 w-8 bg-gray-100 rounded-lg" />
           <div className="h-4 w-20 bg-gray-100 rounded" />
           <div className="h-9 w-full bg-gray-200 rounded-xl mt-auto" />
           <div className="h-9 w-full bg-gray-100 rounded-xl" />
@@ -640,9 +568,6 @@ export default function ServiceCategoryPage() {
   const { data: categories = [] } = useServiceCategories();
   const category = categories.find(c => c.slug === slug);
 
-  // Debounce the raw input so typing doesn't fire a request per keystroke.
-  // The input itself still updates `search` immediately (feels responsive),
-  // only the network request waits for a pause in typing.
   const debouncedSearch = useDebouncedValue(search, 400);
 
   const budget = BUDGET_OPTIONS[filters.budgetIdx];
@@ -680,137 +605,131 @@ export default function ServiceCategoryPage() {
 
   return (
     <AppLayout showMobileHeader title={category?.name ?? 'Services'} showBottomNav>
-      <div className="max-w-[1180px] mx-auto px-4 md:px-6 py-5 md:py-6">
+      <div className="max-w-[1400px] mx-auto">
+        {/* Mobile/tablet sticky nav bar — same as network page */}
+        <ServicesTopBar />
 
-        {/* Breadcrumb */}
-        <nav className="flex justify-start items-center gap-2 text-[12px] text-gray-400 mb-4 overflow-x-auto whitespace-nowrap">
-          <span><Link to="/" className="hover:text-gray-600">Home</Link></span>
-          <span>›</span>
-          <span><Link to="/network/services" className="hover:text-gray-600">Services</Link></span>
-          <span>›</span>
-          <span className="text-blue-600 font-medium">{category?.name ?? slug}</span>
-        </nav>
+        <div className="px-4 md:px-6 py-4 md:py-6">
 
-        {/* Category hero banner */}
-        {category && (
-          <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 mb-5 flex items-center gap-4 sm:gap-5">
-            <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-2xl bg-blue-50 flex items-center justify-center shrink-0 p-2.5 sm:p-3">
-              {getCategoryIcon(category.icon)}
-            </div>
+          {/* Breadcrumb */}
+          <nav className="flex justify-start items-center gap-2 text-[12px] text-gray-400 mb-4 overflow-x-auto whitespace-nowrap">
+            <span><Link to="/" className="hover:text-gray-600">Home</Link></span>
+            <span>›</span>
+            <span><Link to="/network/services" className="hover:text-gray-600">Services</Link></span>
+            <span>›</span>
+            <span className="text-blue-600 font-medium">{category?.name ?? slug}</span>
+          </nav>
+
+          {/* 4-column layout: nav rail | filters | providers | right sidebar */}
+          <div className="flex gap-3 md:gap-4 lg:gap-5 items-start">
+
+            {/* Left nav rail — same Discover / My Space sections as the network page */}
+            {/* <ServicesLeftSidebar /> */}
+
+            {/* Filter sidebar — desktop only */}
+            <FilterSidebar {...filterSidebarProps} />
+
+            {/* Provider list */}
             <div className="flex-1 min-w-0">
-              <h1 className="text-[18px] sm:text-[22px] font-bold text-gray-900">{category.name}</h1>
-              <p className="text-[12px] sm:text-[13px] text-gray-500 mt-0.5">{category.description}</p>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 sm:gap-5 mt-2">
-                <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-[12px] text-gray-600">
-                  <ShieldCheck className="h-3.5 w-3.5 text-green-500" />
-                  {category.provider_count}+ Verified Providers
-                </span>
-                <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-[12px] text-gray-600">
-                  <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                  4.8 Avg. Rating
-                </span>
-                <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-[12px] text-gray-600">
-                  <Users className="h-3.5 w-3.5 text-blue-500" />
-                  10K+ Startups Served
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
-        {/* 3-column layout: filter | providers | right sidebar */}
-        <div className="flex gap-5">
 
-          {/* Left filter sidebar — desktop only */}
-          <FilterSidebar {...filterSidebarProps} />
+              {/* Toolbar */}
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                <p className="text-[13px] text-gray-500">
+                  Showing <span className="font-medium text-gray-800">{providers.length}</span> providers
+                  {activeSubCat && (
+                    <> for <span className="font-medium text-gray-800">
+                      "{subCategories.find(s => s.slug === activeSubCat)?.name ?? activeSubCat}"
+                    </span></>
+                  )}
+                </p>
 
-          {/* Provider list */}
-          <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <div className="relative hidden md:block">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                    <input
+                      value={search}
+                      onChange={e => setSearch(e.target.value)}
+                      placeholder="Search providers…"
+                      className="pl-8 pr-3 py-1.5 text-[12px] border border-gray-200 rounded-lg bg-white focus:outline-none focus:border-blue-400 w-52"
+                    />
+                  </div>
 
-            {/* Toolbar */}
-            <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-              <p className="text-[13px] text-gray-500 order-1">
-                Showing <span className="font-medium text-gray-800">{providers.length}</span> providers
-                {activeSubCat && (
-                  <> for <span className="font-medium text-gray-800">
-                    "{subCategories.find(s => s.slug === activeSubCat)?.name ?? activeSubCat}"
-                  </span></>
-                )}
-              </p>
-
-              <div className="flex items-center gap-2 order-3 sm:order-2 w-full sm:w-auto">
-                <div className="relative hidden md:block">
-                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
-                  <input
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
-                    placeholder="Search providers…"
-                    className="pl-8 pr-3 py-1.5 text-[12px] border border-gray-200 rounded-lg bg-white focus:outline-none focus:border-blue-400 w-44"
-                  />
-                </div>
-
-                {/* Mobile filter trigger */}
-                <button
-                  onClick={() => setMobileFilterOpen(true)}
-                  className="lg:hidden flex items-center gap-1 text-[12px] border border-gray-200 rounded-lg px-2.5 py-1.5 bg-white text-gray-700"
-                >
-                  Filters
-                </button>
-
-                <div className="flex items-center gap-1 flex-1 sm:flex-initial">
-                  <span className="hidden sm:inline text-[12px] text-gray-500 mr-1">Sort by:</span>
-                  <select
-                    value={filters.sort}
-                    onChange={e => setFilters({ ...filters, sort: e.target.value })}
-                    className="text-[12px] border border-gray-200 rounded-lg px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:border-blue-400 flex-1 sm:flex-initial"
+                  {/* Mobile filter trigger */}
+                  <button
+                    onClick={() => setMobileFilterOpen(true)}
+                    className="lg:hidden flex items-center gap-1 text-[12px] border border-gray-200 rounded-lg px-2.5 py-1.5 bg-white text-gray-700"
                   >
-                    {SORT_OPTIONS.map(o => (
-                      <option key={o.value} value={o.value}>{o.label}</option>
-                    ))}
-                  </select>
-                </div>
+                    Filters
+                  </button>
 
-                <div className="flex border border-gray-200 rounded-lg overflow-hidden shrink-0">
-                  <button
-                    onClick={() => setViewMode('grid')}
-                    className={`p-1.5 ${viewMode === 'grid' ? 'bg-gray-100 text-gray-800' : 'text-gray-400 hover:text-gray-600'}`}>
-                    <Grid3X3 className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => setViewMode('list')}
-                    className={`p-1.5 ${viewMode === 'list' ? 'bg-gray-100 text-gray-800' : 'text-gray-400 hover:text-gray-600'}`}>
-                    <List className="h-4 w-4" />
-                  </button>
+                  <div className="flex items-center gap-1 flex-1 sm:flex-initial">
+                    <span className="hidden sm:inline text-[12px] text-gray-500 mr-1">Sort by:</span>
+                    <select
+                      value={filters.sort}
+                      onChange={e => setFilters({ ...filters, sort: e.target.value })}
+                      className="text-[12px] border border-gray-200 rounded-lg px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:border-blue-400 flex-1 sm:flex-initial"
+                    >
+                      {SORT_OPTIONS.map(o => (
+                        <option key={o.value} value={o.value}>{o.label}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="flex border border-gray-200 rounded-lg overflow-hidden shrink-0">
+                    <button
+                      onClick={() => setViewMode('grid')}
+                      className={`p-1.5 ${viewMode === 'grid' ? 'bg-gray-100 text-gray-800' : 'text-gray-400 hover:text-gray-600'}`}>
+                      <Grid3X3 className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => setViewMode('list')}
+                      className={`p-1.5 ${viewMode === 'list' ? 'bg-gray-100 text-gray-800' : 'text-gray-400 hover:text-gray-600'}`}>
+                      <List className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Cards */}
-            <div className={viewMode === 'list'
-              ? 'space-y-3'
-              : 'grid grid-cols-1 sm:grid-cols-2 gap-3'
-            }>
-              {showSkeleton
-                ? Array.from({ length: 3 }).map((_, i) => <CardSkeleton key={i} />)
-                : providers.map(p => <ProviderCard key={p.id} provider={p} />)
-              }
-            </div>
-
-            {/* Empty state */}
-            {!showSkeleton && providers.length === 0 && (
-              <div className="flex flex-col items-center gap-2 py-16 text-center">
-                <ClipboardList className="h-10 w-10 text-gray-200" />
-                <p className="text-sm text-gray-400 font-medium">No providers found</p>
-                <p className="text-xs text-gray-300">Try adjusting your filters or check back soon.</p>
+              {/* Cards */}
+              <div className={viewMode === 'list'
+                ? 'space-y-3'
+                : 'grid grid-cols-1 sm:grid-cols-2 gap-3'
+              }>
+                {showSkeleton
+                  ? Array.from({ length: 3 }).map((_, i) => <CardSkeleton key={i} />)
+                  : providers.map(p => <ProviderCard key={p.id} provider={p} />)
+                }
               </div>
-            )}
+
+              {/* View more */}
+              {!showSkeleton && providers.length > 0 && (
+                <div className="flex justify-center mt-5">
+                  <Link
+                    to={`/network/services?view=all${slug ? `` : ''}`}
+                    className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-blue-600 hover:text-blue-500 transition-colors"
+                  >
+                    View more providers <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+              )}
+
+              {/* Empty state */}
+              {!showSkeleton && providers.length === 0 && (
+                <div className="flex flex-col items-center gap-2 py-16 text-center">
+                  <ClipboardList className="h-10 w-10 text-gray-200" />
+                  <p className="text-sm text-gray-400 font-medium">No providers found</p>
+                  <p className="text-xs text-gray-300">Try adjusting your filters or check back soon.</p>
+                </div>
+              )}
+            </div>
+
+            {/* Right sidebar */}
+            <RightSidebar
+              categoryName={category?.name ?? ''}
+              categoryDescription={category?.description ?? ''}
+              popularSearches={popularSearches}
+            />
           </div>
-
-          {/* Right sidebar */}
-          <RightSidebar
-            categoryName={category?.name ?? ''}
-            categoryDescription={category?.description ?? ''}
-            popularSearches={popularSearches}
-          />
         </div>
       </div>
 
