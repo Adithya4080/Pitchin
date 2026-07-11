@@ -66,7 +66,7 @@ const ACTIVITY = [
 function ProviderCTACard() {
   return (
     <div className="relative overflow-hidden rounded-2xl border border-gray-200 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08),0_2px_8px_-2px_rgba(0,0,0,0.04)]">
-      {/* <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #fdfdfd 0%, #ffffff 100%)' }} /> */}
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #fdfdfd 0%, #ffffff 100%)' }} />
       {/* <div className="absolute inset-0 opacity-30">
         <svg className="w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
           <defs>
