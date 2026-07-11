@@ -2,10 +2,8 @@ import { useState, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Globe } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useNetworkDiscover } from '@/hooks/useNetworkDiscover';
 import type { NetworkTab } from '@/api/profiles';
 import { useSendInterest } from '@/hooks/useSendInterest';
-import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
 const TAB_ICONS: Record<NetworkTab, JSX.Element> = {
@@ -201,7 +199,6 @@ function ProfileCard({ profile }: { profile: NetworkProfile }) {
           willChange: 'transform',
         }}
       >
-        {/* macOS liquid glow */}
         {active && (
           <div
             className="absolute inset-0 pointer-events-none rounded-xl z-10"
@@ -212,10 +209,8 @@ function ProfileCard({ profile }: { profile: NetworkProfile }) {
           />
         )}
 
-        {/* top border accent line */}
         <div className="h-px w-full bg-gray-200" />
 
-        {/* Subtle colour tint on hover/press */}
         <div
           className="absolute inset-0 pointer-events-none rounded-xl transition-opacity duration-300"
           style={{
@@ -227,7 +222,6 @@ function ProfileCard({ profile }: { profile: NetworkProfile }) {
         {profile.is_verified && <VerifiedPill />}
 
         <div className="relative p-4 flex flex-col h-full">
-          {/* Avatar */}
           <span
             className="inline-flex shrink-0 mb-3"
             style={{
@@ -238,22 +232,18 @@ function ProfileCard({ profile }: { profile: NetworkProfile }) {
             <Avatar src={profile.avatar} name={profile.name} />
           </span>
 
-          {/* Name */}
           <p className="text-sm font-semibold text-foreground leading-snug mb-1 truncate">
             {profile.name}
           </p>
 
-          {/* Role / org */}
           <p className="text-[11px] text-foreground/50 leading-snug mb-2">
             {profile.role_label}{profile.org_name ? ` · ${profile.org_name}` : ''}
           </p>
 
-          {/* Bio */}
           <p className="text-[11px] text-foreground/50 leading-snug line-clamp-2 mb-3 flex-1">
             {profile.bio || 'No description yet.'}
           </p>
 
-          {/* Tags */}
           {profile.tags.length > 0 && (
             <div className="flex flex-wrap gap-1 mb-3">
               {profile.tags.slice(0, 2).map((tag) => (
@@ -264,7 +254,6 @@ function ProfileCard({ profile }: { profile: NetworkProfile }) {
             </div>
           )}
 
-          {/* Footer — same as CategoryCard: link text + arrow, color shifts on hover */}
           <div className="flex items-center justify-between mt-auto">
             <button
               onClick={handleConnect}
@@ -284,17 +273,6 @@ function ProfileCard({ profile }: { profile: NetworkProfile }) {
           </div>
         </div>
       </motion.div>
-    </div>
-  );
-}
-
-function CardSkeleton() {
-  return (
-    <div className="rounded-xl border border-foreground/10 bg-white p-4 animate-pulse flex-shrink-0">
-      <div className="h-12 w-12 rounded-xl bg-foreground/[0.06] mb-3" />
-      <div className="h-4 w-24 bg-foreground/[0.06] rounded mb-2" />
-      <div className="h-3 w-32 bg-foreground/[0.04] rounded mb-3" />
-      <div className="h-3 w-16 bg-foreground/[0.04] rounded" />
     </div>
   );
 }
@@ -323,25 +301,13 @@ function DotPagination({ total, current, onChange }: {
 
 export function NetworkingOpportunitiesSection() {
   const [activeTab, setActiveTab] = useState<NetworkTab>('investor');
-  const [page, setPage] = useState(1);
-  const { user, loading: authLoading } = useAuth();
-  const { data, isLoading, isError } = useNetworkDiscover({
-    tab: activeTab,
-    page,
-    enabled: !!user && !authLoading,
-  });
-
-  const profiles = data?.results ?? [];
-  const numPages  = data?.num_pages ?? 1;
 
   const handleTabChange = (tab: NetworkTab) => {
     setActiveTab(tab);
-    setPage(1);
   };
 
   return (
     <section>
-      {/* Header — matches ServiceCategoryGrid header style */}
       <div className="flex items-start justify-between mb-4">
         <div>
           <h2 className="text-lg md:text-xl font-bold text-foreground">
@@ -359,7 +325,6 @@ export function NetworkingOpportunitiesSection() {
         </Link>
       </div>
 
-      {/* Tabs */}
       <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none pointer-events-none opacity-50 mb-4">
         {TABS.map((tab) => (
           <button
@@ -373,35 +338,24 @@ export function NetworkingOpportunitiesSection() {
         ))}
       </div>
 
-      {/* Card grid with blur overlay */}
+      {/* No live data source — useNetworkDiscover has been removed. Section
+          renders in a static locked/"coming soon" state behind the blur overlay. */}
       <div className="relative">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 min-h-[160px]">
-          {isLoading
-            ? Array.from({ length: 5 }).map((_, i) => <CardSkeleton key={i} />)
-            : isError
-            ? null
-            : profiles.map((p) => <ProfileCard key={p.id} profile={p} />)}
-        </div>
-
-        {/* Empty state */}
-        {!isLoading && !isError && profiles.length === 0 && (
-          <div className="mt-6 flex flex-col items-center gap-2 py-10 text-center">
+          <div className="col-span-full flex flex-col items-center gap-2 py-10 text-center">
             <Globe className="h-8 w-8 text-gray-300" />
             <p className="text-sm text-gray-400">
-              No {TABS.find((t) => t.key === activeTab)?.label.toLowerCase()} yet.
+              {TABS.find((t) => t.key === activeTab)?.label} coming soon.
             </p>
-            <p className="text-xs text-gray-300">Check back soon — more are joining every day.</p>
+            <p className="text-xs text-gray-300">Check back soon — this section is launching shortly.</p>
           </div>
-        )}
+        </div>
 
-        {/* Blur overlay — visible but not interactive */}
         <div className="absolute inset-0 bg-white/20 backdrop-blur-[1px] rounded-xl z-30 cursor-not-allowed" />
       </div>
 
-      {/* Dot pagination */}
-      <DotPagination total={numPages} current={page} onChange={setPage} />
+      <DotPagination total={1} current={1} onChange={() => {}} />
 
-      {/* Mobile view all */}
       <div className="flex md:hidden justify-center mt-4">
         <Link
           to="/network"

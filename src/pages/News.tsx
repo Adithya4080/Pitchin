@@ -166,7 +166,6 @@ export default function News() {
       {/* Mobile */}
       <div className="block md:hidden min-h-screen bg-background">
         <MobileSearchHeader  />
-
         <div className="px-4 pt-3 pb-3 sticky top-14 bg-background/95 backdrop-blur-sm z-10 border-b border-border/40">
           <DiscoverCategoryChips
             active={activeFilter}
