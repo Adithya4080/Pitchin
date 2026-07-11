@@ -4,8 +4,7 @@ import { Search } from 'lucide-react';
 import { AppLayout } from '@/components/layouts/AppLayout';
 import { FeedLeftSidebar } from '@/components/FeedLeftSidebar';
 import { BottomNavigation } from '@/components/mobile/BottomNavigation';
-import { MobileHeader } from '@/components/mobile/MobileHeader';
-
+import { MobileSearchHeader } from '@/components/mobile';
 import { TopStoryCard } from '@/components/news/TopStoryCard';
 import { LatestUpdateRow } from '@/components/news/LatestUpdateRow';
 import { NewsRightSidebar } from '@/components/news/NewsRightSidebar';
@@ -166,7 +165,7 @@ export default function News() {
     <>
       {/* Mobile */}
       <div className="block md:hidden min-h-screen bg-background">
-        <MobileHeader title="News" />
+        <MobileSearchHeader  />
 
         <div className="px-4 pt-3 pb-3 sticky top-14 bg-background/95 backdrop-blur-sm z-10 border-b border-border/40">
           <DiscoverCategoryChips

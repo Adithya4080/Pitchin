@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import {
   LayoutGrid, Phone, ClipboardList, Heart,
   ArrowRight, Star, Search, ShieldCheck,
-  MapPin, ExternalLink, Bookmark, Zap, TrendingUp,
+  MapPin, Bookmark, Zap, TrendingUp, SlidersHorizontal, Check,
 } from 'lucide-react';
 import { AppLayout } from '@/components/layouts/AppLayout';
 import { ServicesLeftSidebar, ServicesTopBar } from '@/components/network/ServicesLeftSidebar';
@@ -16,6 +16,7 @@ import { ProfileStrengthCard } from '@/components/profile/ProfileStrengthCard';
 import { useMyProfile } from '@/hooks/useRoleProfile';
 import { useUserPitches } from '@/hooks/usePitches';
 import { NetworkingForOpportunitySection } from '@/components/network/OpportunitiesAndSurveysSection';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 // ─── Quick Actions ─────────────────────────────────────────────────────────────
 const QUICK_ACTIONS = [
@@ -161,117 +162,164 @@ type ProviderItem = {
 };
 
 function ProviderMiniCard({ provider: p }: { provider: ProviderItem }) {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const [glowPos, setGlowPos] = useState({ x: 50, y: 50 });
   const [hovered, setHovered] = useState(false);
-
   const initials = p.name.split(' ').slice(0, 2).map((w: string) => w[0]?.toUpperCase()).join('');
 
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const card = cardRef.current;
-    if (!card) return;
-    const rect = card.getBoundingClientRect();
-    const cx = e.clientX - rect.left;
-    const cy = e.clientY - rect.top;
-    setTilt({ x: ((cy / rect.height) - 0.5) * -10, y: ((cx / rect.width) - 0.5) * 10 });
-    setGlowPos({ x: (cx / rect.width) * 100, y: (cy / rect.height) * 100 });
-  }, []);
-
-  const handleMouseLeave = useCallback(() => {
-    setTilt({ x: 0, y: 0 });
-    setHovered(false);
-  }, []);
-
   return (
-    <div style={{ perspective: '900px' }}>
-      <div
-        ref={cardRef}
-        onMouseMove={handleMouseMove}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={handleMouseLeave}
-        className="group relative bg-white rounded-2xl overflow-hidden"
-        style={{
-          border: hovered ? '1px solid #d1d5db' : '1px solid #f3f4f6',
-          // transform: hovered
-          //   ? `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateZ(14px) scale(1.015)`
-          //   : 'rotateX(0deg) rotateY(0deg) translateZ(0px) scale(1)',
-          // transition: hovered
-          //   ? 'transform 0.08s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease-out'
-          //   : 'transform 0.45s cubic-bezier(0.23,1,0.32,1), box-shadow 0.45s ease-out, border-color 0.45s ease-out',
-          boxShadow: hovered
-            ? '0 20px 60px -8px rgba(0,0,0,0.16), 0 8px 20px -4px rgba(0,0,0,0.09), 0 0 0 1px rgba(0,0,0,0.04)'
-            : '0 1px 3px rgba(0,0,0,0.05)',
-          willChange: 'transform',
-        }}
-      >
-        {hovered && (
-          <div className="absolute inset-0 pointer-events-none rounded-2xl z-10"
-            style={{
-              background: `radial-gradient(300px circle at ${glowPos.x}% ${glowPos.y}%, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.05) 50%, transparent 100%)`,
-              mixBlendMode: 'screen',
-            }}
-          />
-        )}
-        <div className={`h-1 w-full bg-gradient-to-r ${getCategoryGradient(p.category_name)} opacity-60 group-hover:opacity-100 transition-opacity duration-200`} />
-        <div className="p-4 flex flex-col gap-3">
-          <div className="flex items-start gap-3">
-            {p.logo_url
-              ? <img src={p.logo_url} alt={p.name} loading="lazy" decoding="async" width={44} height={44} className="h-11 w-11 rounded-xl object-cover shrink-0 border border-gray-100" />
-              : <div className="h-11 w-11 rounded-xl bg-gray-950 flex items-center justify-center text-white text-sm font-bold shrink-0">{initials}</div>
-            }
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5">
-                <p className="text-[13px] font-bold text-gray-900 truncate">{p.name}</p>
-                {p.is_verified && <ShieldCheck className="h-3.5 w-3.5 text-blue-500 shrink-0" />}
-              </div>
-              <p className="text-[11px] text-gray-400 font-semibold">{p.category_name}</p>
-              {p.location && (
-                <span className="inline-flex items-center gap-1 text-[11px] text-gray-300 mt-0.5">
-                  <MapPin className="h-3 w-3" />{p.location}
-                </span>
-              )}
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="relative bg-white border border-gray-200 rounded-sm overflow-hidden h-[196px] flex flex-col"
+      style={{
+        border: hovered ? '1px solid #d1d5db' : '1px solid #e5e7eb',
+        boxShadow: hovered
+          ? '0 12px 32px -8px rgba(0,0,0,0.12), 0 4px 12px -4px rgba(0,0,0,0.06)'
+          : '0 1px 3px rgba(0,0,0,0.05)',
+        transition: 'border-color 0.2s ease-out, box-shadow 0.2s ease-out',
+      }}
+    >
+      <div className="p-3.5 flex flex-col gap-2 flex-1 min-h-0">
+        {/* Logo + identity block */}
+        <div className="flex items-start gap-2.5">
+          {p.logo_url
+            ? <img src={p.logo_url} alt={p.name} loading="lazy" decoding="async" width={48} height={48} className="h-12 w-12 rounded-xl object-cover shrink-0 border border-gray-100" />
+            : <div className="h-12 w-12 rounded-xl bg-gray-950 flex items-center justify-center text-white text-sm font-bold shrink-0">{initials}</div>
+          }
+          <div className="min-w-0 flex-1 pt-0.5">
+            <div className="flex items-center gap-1.5">
+              <p className="text-[13px] font-bold text-gray-900 truncate">{p.name}</p>
+              {p.is_verified && <ShieldCheck className="h-3.5 w-3.5 text-blue-500 shrink-0" />}
             </div>
-          </div>
-          {p.tagline && <p className="text-[12px] text-gray-500 leading-relaxed line-clamp-2">{p.tagline}</p>}
-          {Number(p.rating) > 0 && (
-            <div className="flex items-center gap-1">
-              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-              <span className="text-[12px] font-bold text-gray-700">{p.rating}</span>
-              <span className="text-[11px] text-gray-300">({p.review_count})</span>
-            </div>
-          )}
-          <div className="flex gap-2 mt-auto">
-            <Link to={`/network/services/${p.category_slug}`}
-              className="flex-1 text-center text-[12px] font-bold bg-gray-950 hover:bg-gray-800 text-white py-2.5 rounded-xl transition-colors"
-            >View Profile</Link>
-            {p.website && (
-              <a href={p.website} target="_blank" rel="noreferrer"
-                className="p-2.5 border border-gray-200 rounded-xl text-gray-400 hover:text-gray-700 hover:border-gray-300 transition-colors">
-                <ExternalLink className="h-4 w-4" />
-              </a>
+            <p className="text-[11px] text-gray-400 font-semibold truncate mt-0.5">{p.category_name}</p>
+            {p.location && (
+              <span className="inline-flex items-center gap-1 text-[10.5px] text-gray-300 mt-0.5 truncate max-w-full">
+                <MapPin className="h-2.5 w-2.5 shrink-0" /><span className="truncate">{p.location}</span>
+              </span>
             )}
           </div>
         </div>
+
+        {/* Description */}
+        <p className="text-[11.5px] text-gray-500 leading-snug truncate">
+          {p.tagline || '\u00A0'}
+        </p>
+
+        {/* Rating */}
+        <div className="h-3.5 flex items-center gap-1">
+          {Number(p.rating) > 0 && (
+            <>
+              <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+              <span className="text-[11.5px] font-bold text-gray-700">{p.rating}</span>
+              <span className="text-[10.5px] text-gray-300">({p.review_count})</span>
+            </>
+          )}
+        </div>
+
+        {/* Button */}
+        <Link to={`/network/services/${p.category_slug}`}
+          className="mt-auto block text-center text-[11.5px] font-bold bg-primary hover:bg-primary/90 text-primary-foreground py-2 rounded-xl transition-colors"
+        >View Profile</Link>
       </div>
     </div>
   );
 }
 
 // ─── All Providers browse ─────────────────────────────────────────────────────
+const CATEGORY_PILLS_COLLAPSED_COUNT = 6;
+
+function FilterPanel({
+  categories,
+  activeCategory,
+  setActiveCategory,
+  showAllCategories,
+  setShowAllCategories,
+  onClose,
+}: {
+  categories: { id: number; slug: string; name: string }[];
+  activeCategory: string;
+  setActiveCategory: (v: string) => void;
+  showAllCategories: boolean;
+  setShowAllCategories: (v: boolean) => void;
+  onClose: () => void;
+}) {
+  const visibleCategories = showAllCategories
+    ? categories
+    : categories.slice(0, CATEGORY_PILLS_COLLAPSED_COUNT);
+  const hasMoreCategories = categories.length > CATEGORY_PILLS_COLLAPSED_COUNT;
+
+  return (
+    <div className="w-72">
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-[13px] font-bold text-gray-900">Filter by Category</p>
+        {activeCategory && (
+          <button
+            onClick={() => setActiveCategory('')}
+            className="text-[11px] font-semibold text-primary hover:text-primary/80"
+          >Clear</button>
+        )}
+      </div>
+
+      <div className="space-y-1 max-h-72 overflow-y-auto pr-1">
+        <label className="flex items-center gap-2.5 py-1.5 px-1.5 rounded-lg hover:bg-gray-50 cursor-pointer">
+          <span className={`h-4 w-4 rounded-md border flex items-center justify-center shrink-0 ${
+            !activeCategory ? 'bg-primary border-primary' : 'border-gray-300'
+          }`}>
+            {!activeCategory && <Check className="h-3 w-3 text-white" strokeWidth={3} />}
+          </span>
+          <input type="radio" name="category" className="sr-only" checked={!activeCategory} onChange={() => setActiveCategory('')} />
+          <span className="text-[12.5px] text-gray-700 font-medium">All Categories</span>
+        </label>
+        {visibleCategories.map(c => (
+          <label key={c.id} className="flex items-center gap-2.5 py-1.5 px-1.5 rounded-lg hover:bg-gray-50 cursor-pointer">
+            <span className={`h-4 w-4 rounded-md border flex items-center justify-center shrink-0 ${
+              activeCategory === c.slug ? 'bg-primary border-primary' : 'border-gray-300'
+            }`}>
+              {activeCategory === c.slug && <Check className="h-3 w-3 text-white" strokeWidth={3} />}
+            </span>
+            <input type="radio" name="category" className="sr-only" checked={activeCategory === c.slug}
+              onChange={() => setActiveCategory(activeCategory === c.slug ? '' : c.slug)} />
+            <span className="text-[12.5px] text-gray-700 font-medium truncate">{c.name}</span>
+          </label>
+        ))}
+      </div>
+
+      {hasMoreCategories && (
+        <button
+          onClick={() => setShowAllCategories(!showAllCategories)}
+          className="mt-2 text-[12px] font-bold text-primary hover:text-primary/80 transition-colors"
+        >
+          {showAllCategories ? 'Show Less' : `Show More (${categories.length - CATEGORY_PILLS_COLLAPSED_COUNT})`}
+        </button>
+      )}
+
+      <button
+        onClick={onClose}
+        className="w-full mt-4 bg-primary hover:bg-primary/90 text-primary-foreground text-[12.5px] font-bold py-2.5 rounded-xl transition-colors"
+      >
+        Apply Filters
+      </button>
+    </div>
+  );
+}
+
 function AllProvidersView() {
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState('');
+  const [showAllCategories, setShowAllCategories] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
   const debouncedSearch = useDebouncedValue(search, 400);
   const { data: categories = [] } = useServiceCategories();
-  const { data: providers = [], isLoading } = useServiceProviders({
+  const { data: providers = [], isLoading, isFetching } = useServiceProviders({
     category: activeCategory || undefined,
     search: debouncedSearch || undefined,
     sort: 'top_rated',
   });
 
+  const showSkeleton = isLoading || isFetching;
+  const activeCategoryName = categories.find(c => c.slug === activeCategory)?.name;
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-2">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-[18px] font-bold text-gray-900 tracking-tight">All Service Providers</h2>
@@ -280,43 +328,72 @@ function AllProvidersView() {
         <Link to="/network/services" className="text-[13px] font-bold text-gray-500 hover:text-gray-900 transition-colors">← Back</Link>
       </div>
 
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
-        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search providers…"
-          className="w-full pl-10 pr-4 py-2.5 text-[13px] border border-gray-200 rounded-xl bg-white focus:outline-none focus:border-gray-400 placeholder:text-gray-300"
-        />
+      <div className="flex items-center gap-2 flex-wrap">
+        <div className="relative max-w-sm flex-1 min-w-[220px]">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search providers…"
+            className="w-full pl-10 pr-4 py-2.5 text-[13px] border border-gray-200 rounded-xl bg-white focus:outline-none focus:border-gray-400 placeholder:text-gray-300"
+          />
+        </div>
+
+        <Popover open={filterOpen} onOpenChange={setFilterOpen}>
+          <PopoverTrigger asChild>
+            <button
+              className={`inline-flex items-center gap-1.5 text-[12.5px] font-bold px-3.5 py-2.5 rounded-xl border transition-all ${
+                activeCategory ? 'bg-primary/5 border-primary/30 text-primary' : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
+              }`}
+            >
+              <SlidersHorizontal className="h-3.5 w-3.5" />
+              Filter
+              {activeCategory && <span className="h-4 min-w-4 px-1 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center">1</span>}
+            </button>
+          </PopoverTrigger>
+          <PopoverContent align="start" className="p-4">
+            <FilterPanel
+              categories={categories}
+              activeCategory={activeCategory}
+              setActiveCategory={setActiveCategory}
+              showAllCategories={showAllCategories}
+              setShowAllCategories={setShowAllCategories}
+              onClose={() => setFilterOpen(false)}
+            />
+          </PopoverContent>
+        </Popover>
+
+        {isFetching && !isLoading && (
+          <span className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-gray-400">
+            <span className="h-3 w-3 rounded-full border-2 border-gray-300 border-t-primary animate-spin" />
+            Filtering…
+          </span>
+        )}
       </div>
 
-      <div className="flex flex-wrap gap-1.5">
-        <button onClick={() => setActiveCategory('')}
-          className={`text-[12px] font-bold px-3.5 py-1.5 rounded-full border transition-all ${
-            !activeCategory ? 'bg-gray-950 text-white border-gray-950' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
-          }`}
-        >All</button>
-        {categories.map(c => (
-          <button key={c.id} onClick={() => setActiveCategory(activeCategory === c.slug ? '' : c.slug)}
-            className={`text-[12px] font-bold px-3.5 py-1.5 rounded-full border transition-all ${
-              activeCategory === c.slug ? 'bg-gray-950 text-white border-gray-950' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
-            }`}
-          >{c.name}</button>
-        ))}
-      </div>
+      {activeCategoryName && (
+        <div className="flex items-center gap-1.5">
+          <span className="inline-flex items-center gap-1.5 text-[11.5px] font-semibold px-2.5 py-1 rounded-full bg-primary/5 text-primary border border-primary/20">
+            {activeCategoryName}
+            <button onClick={() => setActiveCategory('')} className="hover:text-primary/60">×</button>
+          </span>
+        </div>
+      )}
 
-      {isLoading && (
+      {showSkeleton && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-44 rounded-2xl bg-gray-50 animate-pulse" />
+            <div key={i} className="h-[196px] rounded-2xl border border-gray-100 bg-gray-50 animate-pulse" />
           ))}
         </div>
       )}
 
-      {!isLoading && providers.length === 0 && (
+      {!showSkeleton && providers.length === 0 && (
         <p className="text-[13px] text-gray-400 py-12 text-center">No providers found.</p>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {providers.map(p => <ProviderMiniCard key={p.id} provider={p} />)}
-      </div>
+      {!showSkeleton && providers.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1">
+          {providers.map(p => <ProviderMiniCard key={p.id} provider={p} />)}
+        </div>
+      )}
     </div>
   );
 }

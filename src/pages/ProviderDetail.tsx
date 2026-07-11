@@ -425,21 +425,6 @@ export default function ProviderDetail() {
                   <ProviderAvatar name={provider.name} avatarBg={avatarBg} size={56} />
                 )}
               </div>
-
-              {/* Action buttons */}
-              <div className="pd-hero-actions" style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 4 }}>
-                <button className="pd-action-btn" onClick={() => setActiveTab('consultation')}>
-                  <Calendar size={13} /> Book consultation
-                </button>
-                <button className="pd-action-btn" onClick={() => setActiveTab('message')}>
-                  <MessageSquare size={13} /> Message
-                </button>
-                {provider.website && (
-                  <a href={provider.website} target="_blank" rel="noreferrer" className="pd-action-btn">
-                    <ExternalLink size={13} />
-                  </a>
-                )}
-              </div>
             </div>
 
             {/* Name + meta below the logo */}

@@ -2,7 +2,7 @@ import { AppLayout } from '@/components/layouts/AppLayout';
 import { FeedLeftSidebar } from '@/components/FeedLeftSidebar';
 import { FeedRightSidebar } from '@/components/FeedRightSidebar';
 import { BottomNavigation } from '@/components/mobile/BottomNavigation';
-import { MobileHeader } from '@/components/mobile/MobileHeader';
+import { MobileSearchHeader } from '@/components/mobile/MobileSearchHeader';
 import { MessageCircle, Sparkles } from 'lucide-react';
 
 function ComingSoonContent() {
@@ -42,7 +42,7 @@ export default function Messages() {
     <>
       {/* Mobile */}
       <div className="block md:hidden min-h-screen bg-background">
-        <MobileHeader title="Messages" />
+        <MobileSearchHeader  />
         <main className="pb-24">
           <ComingSoonContent />
         </main>
