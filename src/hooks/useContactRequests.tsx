@@ -1,15 +1,3 @@
-// import { useQuery } from '@tanstack/react-query';
-// import { useAuth } from './useAuth';
-
-// export function useContactRequests(pitchId?: string) {
-//   const { user } = useAuth();
-//   return useQuery({
-//     queryKey: ['contact-requests', pitchId, user?.id],
-//     queryFn: async () => [],
-//     enabled: !!user,
-//   });
-// }
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from './useAuth';
 import { useToast } from '@/hooks/use-toast';

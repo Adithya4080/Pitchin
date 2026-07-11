@@ -3,7 +3,7 @@ import { Link, useParams, useSearchParams } from 'react-router-dom';
 import {
   Star, ShieldCheck, MapPin, Users, Grid3X3,
   List, ChevronDown, RotateCcw, Plus, Phone, ClipboardList,
-  Search, ArrowRight,
+  Search, ArrowRight, SlidersHorizontal,
 } from 'lucide-react';
 import { AppLayout } from '@/components/layouts/AppLayout';
 import { ServicesLeftSidebar, ServicesTopBar } from '@/components/network/ServicesLeftSidebar';
@@ -41,12 +41,12 @@ function ProviderLogo({ name, logoUrl }: { name: string; logoUrl: string | null 
         decoding="async"
         width={72}
         height={72}
-        className="w-14 h-14 sm:w-[72px] sm:h-[72px] rounded-xl object-cover shrink-0 border border-gray-200"
+        className="w-12 h-12 sm:w-[72px] sm:h-[72px] rounded-xl object-cover shrink-0 border border-gray-200"
       />
     );
   }
   return (
-    <div className={`w-14 h-14 sm:w-[72px] sm:h-[72px] rounded-xl ${bg} flex items-center justify-center text-white text-base sm:text-lg font-bold shrink-0`}>
+    <div className={`w-12 h-12 sm:w-[72px] sm:h-[72px] rounded-xl ${bg} flex items-center justify-center text-white text-sm sm:text-lg font-bold shrink-0`}>
       {initials}
     </div>
   );
@@ -413,16 +413,16 @@ function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProv
                   {provider.name}
                 </h3>
                 {provider.is_verified && <VerifiedBadge />}
-                {provider.is_top_rated && (
-                  <span className="text-[10px] font-semibold px-2 py-0.5 bg-orange-50 text-orange-500 border border-orange-200 rounded-full">
-                    Top Rated
-                  </span>
-                )}
               </div>
+              {provider.is_top_rated && (
+                <span className="inline-block mt-1.5 text-[10px] font-semibold px-2 py-0.5 bg-orange-50 text-orange-500 border border-orange-200 rounded-full">
+                  Top Rated
+                </span>
+              )}
 
               {/* Rating row */}
               {Number(provider.rating) > 0 && (
-                <div className="flex items-center whitespace-nowrap gap-1.5 mt-1">
+                <div className="flex items-center whitespace-nowrap gap-1.5 mt-1.5">
                   <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
                   <span className="text-[12px] font-medium text-gray-700">{provider.rating}</span>
                   <span className="text-[12px] text-gray-400">({provider.review_count} reviews)</span>
@@ -431,19 +431,29 @@ function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProv
 
               {/* Tagline */}
               {provider.tagline && (
-                <p className="text-[12px] text-gray-500 mt-1.5 line-clamp-2">{provider.tagline}</p>
+                <p className="hidden sm:block text-[12px] text-gray-500 mt-2 leading-relaxed line-clamp-2">{provider.tagline}</p>
               )}
 
               {/* Service tags */}
               {provider.tags?.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mt-2">
-                  {provider.tags.slice(0, 3).map(tag => (
+                <div className="flex flex-wrap gap-1.5 mt-2.5">
+                  {provider.tags.slice(0, 2).map(tag => (
                     <span key={tag} className="text-[11px] px-2.5 py-[3px] bg-gray-100 text-gray-600 border border-gray-200 rounded-full">
                       {tag}
                     </span>
                   ))}
+                  {provider.tags.slice(2, 3).map(tag => (
+                    <span key={tag} className="hidden sm:inline-block text-[11px] px-2.5 py-[3px] bg-gray-100 text-gray-600 border border-gray-200 rounded-full">
+                      {tag}
+                    </span>
+                  ))}
+                  {provider.tags.length > 2 && (
+                    <span className="sm:hidden text-[11px] px-2.5 py-[3px] bg-gray-100 text-gray-500 border border-gray-200 rounded-full">
+                      +{provider.tags.length - 2} more
+                    </span>
+                  )}
                   {provider.tags.length > 3 && (
-                    <span className="text-[11px] px-2.5 py-[3px] bg-gray-100 text-gray-500 border border-gray-200 rounded-full">
+                    <span className="hidden sm:inline-block text-[11px] px-2.5 py-[3px] bg-gray-100 text-gray-500 border border-gray-200 rounded-full">
                       +{provider.tags.length - 3} more
                     </span>
                   )}
@@ -451,7 +461,7 @@ function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProv
               )}
 
               {/* Meta row */}
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2.5">
+              <div className="hidden sm:flex flex-wrap items-center gap-x-3 gap-y-1.5 mt-3">
                 {provider.stage_focus_label && (
                   <span className="inline-flex items-center gap-1 text-[11px] text-gray-500">
                     <Users className="h-3 w-3" />{provider.stage_focus_label}
@@ -483,7 +493,7 @@ function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProv
 
               <div className="flex flex-col gap-1.5 w-full mt-auto">
                 <Link to={`/network/provider/${provider.slug}`}
-                  className="w-full text-center bg-blue-600 hover:bg-blue-500 text-white text-[12px] font-medium py-2 rounded-xl transition-colors">
+                  className="w-full justify-center text-center bg-blue-600 hover:bg-blue-500 text-white text-[12px] font-medium py-2 rounded-xl transition-colors">
                   View Profile
                 </Link>
                 <button
@@ -497,18 +507,18 @@ function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProv
           </div>
 
           {/* Mobile-only bottom bar: price + full-width action buttons below content */}
-          <div className="sm:hidden mt-3 pt-3 border-t border-gray-100">
-            {provider.starting_price && (
-              <div className="flex items-baseline gap-1 mb-2">
+          <div className="sm:hidden mt-4 pt-3 border-t border-gray-100">
+            {/* {provider.starting_price && (
+              <div className="flex items-baseline gap-1 mb-2.5">
                 <p className="text-[10px] text-gray-400">Starting from</p>
                 <p className="text-[15px] font-bold text-gray-900">
                   ₹{Number(provider.starting_price).toLocaleString('en-IN')}
                 </p>
               </div>
-            )}
+            )} */}
             <div className="flex gap-2">
               <Link to={`/network/provider/${provider.slug}`}
-                className="flex-1 text-center bg-blue-600 hover:bg-blue-500 text-white text-[12px] font-medium py-2.5 rounded-xl transition-colors">
+                className="flex-1 justify-center text-center bg-blue-600 hover:bg-blue-500 text-white text-[12px] font-medium py-2.5 rounded-xl transition-colors">
                 View Profile
               </Link>
               <button
@@ -529,7 +539,7 @@ function CardSkeleton() {
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 animate-pulse">
       <div className="flex gap-3 sm:gap-4">
-        <div className="w-14 h-14 sm:w-[72px] sm:h-[72px] rounded-xl bg-gray-200 shrink-0" />
+        <div className="w-12 h-12 sm:w-[72px] sm:h-[72px] rounded-xl bg-gray-200 shrink-0" />
         <div className="flex-1 space-y-2">
           <div className="h-4 w-36 bg-gray-200 rounded" />
           <div className="h-3 w-24 bg-gray-100 rounded" />
@@ -633,8 +643,8 @@ export default function ServiceCategoryPage() {
             <div className="flex-1 min-w-0">
 
               {/* Toolbar */}
-              <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-                <p className="text-[13px] text-gray-500">
+              <div className="mb-4">
+                <p className="text-[13px] text-gray-500 mb-2.5">
                   Showing <span className="font-medium text-gray-800">{providers.length}</span> providers
                   {activeSubCat && (
                     <> for <span className="font-medium text-gray-800">
@@ -643,7 +653,7 @@ export default function ServiceCategoryPage() {
                   )}
                 </p>
 
-                <div className="flex items-center gap-2 w-full sm:w-auto">
+                <div className="flex items-center gap-2">
                   <div className="relative hidden md:block">
                     <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
                     <input
@@ -657,17 +667,18 @@ export default function ServiceCategoryPage() {
                   {/* Mobile filter trigger */}
                   <button
                     onClick={() => setMobileFilterOpen(true)}
-                    className="lg:hidden flex items-center gap-1 text-[12px] border border-gray-200 rounded-lg px-2.5 py-1.5 bg-white text-gray-700"
+                    className="lg:hidden flex items-center justify-center gap-1.5 text-[12px] font-medium border border-gray-200 rounded-lg px-3 py-2 bg-white text-gray-700 shrink-0"
                   >
-                    Filters
+                    <SlidersHorizontal className="h-3.5 w-3.5" />
+                    <span className="hidden xs:inline">Filters</span>
                   </button>
 
-                  <div className="flex items-center gap-1 flex-1 sm:flex-initial">
-                    <span className="hidden sm:inline text-[12px] text-gray-500 mr-1">Sort by:</span>
+                  <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                    <span className="hidden sm:inline text-[12px] text-gray-500 shrink-0">Sort by:</span>
                     <select
                       value={filters.sort}
                       onChange={e => setFilters({ ...filters, sort: e.target.value })}
-                      className="text-[12px] border border-gray-200 rounded-lg px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:border-blue-400 flex-1 sm:flex-initial"
+                      className="text-[12px] border border-gray-200 rounded-lg pl-2 pr-6 py-2 bg-white text-gray-700 focus:outline-none focus:border-blue-400 w-full min-w-0"
                     >
                       {SORT_OPTIONS.map(o => (
                         <option key={o.value} value={o.value}>{o.label}</option>
@@ -678,12 +689,12 @@ export default function ServiceCategoryPage() {
                   <div className="flex border border-gray-200 rounded-lg overflow-hidden shrink-0">
                     <button
                       onClick={() => setViewMode('grid')}
-                      className={`p-1.5 ${viewMode === 'grid' ? 'bg-gray-100 text-gray-800' : 'text-gray-400 hover:text-gray-600'}`}>
+                      className={`p-2 ${viewMode === 'grid' ? 'bg-gray-100 text-gray-800' : 'text-gray-400 hover:text-gray-600'}`}>
                       <Grid3X3 className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => setViewMode('list')}
-                      className={`p-1.5 ${viewMode === 'list' ? 'bg-gray-100 text-gray-800' : 'text-gray-400 hover:text-gray-600'}`}>
+                      className={`p-2 ${viewMode === 'list' ? 'bg-gray-100 text-gray-800' : 'text-gray-400 hover:text-gray-600'}`}>
                       <List className="h-4 w-4" />
                     </button>
                   </div>
@@ -692,7 +703,7 @@ export default function ServiceCategoryPage() {
 
               {/* Cards */}
               <div className={viewMode === 'list'
-                ? 'space-y-3'
+                ? 'space-y-3 sm:space-y-3'
                 : 'grid grid-cols-1 sm:grid-cols-2 gap-3'
               }>
                 {showSkeleton
