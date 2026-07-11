@@ -18,6 +18,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useProfileShare } from '@/hooks/useProfileShare';
+import { SignOutDialog } from '@/components/SignOutDialog';
 import { cn } from '@/lib/utils';
 
 type SettingsSection = 'account' | 'profile' | 'privacy' | 'notifications' | 'preferences' | 'support';
@@ -33,10 +34,11 @@ const sectionConfig = {
 
 export default function Settings() {
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const { data: userRole } = useUserRole(user?.id);
   const isMobile = useIsMobile();
   const [activeSection, setActiveSection] = useState<SettingsSection>('account');
+  const [showSignOutDialog, setShowSignOutDialog] = useState(false);
 
   // Notification toggles (placeholder state)
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -49,11 +51,6 @@ export default function Settings() {
 
   // Profile language
   const [profileLanguage, setProfileLanguage] = useState('en');
-
-  const handleLogout = async () => {
-    await signOut();
-    navigate('/');
-  };
 
   const getRoleLabel = (role: string | undefined) => {
     switch (role) {
@@ -137,7 +134,7 @@ export default function Settings() {
           <Button 
             variant="outline" 
             className="w-full justify-start text-foreground"
-            onClick={handleLogout}
+            onClick={() => setShowSignOutDialog(true)}
           >
             <LogOut className="h-4 w-4 mr-3" />
             Sign out
@@ -601,6 +598,7 @@ export default function Settings() {
           </div>
         </div>
       </div>
+      <SignOutDialog open={showSignOutDialog} onOpenChange={setShowSignOutDialog} />
     </div>
   );
 }

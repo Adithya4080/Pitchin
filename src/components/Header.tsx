@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Input } from '@/components/ui/input';
 import { NotificationList } from './NotificationList';
 import { CreatePitchModal } from './CreatePitchModal';
+import { SignOutDialog } from './SignOutDialog';
 import { useAuth } from '@/hooks/useAuth';
 import { useUnreadCount } from '@/hooks/useNotifications';
 import { useUserActivePitch } from '@/hooks/usePitches';
@@ -20,10 +21,7 @@ export function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const isFeedPage = location.pathname === '/feed';
-  const {
-    user,
-    signOut
-  } = useAuth();
+  const { user } = useAuth();
   const {
     data: unreadCount = 0
   } = useUnreadCount();
@@ -32,6 +30,7 @@ export function Header() {
   } = useUserActivePitch();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [showSignOutDialog, setShowSignOutDialog] = useState(false);
 
   // Shared with FeedLeftSidebar.tsx (same ['my-profile', user?.id]
   // queryKey) — avoids fetching two separate profile endpoints for the
@@ -41,10 +40,6 @@ export function Header() {
   const displayName = profile?.full_name || user?.full_name || user?.email || '?';
   const avatarUrl = profile?.avatar || user?.avatar_url;
   const initials = displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
-  };
   const actions = (
     <>
       <Button
@@ -115,7 +110,7 @@ export function Header() {
                 {user.email === 'pitchin.admn@gmail.com' ? 'Admin Panel' : 'My Pitches'}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
+              <DropdownMenuItem onClick={() => setShowSignOutDialog(true)} className="text-destructive">
                 <LogOut className="mr-2 h-4 w-4" />
                 Sign out
               </DropdownMenuItem>
@@ -199,6 +194,7 @@ export function Header() {
       </header>
 
       <CreatePitchModal open={showCreateModal} onOpenChange={setShowCreateModal} />
+      <SignOutDialog open={showSignOutDialog} onOpenChange={setShowSignOutDialog} />
       
       {/* Tutorial Overlay */}
     </>

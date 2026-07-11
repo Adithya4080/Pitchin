@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useUnreadCount } from '@/hooks/useNotifications';
 import { Switch } from '@/components/ui/switch';
+import { SignOutDialog } from '@/components/SignOutDialog';
 
 const DISCOVER_NAV = [
   { label: 'Services',      icon: Briefcase,    path: '/network/services', sub: 'Find the right services' },
@@ -78,19 +79,14 @@ interface AppMenuDrawerProps {
   trigger: React.ReactNode;
 }
 
-/**
- * Shared slide-in menu drawer — same panel/backdrop animation and Discover
- * / My Space nav content that used to live only in the Network page's own
- * hamburger, now available everywhere via the header hamburger. Also keeps
- * the Logout + Dark Mode footer that used to live in MobileSidebar.
- */
 export function AppMenuDrawer({ trigger }: AppMenuDrawerProps) {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const { theme, setTheme } = useTheme();
   const { data: unreadCount = 0 } = useUnreadCount();
+  const [showSignOutDialog, setShowSignOutDialog] = useState(false);
 
   const isActive = (path: string) => {
     if (path === '/network/services') return location.pathname.startsWith('/network/services');
@@ -101,10 +97,9 @@ export function AppMenuDrawer({ trigger }: AppMenuDrawerProps) {
 
   const close = () => setOpen(false);
 
-  const handleSignOut = async () => {
+  const handleSignOutClick = () => {
     close();
-    await signOut();
-    navigate('/');
+    setShowSignOutDialog(true);
   };
 
   useEffect(() => {
@@ -183,7 +178,7 @@ export function AppMenuDrawer({ trigger }: AppMenuDrawerProps) {
             <div className="p-3 space-y-1 border-t border-gray-100 shrink-0">
               {user && (
                 <button
-                  onClick={handleSignOut}
+                  onClick={handleSignOutClick}
                   className="w-full flex items-center gap-3 h-11 px-3 rounded-xl text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors touch-manipulation"
                 >
                   <LogOut className="h-5 w-5 shrink-0" />
@@ -206,6 +201,7 @@ export function AppMenuDrawer({ trigger }: AppMenuDrawerProps) {
         </>,
         document.body
       )}
+      <SignOutDialog open={showSignOutDialog} onOpenChange={setShowSignOutDialog} />
     </>
   );
 }
