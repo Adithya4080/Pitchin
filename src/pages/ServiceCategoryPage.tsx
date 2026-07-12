@@ -366,13 +366,13 @@ function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProv
   };
 
   return (
-    <div style={{ perspective: '900px' }}>
+    <div style={{ perspective: '900px' }} className="sm:h-[156px]">
       <div
         ref={cardRef}
         onMouseMove={handleMouseMove}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={handleMouseLeave}
-        className="relative bg-white rounded-xl overflow-hidden"
+        className="relative bg-white rounded-xl overflow-hidden sm:h-[156px]"
         style={{
           border: '1px solid #e5e7eb',
           // transform: hovered
@@ -400,29 +400,29 @@ function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProv
 
         <div className="h-px w-full bg-gray-200" />
 
-        <div className="p-4 sm:p-5">
+        <div className="p-4 sm:p-5 sm:h-full sm:flex sm:flex-col sm:justify-center">
 
           {/* Top block: logo + name/rating/tags/meta, price + buttons pinned right on desktop */}
           <div className="flex gap-3 sm:gap-4">
             <ProviderLogo name={provider.name} logoUrl={provider.logo_url} />
 
             <div className="flex-1 min-w-0">
-              {/* Name row */}
+              {/* Name row — name, verified badge, and Top Rated all in one line */}
               <div className="flex items-center gap-1.5 flex-wrap">
-                <h3 className="text-[14px] font-semibold text-gray-900 leading-snug">
+                <h3 className="text-[14px] font-semibold text-gray-900 leading-snug truncate max-w-[180px]">
                   {provider.name}
                 </h3>
                 {provider.is_verified && <VerifiedBadge />}
+                {provider.is_top_rated && (
+                  <span className="shrink-0 text-[10px] font-semibold px-2 py-0.5 bg-orange-50 text-orange-500 border border-orange-200 rounded-full">
+                    Top Rated
+                  </span>
+                )}
               </div>
-              {provider.is_top_rated && (
-                <span className="inline-block mt-1.5 text-[10px] font-semibold px-2 py-0.5 bg-orange-50 text-orange-500 border border-orange-200 rounded-full">
-                  Top Rated
-                </span>
-              )}
 
               {/* Rating row */}
               {Number(provider.rating) > 0 && (
-                <div className="flex items-center whitespace-nowrap gap-1.5 mt-1.5">
+                <div className="flex items-center whitespace-nowrap gap-1.5 mt-1">
                   <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
                   <span className="text-[12px] font-medium text-gray-700">{provider.rating}</span>
                   <span className="text-[12px] text-gray-400">({provider.review_count} reviews)</span>
@@ -431,12 +431,12 @@ function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProv
 
               {/* Tagline */}
               {provider.tagline && (
-                <p className="hidden sm:block text-[12px] text-gray-500 mt-2 leading-relaxed line-clamp-2">{provider.tagline}</p>
+                <p className="hidden sm:block text-[12px] text-gray-500 mt-1 leading-relaxed truncate">{provider.tagline}</p>
               )}
 
               {/* Service tags */}
               {provider.tags?.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mt-2.5">
+                <div className="flex flex-wrap gap-1.5 mt-1.5">
                   {provider.tags.slice(0, 2).map(tag => (
                     <span key={tag} className="text-[11px] px-2.5 py-[3px] bg-gray-100 text-gray-600 border border-gray-200 rounded-full">
                       {tag}
@@ -461,7 +461,7 @@ function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProv
               )}
 
               {/* Meta row */}
-              <div className="hidden sm:flex flex-wrap items-center gap-x-3 gap-y-1.5 mt-3">
+              <div className="hidden sm:flex flex-wrap items-center gap-x-3 gap-y-1.5 mt-1.5">
                 {provider.stage_focus_label && (
                   <span className="inline-flex items-center gap-1 text-[11px] text-gray-500">
                     <Users className="h-3 w-3" />{provider.stage_focus_label}
@@ -537,7 +537,7 @@ function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProv
 
 function CardSkeleton() {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 animate-pulse">
+    <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 animate-pulse sm:h-[156px]">
       <div className="flex gap-3 sm:gap-4">
         <div className="w-12 h-12 sm:w-[72px] sm:h-[72px] rounded-xl bg-gray-200 shrink-0" />
         <div className="flex-1 space-y-2">
@@ -703,8 +703,8 @@ export default function ServiceCategoryPage() {
 
               {/* Cards */}
               <div className={viewMode === 'list'
-                ? 'space-y-3 sm:space-y-3'
-                : 'grid grid-cols-1 sm:grid-cols-2 gap-3'
+                ? 'space-y-0'
+                : 'grid grid-cols-1 sm:grid-cols-2 gap-'
               }>
                 {showSkeleton
                   ? Array.from({ length: 3 }).map((_, i) => <CardSkeleton key={i} />)
