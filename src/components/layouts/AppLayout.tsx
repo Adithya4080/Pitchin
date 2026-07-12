@@ -1,5 +1,4 @@
 import { Header } from '@/components/Header';
-import { MobileHeader } from '@/components/mobile/MobileHeader';
 import { MobileSearchHeader } from '@/components/mobile/MobileSearchHeader';
 import { BottomNavigation } from '@/components/mobile/BottomNavigation';
 
@@ -17,10 +16,8 @@ interface AppLayoutProps {
 export function AppLayout({
   children,
   title,
-  showMobileHeader = false,
   showDesktopHeader = true,
   showBottomNav = true,
-  mobileHeaderVariant = 'default',
 }: AppLayoutProps) {
   return (
     <div className="min-h-screen bg-background">
@@ -32,11 +29,7 @@ export function AppLayout({
       )}
 
       {/* Mobile Header */}
-      {showMobileHeader && (
-        mobileHeaderVariant === 'search'
-          ? <MobileSearchHeader />
-          : <MobileHeader title={title} />
-      )}
+      {<MobileSearchHeader />}
 
       {/* Main Content */}
       <main className={`md:pt-16 min-h-screen ${showBottomNav ? "pb-20 md:pb-0" : ""}`}>
