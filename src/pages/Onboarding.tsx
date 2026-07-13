@@ -39,7 +39,7 @@ const roles: {
     description: 'I have ideas and want to share them with the world',
     icon: <Lightbulb className="h-5 w-5" />,
     color: 'bg-amber-50 text-amber-700',
-    available: false,
+    available: true,
   },
   {
     id: 'investor',
