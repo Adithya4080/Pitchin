@@ -42,7 +42,7 @@ const roles: {
     title: 'Innovator',
     description: 'I have ideas and want to share them with the world',
     color: 'bg-amber-50 text-amber-700',
-    available: true,
+    available: false,
   },
   {
     id: 'investor',
