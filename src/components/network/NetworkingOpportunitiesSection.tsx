@@ -307,21 +307,21 @@ export function NetworkingOpportunitiesSection() {
   };
 
   return (
-    <section>
-      <div className="flex items-start justify-between mb-4">
+    <section className="bg-white border border-gray-200 rounded-2xl p-5 md:p-6">
+      <div className="flex items-start justify-between mb-3">
         <div>
-          <h2 className="text-lg md:text-xl font-bold text-foreground">
+          <h2 className="text-[17px] font-bold text-gray-900">
             Networking &amp; Opportunities
           </h2>
-          <p className="text-sm text-foreground/55 mt-0.5">
+          <p className="text-[13px] text-gray-400 mt-0.5">
             Connect with investors, mentors, partners and explore opportunities.
           </p>
         </div>
         <Link
           to="/network"
-          className="hidden md:inline-flex items-center gap-1.5 text-sm font-medium text-foreground border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition-colors shrink-0 mt-1"
+          className="hidden md:inline-flex items-center gap-1 text-[13px] font-semibold text-blue-600 hover:text-blue-500 transition-colors shrink-0 mt-1"
         >
-          View all networking <ArrowRight className="h-4 w-4" />
+          View all networking <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
 
@@ -339,29 +339,31 @@ export function NetworkingOpportunitiesSection() {
       </div>
 
       {/* No live data source — useNetworkDiscover has been removed. Section
-          renders in a static locked/"coming soon" state behind the blur overlay. */}
+          renders in a static locked/"coming soon" state. */}
       <div className="relative">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 min-h-[160px]">
-          <div className="col-span-full flex flex-col items-center gap-2 py-10 text-center">
-            <Globe className="h-8 w-8 text-gray-300" />
-            <p className="text-sm text-gray-400">
-              {TABS.find((t) => t.key === activeTab)?.label} coming soon.
+        <div className="grid grid-cols-1 min-h-[200px] rounded-xl border border-dashed border-gray-200 bg-gray-50/60">
+          <div className="flex flex-col items-center justify-center gap-3 py-12 text-center px-4">
+            <span className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-blue-50">
+              <Globe className="h-6 w-6 text-blue-500" />
+            </span>
+            <p className="text-[15px] font-semibold text-gray-700">
+              {TABS.find((t) => t.key === activeTab)?.label} coming soon
             </p>
-            <p className="text-xs text-gray-300">Check back soon — this section is launching shortly.</p>
+            <p className="text-sm text-gray-500 max-w-xs">Check back soon — this section is launching shortly.</p>
           </div>
         </div>
 
-        <div className="absolute inset-0 bg-white/20 backdrop-blur-[1px] rounded-xl z-30 cursor-not-allowed" />
+        <div className="absolute inset-0 rounded-xl z-30 cursor-not-allowed" />
       </div>
 
       <DotPagination total={1} current={1} onChange={() => {}} />
 
-      <div className="flex md:hidden justify-center mt-4">
+      <div className="flex md:hidden items-center justify-center mt-5">
         <Link
           to="/network"
-          className="inline-flex items-center gap-1 text-[13px] font-medium text-blue-600 hover:text-blue-500 transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-500 transition-colors"
         >
-          View all networking <ArrowRight className="h-3.5 w-3.5" />
+          View all networking <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
     </section>
