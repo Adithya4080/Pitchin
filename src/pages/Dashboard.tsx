@@ -182,6 +182,8 @@ export default function Dashboard() {
   const role = (profile as any)?.role || (user as any)?.role || null;
   const roleProfile = profile ?? null;
 
+  
+
   // Update role profile data when loaded - ensure team_members is always an array
   // (moved below the roleProfile declaration above — it depends on it)
   useEffect(() => {
@@ -801,14 +803,6 @@ export default function Dashboard() {
                 portfolioUrl={portfolioUrl}
                 contactEmail={contactEmail}
               />
-
-              {/* Role Section (Skills & Portfolio) in View Mode */}
-              {role && (
-                <div className="space-y-2">
-                  <h3 className="text-sm font-semibold text-foreground px-1">{getRoleTabLabel()}</h3>
-                  {renderRoleSection(false)}
-                </div>
-              )}
 
               {/* Profile Strength Card - only for owner */}
               <ProfileStrengthCard

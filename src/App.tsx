@@ -33,6 +33,8 @@ const NetworkServices = lazy(() => import("./pages/NetworkServices"));
 const ServiceCategoryPage = lazy(() => import("./pages/ServiceCategoryPage"));
 const ProviderDetail = lazy(() => import("./pages/ProviderDetail"));
 const ProviderDashboard = lazy(() => import("./pages/ProviderDashboard"));
+const Terms = lazy(() => import("./pages/Terms"))
+const Privacy = lazy(() => import("./pages/Privacy"))
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -70,6 +72,8 @@ const App = () => (
 							<Route path="/admin" element={<Admin />} />
 							<Route path="/reset-password" element={<ResetPassword />} />
 							<Route path="/shared/:userId" element={<SharedProfile />} />
+							<Route path="/terms" element={<Terms />} />
+							<Route path="/privacy" element={<Privacy />} />
 							<Route path="/shared/:userId/pitch/:pitchId" element={<SharedPitchDetail />} />
 							{/* <Route element={<ProtectedRoute />}> */}
 								<Route path="/" element={<Index />} />
