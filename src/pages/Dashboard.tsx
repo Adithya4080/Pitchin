@@ -182,6 +182,8 @@ export default function Dashboard() {
   const role = (profile as any)?.role || (user as any)?.role || null;
   const roleProfile = profile ?? null;
 
+  
+
   // Update role profile data when loaded - ensure team_members is always an array
   // (moved below the roleProfile declaration above — it depends on it)
   useEffect(() => {
