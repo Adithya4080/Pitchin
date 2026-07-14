@@ -107,7 +107,7 @@ function ProfilePitchSectionWrapper({
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { user, loading: authLoading, isOnboarded, isOnboardingChecked } = useAuth();
+  const { user, loading: authLoading, isOnboarded, isOnboardingChecked, refreshUser } = useAuth();
   const queryClient = useQueryClient();
   const isMobile = useIsMobile();
 
@@ -371,13 +371,25 @@ export default function Dashboard() {
         ...(!avatarFile && avatarPreview === null ? { avatar: null } : {}),
         ...(!bannerFile && bannerPreview === null ? { banner: null } : {}),
       } as any);
-
-      // Save role-specific profile if data exists
       if (roleProfileData && role) {
-        await saveRoleProfile.mutateAsync(roleProfileData);
+        const {
+          user_name,
+          bio: _roleBio,
+          location: _roleLocation,
+          contact_email,
+          linkedin,
+          twitter,
+          website,
+          avatar,
+          banner,
+          ...roleOnlyData
+        } = roleProfileData as any;
+
+        await saveRoleProfile.mutateAsync(roleOnlyData);
       }
 
       queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+      await refreshUser();
       toast.success('Profile updated successfully!');
       setAvatarFile(null);
       setBannerFile(null);
@@ -527,7 +539,7 @@ export default function Dashboard() {
     return (
       <AppLayout showBottomNav={true}>
         <MobileProfileView
-          fullName={user?.full_name || 'Your Name'}
+          fullName={fullName || user?.full_name || 'Your Name'}
           email={user?.email}
           avatarUrl={avatarPreview}
           bannerUrl={bannerPreview}
@@ -698,7 +710,7 @@ export default function Dashboard() {
           {/* Profile Header */}
           <ProfileHeader
             userId={String(user?.id) || ''}
-            fullName={user?.full_name || 'Your Name'}
+            fullName={fullName || user?.full_name || 'Your Name'}
             email={user?.email}
             avatarUrl={avatarPreview}
             bannerUrl={bannerPreview}
@@ -801,14 +813,6 @@ export default function Dashboard() {
                 portfolioUrl={portfolioUrl}
                 contactEmail={contactEmail}
               />
-
-              {/* Role Section (Skills & Portfolio) in View Mode */}
-              {role && (
-                <div className="space-y-2">
-                  <h3 className="text-sm font-semibold text-foreground px-1">{getRoleTabLabel()}</h3>
-                  {renderRoleSection(false)}
-                </div>
-              )}
 
               {/* Profile Strength Card - only for owner */}
               <ProfileStrengthCard

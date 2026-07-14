@@ -107,7 +107,7 @@ export function Header() {
                 }}
               >
                 <User className="mr-2 h-4 w-4" />
-                {user.email === 'pitchin.admn@gmail.com' ? 'Admin Panel' : 'My Pitches'}
+                {user.email === 'pitchin.admn@gmail.com' ? 'Admin Panel' : 'Profile'}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => setShowSignOutDialog(true)} className="text-destructive">
