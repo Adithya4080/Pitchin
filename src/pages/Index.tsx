@@ -135,9 +135,9 @@ function DesktopLanding() {
 
               <p className="mt-4 text-sm text-muted-foreground">
                 By signing in, you agree to our{" "}
-                <a href="#" className="underline hover:text-foreground">Terms</a>
+                <a href="/terms" className="underline hover:text-foreground">Terms</a>
                 {" "}and{" "}
-                <a href="#" className="underline hover:text-foreground">Privacy Policy</a>
+                <a href="/privacy" className="underline hover:text-foreground">Privacy Policy</a>
               </p>
             </div>
 

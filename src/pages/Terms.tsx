@@ -220,7 +220,12 @@ const sections: Section[] = [
     body: (
       <p>
         Questions about these Terms? Reach us at{' '}
-        <a href="mailto:hello@pitchin.app" className="text-primary underline underline-offset-2 hover:text-primary/80">hello@pitchin.app</a>{' '}
+        <a
+          href="mailto:hello@pitchin.app"
+          className="text-primary underline underline-offset-2 hover:text-primary/80 break-all sm:break-normal"
+        >
+          hello@pitchin.app
+        </a>{' '}
         or through our <Link to="/contact" className="text-primary underline underline-offset-2 hover:text-primary/80">Contact page</Link>.
       </p>
     ),
@@ -238,6 +243,7 @@ export default function Terms() {
   const navigate = useNavigate();
   const [activeId, setActiveId] = useState<string>(sections[0].id);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+  const mobileNavRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -267,6 +273,26 @@ export default function Terms() {
     };
   }, []);
 
+  // Keep the active chip in the mobile jump menu scrolled into view as the
+  // user scrolls the page, so the horizontally-scrolling strip tracks progress.
+  // IMPORTANT: this must only adjust the strip's own horizontal scroll — never
+  // scrollIntoView() on the button, since the strip scrolls away with the page
+  // (it isn't sticky) and scrollIntoView would drag the whole window back up
+  // to make it visible again, fighting the user's scroll.
+  useEffect(() => {
+    const container = mobileNavRef.current;
+    if (!container) return;
+    const activeButton = container.querySelector<HTMLButtonElement>(
+      `[data-section-id="${activeId}"]`
+    );
+    if (!activeButton) return;
+    const containerRect = container.getBoundingClientRect();
+    const buttonRect = activeButton.getBoundingClientRect();
+    const delta =
+      buttonRect.left - containerRect.left - (containerRect.width - buttonRect.width) / 2;
+    container.scrollBy({ left: delta, behavior: 'smooth' });
+  }, [activeId]);
+
   const jumpTo = (id: string) => {
     sectionRefs.current[id]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
@@ -274,7 +300,7 @@ export default function Terms() {
   const activeIndex = useMemo(() => sections.findIndex((s) => s.id === activeId), [activeId]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen w-full bg-background">
       {/* Hero */}
       <div className="relative overflow-hidden border-b border-border">
         <div
@@ -284,10 +310,10 @@ export default function Terms() {
               'radial-gradient(circle at 15% 20%, hsl(var(--primary) / 0.18), transparent 45%), radial-gradient(circle at 85% 0%, hsl(var(--primary) / 0.12), transparent 40%)',
           }}
         />
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-6 pb-10 sm:pt-8 sm:pb-14">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-5 pb-8 sm:pt-8 sm:pb-14">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-1 text-sm text-muted-foreground mb-8 touch-manipulation hover:text-foreground transition-colors"
+            className="flex items-center gap-1 text-sm text-muted-foreground mb-6 sm:mb-8 touch-manipulation hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             Back
@@ -298,11 +324,11 @@ export default function Terms() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
           >
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 text-primary text-xs font-medium px-3 py-1 mb-5">
-              <ScrollText className="h-3.5 w-3.5" />
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 text-primary text-xs font-medium px-3 py-1 mb-4 sm:mb-5">
+              <ScrollText className="h-3.5 w-3.5 shrink-0" />
               Legal · Terms of Service
             </span>
-            <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-3 leading-tight">
+            <h1 className="font-display text-2xl xs:text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-3 leading-tight">
               The agreement between<br className="hidden sm:block" /> you and Pitchin
             </h1>
             <p className="text-muted-foreground text-sm sm:text-base max-w-xl mb-1">
@@ -316,7 +342,7 @@ export default function Terms() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
-            className="mt-8 grid sm:grid-cols-2 gap-2.5"
+            className="mt-7 sm:mt-8 grid grid-cols-1 sm:grid-cols-2 gap-2.5"
           >
             {highlights.map((h, i) => (
               <div
@@ -332,10 +358,10 @@ export default function Terms() {
       </div>
 
       {/* Body */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 grid md:grid-cols-[180px_1fr] lg:grid-cols-[220px_1fr] gap-6 md:gap-8 lg:gap-10">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10 grid grid-cols-1 md:grid-cols-[180px_1fr] lg:grid-cols-[220px_1fr] gap-6 md:gap-8 lg:gap-10">
         {/* Sticky nav — tablet & desktop */}
         <nav className="hidden md:block">
-          <div className="sticky top-8">
+          <div className="sticky top-8 max-h-[calc(100vh-4rem)] overflow-y-auto pr-1">
             <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground/70 mb-3 px-1">
               On this page
             </p>
@@ -362,7 +388,7 @@ export default function Terms() {
               })}
             </ol>
             <div className="mt-6 pl-4">
-              <div className="h-1 rounded-full bg-muted overflow-hidden w-32">
+              <div className="h-1 rounded-full bg-muted overflow-hidden w-full max-w-32">
                 <div
                   className="h-full bg-primary rounded-full transition-all duration-300"
                   style={{ width: `${((activeIndex + 1) / sections.length) * 100}%` }}
@@ -373,13 +399,17 @@ export default function Terms() {
         </nav>
 
         {/* Mobile jump menu */}
-        <div className="md:hidden -mt-2 mb-2">
-          <div className="flex gap-2 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch] [scrollbar-width:none]">
+        <div className="md:hidden -mt-2 mb-2 relative">
+          <div
+            ref={mobileNavRef}
+            className="flex gap-2 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
             {sections.map((s) => (
               <button
                 key={s.id}
+                data-section-id={s.id}
                 onClick={() => jumpTo(s.id)}
-                className={`shrink-0 text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                className={`shrink-0 whitespace-nowrap text-xs px-3 py-1.5 rounded-full border transition-colors touch-manipulation ${
                   s.id === activeId
                     ? 'bg-primary text-primary-foreground border-primary'
                     : 'bg-card text-muted-foreground border-border'
@@ -389,10 +419,12 @@ export default function Terms() {
               </button>
             ))}
           </div>
+          {/* Edge fade to hint there's more to scroll */}
+          <div className="pointer-events-none absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-background to-transparent" />
         </div>
 
         {/* Sections */}
-        <div className="space-y-3">
+        <div className="space-y-3 min-w-0">
           <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
             Welcome to Pitchin. These Terms of Service ("Terms") govern your access to and use of
             the Pitchin website, mobile experience, and related services (together, the
@@ -412,20 +444,20 @@ export default function Terms() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-80px' }}
                 transition={{ duration: 0.35 }}
-                className="scroll-mt-8 rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-card"
+                className="scroll-mt-8 rounded-2xl border border-border bg-card p-4 sm:p-5 lg:p-6 shadow-card"
               >
                 <div className="flex items-center gap-3 mb-3">
                   <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                     <Icon className="h-[18px] w-[18px] text-primary" />
                   </div>
-                  <h2 className="font-display text-lg sm:text-xl font-bold text-foreground">
+                  <h2 className="font-display text-base sm:text-lg lg:text-xl font-bold text-foreground">
                     <span className="text-muted-foreground/50 font-sans font-medium text-sm mr-2 tabular-nums">
                       {String(i + 1).padStart(2, '0')}
                     </span>
                     {s.title}
                   </h2>
                 </div>
-                <div className="prose prose-sm sm:prose-base dark:prose-invert max-w-none prose-p:text-muted-foreground prose-li:text-muted-foreground prose-p:leading-relaxed prose-li:leading-relaxed">
+                <div className="prose prose-sm sm:prose-base dark:prose-invert max-w-none prose-p:text-muted-foreground prose-li:text-muted-foreground prose-p:leading-relaxed prose-li:leading-relaxed break-words">
                   {s.body}
                 </div>
               </motion.section>
