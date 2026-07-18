@@ -61,7 +61,7 @@ const quickActions: QuickAction[] = [
   { icon: SlidersHorizontal, label: 'Update your info', description: 'Edit profile & account details', ref: '§5', to: '/settings' },
   { icon: Share2, label: 'Control sharing', description: 'Turn public links on or off', ref: '§5', to: '/settings' },
   { icon: Bell, label: 'Manage notifications', description: 'Choose what we email you', ref: '§5', to: '/settings' },
-  { icon: Trash2, label: 'Delete your data', description: 'Request full account deletion', ref: '§5', href: 'mailto:hello@pitchin.app' },
+  { icon: Trash2, label: 'Delete your data', description: 'Request full account deletion', ref: '§5', href: 'mailto:pitche.saas@gmail.com' },
 ];
 
 interface Section {
@@ -154,7 +154,7 @@ const sections: Section[] = [
       <ul>
         <li><strong>Access &amp; update:</strong> edit most of your info directly from Dashboard and Settings.</li>
         <li><strong>Sharing controls:</strong> turn a public share link on or off whenever you like.</li>
-        <li><strong>Deletion:</strong> email <a href="mailto:hello@pitchin.app" className="text-primary underline underline-offset-2 hover:text-primary/80">hello@pitchin.app</a> to have your account and data deleted or anonymized, except where we're legally required to keep it.</li>
+        <li><strong>Deletion:</strong> email <a href="mailto:pitche.saas@gmail.com" className="text-primary underline underline-offset-2 hover:text-primary/80">pitche.saas@gmail.com</a> to have your account and data deleted or anonymized, except where we're legally required to keep it.</li>
         <li><strong>Communications:</strong> manage notification preferences in Settings.</li>
       </ul>
     ),
@@ -216,7 +216,7 @@ const sections: Section[] = [
     body: (
       <p>
         Questions about this Policy or your data? Reach us at{' '}
-        <a href="mailto:hello@pitchin.app" className="text-primary underline underline-offset-2 hover:text-primary/80">hello@pitchin.app</a>{' '}
+        <a href="mailto:pitche.saas@gmail.com" className="text-primary underline underline-offset-2 hover:text-primary/80">pitche.saas@gmail.com</a>{' '}
         or through our <Link to="/contact" className="text-primary underline underline-offset-2 hover:text-primary/80">Contact page</Link>.
       </p>
     ),

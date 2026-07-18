@@ -33,7 +33,7 @@ const sections: Section[] = [
   {
     id: 'who-can-use',
     icon: UserCheck,
-    title: 'Who can use Pitchin',
+    title: 'Who can use Pichin',
     body: (
       <p>
         You must be at least 18 years old, or the age of legal majority in your jurisdiction, to
@@ -56,12 +56,12 @@ const sections: Section[] = [
     ),
   },
   {
-    id: 'using-pitchin',
+    id: 'using-Pichin',
     icon: LayoutGrid,
-    title: 'What you can do on Pitchin',
+    title: 'What you can do on Pichin',
     body: (
       <p>
-        Pitchin lets you build a profile, publish pitches, discover startups, investors, and
+        Pichin lets you build a profile, publish pitches, discover startups, investors, and
         service providers, message other members, and share parts of your profile or pitch
         publicly via a shareable link. Some of these features — including generating a public
         shareable dashboard — are part of a paid Pro tier.
@@ -77,7 +77,7 @@ const sections: Section[] = [
         <p>
           You retain ownership of the content you post — profile details, pitch decks, pitch
           descriptions, media, and messages ("Your Content"). By posting Your Content, you grant
-          Pitchin a worldwide, non-exclusive, royalty-free license to host, store, reproduce, and
+          Pichin a worldwide, non-exclusive, royalty-free license to host, store, reproduce, and
           display it solely to operate and improve the Platform, and, where you choose to make it
           public (for example via a shared profile or pitch link), to make it viewable by anyone
           with that link.
@@ -102,7 +102,7 @@ const sections: Section[] = [
     title: 'Pitches, deals, and introductions',
     body: (
       <p>
-        Pitchin is a discovery and networking tool that helps startups, investors, and service
+        Pichin is a discovery and networking tool that helps startups, investors, and service
         providers find and message one another. We do not broker, underwrite, or guarantee any
         investment, deal, partnership, or transaction between users, and we're not a party to any
         agreement you reach with another member. Any due diligence, negotiation, or investment
@@ -157,7 +157,7 @@ const sections: Section[] = [
     title: 'Suspension and termination',
     body: (
       <p>
-        You may stop using Pitchin and delete your account at any time from Settings. We may
+        You may stop using Pichin and delete your account at any time from Settings. We may
         suspend or terminate your access if you violate these Terms, misuse the Platform, or if
         required by law, with notice where reasonably practicable.
       </p>
@@ -182,7 +182,7 @@ const sections: Section[] = [
     title: 'Limitation of liability',
     body: (
       <p>
-        To the maximum extent permitted by law, Pitchin and its team will not be liable for any
+        To the maximum extent permitted by law, Pichin and its team will not be liable for any
         indirect, incidental, or consequential damages, or for any loss of profits, data, or
         business opportunities, arising from your use of the Platform or any interaction with
         another user.
@@ -220,7 +220,7 @@ const sections: Section[] = [
     body: (
       <p>
         Questions about these Terms? Reach us at{' '}
-        <a href="mailto:hello@pitchin.app" className="text-primary underline underline-offset-2 hover:text-primary/80">hello@pitchin.app</a>{' '}
+        <a href="mailto:pitche.saas@gmail.com" className="text-primary underline underline-offset-2 hover:text-primary/80">pitche.saas@gmail.com</a>{' '}
         or through our <Link to="/contact" className="text-primary underline underline-offset-2 hover:text-primary/80">Contact page</Link>.
       </p>
     ),
@@ -229,7 +229,7 @@ const sections: Section[] = [
 
 const highlights = [
   "You keep ownership of everything you post — pitches, media, and profile content.",
-  "Pitchin only helps you connect; we're never a party to a deal you make with another member.",
+  "Pichin only helps you connect; we're never a party to a deal you make with another member.",
   "Pro features are billed through Razorpay and are generally non-refundable.",
   'You can delete your account and data from Settings whenever you like.',
 ];
@@ -303,7 +303,7 @@ export default function Terms() {
               Legal · Terms of Service
             </span>
             <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-3 leading-tight">
-              The agreement between<br className="hidden sm:block" /> you and Pitchin
+              The agreement between<br className="hidden sm:block" /> you and Pichin
             </h1>
             <p className="text-muted-foreground text-sm sm:text-base max-w-xl mb-1">
               Plain-language terms for using our startup–investor matchmaking platform.
@@ -321,7 +321,7 @@ export default function Terms() {
             {highlights.map((h, i) => (
               <div
                 key={i}
-                className="flex items-start gap-2.5 rounded-xl bg-card border border-border px-3.5 py-3 shadow-card"
+                className="flex items-center gap-2.5 rounded-xl bg-card border border-border px-3.5 py-3 shadow-card"
               >
                 <span className="mt-0.5 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
                 <span className="text-xs sm:text-[13px] text-foreground/80 leading-relaxed">{h}</span>
@@ -394,9 +394,9 @@ export default function Terms() {
         {/* Sections */}
         <div className="space-y-3">
           <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-            Welcome to Pitchin. These Terms of Service ("Terms") govern your access to and use of
-            the Pitchin website, mobile experience, and related services (together, the
-            "Platform"), operated by the Pitchin team ("Pitchin", "we", "us", or "our"). By
+            Welcome to Pichin. These Terms of Service ("Terms") govern your access to and use of
+            the Pichin website, mobile experience, and related services (together, the
+            "Platform"), operated by the Pichin team ("Pichin", "we", "us", or "our"). By
             creating an account or otherwise using the Platform, you agree to these Terms. If you
             don't agree, please don't use the Platform.
           </p>

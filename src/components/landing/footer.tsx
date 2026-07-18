@@ -57,7 +57,7 @@ export function SiteFooter() {
                 </li>
 
                 <li>
-                  <a href="mailto:hello@pitchin.app">
+                  <a href="mailto:pitche.saas@gmail.com">
                     Contact
                   </a>
                 </li>
