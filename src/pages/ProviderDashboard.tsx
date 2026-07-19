@@ -125,6 +125,7 @@ export default function ProviderDashboard() {
         description: myProvider.description,
         website: myProvider.website,
         location: myProvider.location,
+        contact_email: myProvider.contact_email,
         pricing_type: myProvider.pricing_type,
         starting_price: myProvider.starting_price ?? undefined,
         tags: myProvider.tags,
@@ -140,9 +141,15 @@ export default function ProviderDashboard() {
   const set = <K extends keyof MyProviderInput>(key: K, value: MyProviderInput[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
 
+  const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+
   const handleSave = async () => {
     if (!form.name || !form.category) {
       toast({ title: 'Company name and category are required', variant: 'destructive' });
+      return;
+    }
+    if (!form.contact_email || !isValidEmail(form.contact_email)) {
+      toast({ title: 'A valid notification email is required', description: 'This is where service requests will be sent.', variant: 'destructive' });
       return;
     }
     try {
@@ -386,6 +393,7 @@ export default function ProviderDashboard() {
 
   const completionChecks = [
     !!form.name,
+    !!form.contact_email,
     !!form.tagline,
     !!(form.description && form.description.length > 20),
     !!form.category,
@@ -483,6 +491,22 @@ export default function ProviderDashboard() {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="space-y-1.5">
+                <Label>
+                  Notification email <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  type="email"
+                  value={form.contact_email || ''}
+                  onChange={(e) => set('contact_email', e.target.value)}
+                  placeholder="bookings@yourcompany.com"
+                  className="rounded-lg"
+                  required
+                />
+                <p className="text-xs text-muted-foreground">
+                  Service requests from founders will be sent here — this can be different from your login email.
+                </p>
+              </div>
               <div className="space-y-1.5">
                 <Label>Company / brand name</Label>
                 <Input value={form.name || ''} onChange={(e) => set('name', e.target.value)} placeholder="e.g. Acme Legal Co." className="rounded-lg" />

@@ -61,6 +61,7 @@ export type ServiceProvider = {
   banner_url: string | null;
   website: string;
   location: string;
+  contact_email?: string;
   pricing_type: 'hourly' | 'fixed' | 'retainer' | 'custom';
   starting_price: string | null;
   rating: string;
@@ -166,6 +167,7 @@ export type MyProviderInput = Partial<{
   description: string;
   website: string;
   location: string;
+  contact_email: string;
   pricing_type: 'hourly' | 'fixed' | 'retainer' | 'custom';
   starting_price: number | string;
   tags: string[];
