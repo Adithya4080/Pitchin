@@ -255,6 +255,18 @@ function ProviderAvatar({
   );
 }
 
+// ─── Social Media ─────────────────────────────────────────────────────────────────
+function SocialIcon({ type }: { type: 'instagram' | 'facebook' | 'linkedin' | 'twitter' | 'youtube' }) {
+  const paths: Record<string, JSX.Element> = {
+    instagram: <path d="M12 2.2c3.2 0 3.6 0 4.85.07 3.25.15 4.77 1.69 4.92 4.92.06 1.25.07 1.6.07 4.81 0 3.22 0 3.56-.07 4.81-.15 3.23-1.66 4.77-4.92 4.92-1.25.06-1.6.07-4.85.07-3.2 0-3.6 0-4.85-.07-3.26-.15-4.77-1.7-4.92-4.92-.06-1.25-.07-1.6-.07-4.81 0-3.22 0-3.56.07-4.81.15-3.23 1.67-4.77 4.92-4.92C8.4 2.2 8.8 2.2 12 2.2Zm0 1.8c-3.14 0-3.51 0-4.75.07-2.35.1-3.4 1.18-3.5 3.5C3.7 8.8 3.7 9.16 3.7 12s0 3.2.07 4.43c.1 2.32 1.16 3.4 3.5 3.5C8.5 20 8.86 20 12 20s3.51 0 4.75-.07c2.34-.1 3.4-1.18 3.5-3.5.06-1.24.07-1.6.07-4.43s0-3.2-.07-4.43c-.1-2.32-1.16-3.4-3.5-3.5C15.51 4 15.14 4 12 4Zm0 3.5A4.5 4.5 0 1 1 7.5 12 4.5 4.5 0 0 1 12 7.5Zm0 1.8a2.7 2.7 0 1 0 2.7 2.7A2.7 2.7 0 0 0 12 9.3Zm4.7-2.55a1.05 1.05 0 1 1-1.05-1.05 1.05 1.05 0 0 1 1.05 1.05Z"/>,
+    facebook: <path d="M13.5 21v-8h2.7l.4-3.1h-3.1V8c0-.9.25-1.5 1.55-1.5H16.7V3.7C16.4 3.65 15.4 3.55 14.2 3.55c-2.4 0-4 1.46-4 4.15V9.9H7.5V13h2.7v8Z"/>,
+    linkedin: <path d="M6.94 8.5H3.56V20h3.38ZM5.25 3.2A1.96 1.96 0 1 0 5.28 7.1a1.96 1.96 0 0 0-.03-3.9ZM20.44 20h-3.37v-5.9c0-1.4-.03-3.2-1.95-3.2s-2.25 1.53-2.25 3.1V20H9.5V8.5h3.24v1.57h.05c.45-.85 1.56-1.75 3.2-1.75 3.43 0 4.06 2.25 4.06 5.18Z"/>,
+    twitter: <path d="M17.5 3h3l-6.5 7.4L21.5 21h-6l-4.7-6.1L5.4 21H2.4l7-8-7.4-9h6.1l4.2 5.6Zm-1.05 16.2h1.66L7.6 4.7H5.82Z"/>,
+    youtube: <path d="M21.6 7.2s-.2-1.5-.8-2.15c-.8-.8-1.7-.8-2.1-.85C15.9 4 12 4 12 4h0s-3.9 0-6.7.2c-.4.05-1.3.05-2.1.85C2.6 5.7 2.4 7.2 2.4 7.2S2.2 9 2.2 10.75v1.5c0 1.75.2 3.55.2 3.55s.2 1.5.8 2.15c.8.85 1.85.8 2.3.9 1.7.15 6.5.2 6.5.2s3.9 0 6.7-.2c.4-.05 1.3-.05 2.1-.85.6-.65.8-2.15.8-2.15s.2-1.8.2-3.55v-1.5c0-1.75-.2-3.55-.2-3.55ZM9.95 14.6V8.9l5.4 2.85Z"/>,
+  };
+  return <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">{paths[type]}</svg>;
+}
+
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 function PageSkeleton() {
   return (
@@ -434,13 +446,25 @@ export default function ProviderDetail() {
                   {provider.name}
                 </h1>
                 {provider.is_verified && (
-                  <span style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 4,
-                    fontSize: 11, fontWeight: 600, color: '#2563eb',
-                    background: '#eff6ff', border: '1px solid #bfdbfe',
-                    borderRadius: 20, padding: '3px 10px',
-                  }}>
-                    <BadgeCheck size={12} /> Verified
+                  <span
+                    title="Verified provider"
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                      width: 20, height: 20, borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                      boxShadow: '0 0 0 3px #eff6ff, 0 1px 3px rgba(37,99,235,0.35)',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M20 6 9 17l-5-5"
+                        stroke="#fff"
+                        strokeWidth="3.2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
                   </span>
                 )}
                 {provider.is_top_rated && (
@@ -485,6 +509,45 @@ export default function ProviderDetail() {
                 {provider.startups_served > 0 && (
                   <span style={{ fontSize: 12, color: '#9ca3af' }}>{provider.startups_served}+ startups served</span>
                 )}
+              </div>  
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>             
+                {[
+                  { url: provider.instagram_url, type: 'instagram', label: 'Instagram' },
+                  { url: provider.facebook_url, type: 'facebook', label: 'Facebook' },
+                  { url: provider.linkedin_url, type: 'linkedin', label: 'LinkedIn' },
+                  { url: provider.twitter_url, type: 'twitter', label: 'X (Twitter)' },
+                  { url: provider.youtube_url, type: 'youtube', label: 'YouTube' },
+                ].map((s) => (
+                  <a
+                    key={s.type}
+                    href={s.url || '#'}
+                    target={s.url ? '_blank' : undefined}
+                    rel="noreferrer"
+                    onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
+                      if (!s.url) {
+                        e.preventDefault();
+                        toast.info(`${provider.name} hasn't added their ${s.label} yet.`);
+                      }
+                    }}
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 9,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: '#f9fafb',
+                      border: '1px solid #f0f0f0',
+                      color: '#6b7280',
+                      transition: 'all 0.15s',
+                      cursor: 'pointer',
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = accent; e.currentTarget.style.borderColor = accent + '55'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = '#6b7280'; e.currentTarget.style.borderColor = '#f0f0f0'; }}
+                  >
+                    <SocialIcon type={s.type as any} />
+                  </a>
+                ))}
               </div>
             </div>
 

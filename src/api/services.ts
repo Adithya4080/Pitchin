@@ -59,6 +59,11 @@ export type ServiceProvider = {
   description: string;
   logo_url: string | null;
   banner_url: string | null;
+  instagram_url?: string | null;
+  facebook_url?: string | null;
+  linkedin_url?: string | null;
+  twitter_url?: string | null;
+  youtube_url?: string | null;
   website: string;
   location: string;
   contact_email?: string;
