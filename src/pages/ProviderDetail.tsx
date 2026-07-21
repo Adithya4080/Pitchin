@@ -597,7 +597,7 @@ export default function ProviderDetail() {
             </div>
 
             {/* Trust snapshot */}
-            <TrustSnapshot provider={provider} accent={accent} />
+            {/* <TrustSnapshot provider={provider} accent={accent} /> */}
 
             {/* Expertise / skills */}
             <ExpertiseSection tags={provider.tags} />
@@ -615,7 +615,7 @@ export default function ProviderDetail() {
             <CollaboratorsSection collaborators={provider.collaborators || []} />
 
             {/* How we work */}
-            <ProcessSteps accent={accent} />
+            {/* <ProcessSteps accent={accent} /> */}
 
             {/* Certifications — real verified / top-rated flags only */}
             <CertificationsGrid isVerified={provider.is_verified} isTopRated={provider.is_top_rated} accent={accent} />
