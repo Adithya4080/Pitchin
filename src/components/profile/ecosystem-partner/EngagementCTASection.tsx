@@ -54,7 +54,7 @@ export function EngagementCTASection( {
           )}
           {ctaButton && <div className="w-full [&>button]:w-full">{ctaButton}</div>}
           <p className="text-[10px] text-muted-foreground text-center mt-4">
-            This Ecosystem Partner profile is hosted and curated on Pitchin.
+            This Ecosystem Service Provider profile is hosted and curated on Pitchin.
           </p>
         </div>
       </div>
@@ -70,7 +70,7 @@ export function EngagementCTASection( {
         )}
         {ctaButton}
         <p className="text-xs text-muted-foreground mt-4">
-          This Ecosystem Partner profile is hosted and curated on Pitchin.
+          This Ecosystem Service Provider profile is hosted and curated on Pitchin.
         </p>
       </CardContent>
     </Card>

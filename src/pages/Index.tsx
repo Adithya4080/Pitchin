@@ -11,7 +11,8 @@ import TheProblem from '@/components/landing/the-problem';
 import TheSolution from '@/components/landing/solution';
 import { SiteFooter } from '@/components/landing/footer';
 import Features from '@/components/landing/features';
-import heroIllustration from '@/assets/hero-illustration.webp';
+import heroIllustration from '@/assets/hero-illusration.png';
+import HowItWorks from '@/components/landing/how-it-works';
 
 
 const TUTORIAL_COMPLETED_KEY = 'pitchnet_tutorial_completed';
@@ -74,17 +75,17 @@ function DesktopLanding() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background overflow-hidden">
+    <div className="min-h-screen bg-[#f3f3f3] overflow-hidden">
       <Header />
       {/* Hero Section */}
-        <section className="relative min-h-[600px] overflow-visible">
+        <section className="relative min-h-[600px]  overflow-visible">
           {/* Background */}
           <div className="absolute inset-0 -z-10">
             <div className="absolute top-[10%] left-[10%] h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
             <div className="absolute bottom-[10%] right-[10%] h-96 w-96 rounded-full bg-accent/10 blur-3xl" />
           </div>
 
-          <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between px-6 sm:px-10 lg:px-16 xl:px-24 py-10 lg:py-16 bg-white relative overflow-visible">
+          <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between px-6 sm:px-10 lg:px-16 xl:px-24 py-10 lg:py-16 bg-[#f3f3f3] relative overflow-visible">
             {/* Left Content */}
             <div className="relative z-10 flex w-full max-w-[620px] flex-col justify-center py-8 lg:py-">
               {/* Heading */}
@@ -134,14 +135,14 @@ function DesktopLanding() {
 
               <p className="mt-4 text-sm text-muted-foreground">
                 By signing in, you agree to our{" "}
-                <a href="#" className="underline hover:text-foreground">Terms</a>
+                <a href="/terms" className="underline hover:text-foreground">Terms</a>
                 {" "}and{" "}
-                <a href="#" className="underline hover:text-foreground">Privacy Policy</a>
+                <a href="/privacy" className="underline hover:text-foreground">Privacy Policy</a>
               </p>
             </div>
 
             {/* Right Illustration — original size restored */}
-            <div className="absolute right-[-8%] top-0 w-[65%] lg:w-[58%] xl:w-[55%] h-full flex items-start justify-end pointer-events-none">
+            <div className="absolute right-[-8%] top-0 w-[65%] lg:w-[58%] xl:w-[55%] h-full flex items-start justify-end pointer-events-none ">
               <img
                 src={heroIllustration}
                 alt="Team collaborating on ideas"
@@ -153,6 +154,7 @@ function DesktopLanding() {
                 draggable={false}
                 className="
                   w-full
+                  mt-[-10%]
                   h-auto
                   object-contain
                   max-w-none
@@ -171,7 +173,7 @@ function DesktopLanding() {
           </div>
         </section>
 
-      <section className="py-10 sm:py-14">
+      <section className="relative z-10 bg-background py-10 sm:py-6 ">
         <div className="container">
           <div className="grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-12">
             {[
@@ -200,10 +202,11 @@ function DesktopLanding() {
           </div>
         </div>
       </section>
+        <WhoWeAre />
+        {/* <HowItWorks /> */}
 
       {/* Features */}
       {/* <Features /> */}
-      {/* <WhoWeAre /> */}
 
       {/* The Problem */}
       {/* <TheProblem /> */}

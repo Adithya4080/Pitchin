@@ -58,7 +58,7 @@ export function BottomNavigation() {
   const allItems = [...navItems];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden px-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] pointer-events-none">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden px-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.25rem)] pointer-events-none">
       <div className="liquid-glass pointer-events-auto mx-auto flex max-w-md items-center justify-around rounded-full px-2 py-2">
         {allItems.map((item) => {
           const isActive = location.pathname === item.path;

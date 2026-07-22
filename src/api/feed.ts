@@ -54,7 +54,7 @@ function unwrapPaginated<T>(response: T[] | PaginatedResponse<T>): T[] {
   return Array.isArray(response) ? response : (response.results ?? []);
 }
 
-export async function getFeed(filters?: FeedFilters): Promise<Post[]> {
+function buildFeedQuery(filters?: FeedFilters): string {
   const params = new URLSearchParams();
   if (filters?.post_type) params.set('post_type', filters.post_type);
   if (filters?.author__role) params.set('author__role', filters.author__role);
@@ -62,9 +62,26 @@ export async function getFeed(filters?: FeedFilters): Promise<Post[]> {
   if (filters?.ordering) params.set('ordering', filters.ordering);
   if (filters?.page) params.set('page', String(filters.page));
   params.set('page_size', String(filters?.page_size ?? 10));
-  const query = params.toString() ? `?${params.toString()}` : '';
+  return params.toString() ? `?${params.toString()}` : '';
+}
+
+export async function getFeed(filters?: FeedFilters): Promise<Post[]> {
+  const query = buildFeedQuery(filters);
   const response = await apiFetch<Post[] | PaginatedResponse<Post>>(`/feed/${query}`);
   return unwrapPaginated(response);
+}
+
+// Pagination-aware variant for infinite-scroll: unlike getFeed(), this keeps
+// `next`/`count` around so the caller knows whether another page exists,
+// instead of discarding that info and only ever being able to fetch page 1.
+export async function getFeedPage(filters?: FeedFilters): Promise<PaginatedResponse<Post>> {
+  const query = buildFeedQuery(filters);
+  const response = await apiFetch<Post[] | PaginatedResponse<Post>>(`/feed/${query}`);
+  if (Array.isArray(response)) {
+    // Defensive fallback in case pagination is ever disabled server-side.
+    return { count: response.length, next: null, previous: null, results: response };
+  }
+  return response;
 }
 
 export async function createPost(data: {

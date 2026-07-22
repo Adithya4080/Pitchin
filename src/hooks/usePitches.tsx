@@ -1,8 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from './useAuth';
 import { useToast } from '@/hooks/use-toast';
 import {
   getFeed,
+  getFeedPage,
   createPost,
   deletePost,
   likePost,
@@ -58,16 +59,76 @@ export function usePitches(
   });
 }
 
+const FEED_PAGE_SIZE = 10;
+
+// Infinite-scroll version of usePitches: fetches one page (10 posts) at a
+// time via DRF's page-number pagination instead of loading everything
+// up front. Call fetchNextPage() (e.g. from an IntersectionObserver
+// sentinel) to pull in the next page; `hasNextPage` reflects the
+// backend's `next` field so we stop once there's nothing left to load.
+export function useInfinitePitches(
+  sortBy: 'newest' | 'trending' = 'newest',
+  category?: string,
+) {
+  const { user } = useAuth();
+  const query = useInfiniteQuery({
+    queryKey: ['pitches-infinite', sortBy, category, user?.id],
+    queryFn: async ({ pageParam }) => {
+      const ordering = sortBy === 'trending' ? '-like_count' : '-created_at';
+      const page = await getFeedPage({
+        post_type: category,
+        ordering,
+        page: pageParam,
+        page_size: FEED_PAGE_SIZE,
+      });
+      return {
+        ...page,
+        results: page.results.map(adaptPost),
+      };
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.next ? allPages.length + 1 : undefined,
+    enabled: !!user,
+  });
+
+  const pitches = query.data?.pages.flatMap((p) => p.results) ?? [];
+
+  return { ...query, pitches };
+}
+
 export function useUserActivePitch() {
   const { user } = useAuth();
   return useQuery({
-    queryKey: ['user-active-pitch', user?.id],
-    queryFn: async (): Promise<PitchWithProfile | null> => {
-      if (!user) return null;
-      const posts = await getMyPosts();
-      return posts.length ? adaptPost(posts[0]) : null;
+    // Shared cache key with useMyPostsStats() below — both derive from the
+    // same underlying "my posts" list instead of each firing their own
+    // GET /api/feed/my/ request.
+    queryKey: ['my-posts', user?.id],
+    queryFn: async (): Promise<Post[]> => {
+      if (!user) return [];
+      return getMyPosts();
     },
     enabled: !!user,
+    select: (posts): PitchWithProfile | null =>
+      posts.length ? adaptPost(posts[0]) : null,
+  });
+}
+
+export function useMyPostsStats() {
+  const { user } = useAuth();
+  return useQuery({
+    // Same queryKey/queryFn as useUserActivePitch() — React Query dedupes
+    // these into a single network request and shares the cached result.
+    queryKey: ['my-posts', user?.id],
+    queryFn: async (): Promise<Post[]> => {
+      if (!user) return [];
+      return getMyPosts();
+    },
+    enabled: !!user,
+    select: (posts) => ({
+      totalReactions: posts.reduce((sum, p: any) => sum + (p.like_count || 0), 0),
+      pitchCount: posts.length,
+    }),
   });
 }
 
@@ -103,6 +164,7 @@ export function useCreatePitch() {
       }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['pitches'] });
+      qc.invalidateQueries({ queryKey: ['pitches-infinite'] });
       qc.invalidateQueries({ queryKey: ['user-active-pitch'] });
       toast({ title: 'Post is live!', description: 'Your post has been published.' });
     },
@@ -118,6 +180,7 @@ export function useDeletePitch() {
     mutationFn: (id: number | string) => deletePost(Number(id)),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['pitches'] });
+      qc.invalidateQueries({ queryKey: ['pitches-infinite'] });
       qc.invalidateQueries({ queryKey: ['user-active-pitch'] });
       toast({ title: 'Post deleted' });
     },
@@ -130,11 +193,50 @@ export function useReactToPitch() {
   return useMutation({
     mutationFn: ({ pitchId }: { pitchId: number | string; reactionType: string; currentReaction: string | null }) =>
       likePost(Number(pitchId)),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['pitches'] });
+    // Optimistic update: flip the button and count immediately, in every
+    // cached 'pitches' list this post appears in, instead of waiting for
+    // the request to finish and then refetching the entire feed.
+    onMutate: async ({ pitchId, currentReaction }) => {
+      await qc.cancelQueries({ queryKey: ['pitches'] });
+      await qc.cancelQueries({ queryKey: ['pitches-infinite'] });
+      const previous = qc.getQueriesData<PitchWithProfile[]>({ queryKey: ['pitches'] });
+      const previousInfinite = qc.getQueriesData({ queryKey: ['pitches-infinite'] });
+
+      const nowLiked = currentReaction !== 'fire';
+      const bump = (p: PitchWithProfile) =>
+        String(p.id) === String(pitchId)
+          ? {
+              ...p,
+              user_reaction: nowLiked ? 'fire' : null,
+              like_count: Math.max(0, (p.like_count || 0) + (nowLiked ? 1 : -1)),
+            }
+          : p;
+
+      qc.setQueriesData<PitchWithProfile[]>({ queryKey: ['pitches'] }, (old) =>
+        old?.map(bump)
+      );
+      // Infinite-query cache shape is { pages: [{ results, ... }], pageParams }
+      qc.setQueriesData<any>({ queryKey: ['pitches-infinite'] }, (old) => {
+        if (!old?.pages) return old;
+        return {
+          ...old,
+          pages: old.pages.map((page: any) => ({
+            ...page,
+            results: page.results.map(bump),
+          })),
+        };
+      });
+
+      return { previous, previousInfinite };
     },
-    onError: (e: Error) =>
-      toast({ title: 'Failed to react', description: e.message, variant: 'destructive' }),
+    onError: (e: Error, _vars, context) => {
+      // Roll back every list we optimistically touched.
+      context?.previous?.forEach(([key, data]) => qc.setQueryData(key, data));
+      context?.previousInfinite?.forEach(([key, data]) => qc.setQueryData(key, data));
+      toast({ title: 'Failed to react', description: e.message, variant: 'destructive' });
+    },
+    // No onSuccess refetch of the whole feed — the optimistic update already
+    // reflects the real outcome, and the like endpoint is a simple toggle.
   });
 }
 

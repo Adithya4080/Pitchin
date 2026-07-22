@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from 'next-themes';
 import {
@@ -29,6 +30,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { SignOutDialog } from '@/components/SignOutDialog';
 
 interface SidebarNavItem {
   icon: React.ComponentType<{ className?: string }>;
@@ -55,9 +57,10 @@ interface MobileSidebarProps {
 export function MobileSidebar({ trigger }: MobileSidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const { theme, setTheme } = useTheme();
   const { data: unreadCount = 0 } = useUnreadCount();
+  const [showSignOutDialog, setShowSignOutDialog] = useState(false);
 
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],
@@ -81,11 +84,6 @@ export function MobileSidebar({ trigger }: MobileSidebarProps) {
       return;
     }
     navigate(item.path);
-  };
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
   };
 
   return (
@@ -180,7 +178,7 @@ export function MobileSidebar({ trigger }: MobileSidebarProps) {
           {user && (
             <SheetClose asChild>
               <button
-                onClick={handleSignOut}
+                onClick={() => setShowSignOutDialog(true)}
                 className="w-full flex items-center gap-3 h-12 px-3 rounded-xl text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors touch-manipulation"
               >
                 <LogOut className="h-5 w-5 shrink-0" />
@@ -201,6 +199,7 @@ export function MobileSidebar({ trigger }: MobileSidebarProps) {
           </div>
         </div>
       </SheetContent>
+      <SignOutDialog open={showSignOutDialog} onOpenChange={setShowSignOutDialog} />
     </Sheet>
   );
 }

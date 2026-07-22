@@ -1,14 +1,3 @@
-// import { useQuery } from '@tanstack/react-query';
-
-// export function usePitchAttachments(pitchId?: string) {
-//   return useQuery({
-//     queryKey: ['pitch-attachments', pitchId],
-//     queryFn: async () => [],
-//     enabled: !!pitchId,
-//   });
-// }
-
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 

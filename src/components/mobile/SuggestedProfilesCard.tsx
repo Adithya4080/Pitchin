@@ -23,7 +23,7 @@ function ProfileCard({ profile }: { profile: SuggestedProfile }) {
   const roleLabel: Record<string, string> = {
     startup: 'Startup',
     investor: 'Investor',
-    ecosystem_partner: 'Ecosystem Partner',
+    ecosystem_partner: 'Ecosystem Service Provider',
     innovator: 'Innovator',
     consultant: 'Consultant',
   };

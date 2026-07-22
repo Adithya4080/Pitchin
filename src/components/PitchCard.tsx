@@ -28,7 +28,6 @@ import { RoleBadge } from './RoleBadge';
 import { PitchWithProfile, useReactToPitch, useDeletePitch } from '@/hooks/usePitches';
 import { useSendInterest } from '@/hooks/useSendInterest';
 import { useHasSentInterest } from '@/hooks/useHasSentInterest';
-import { usePitchReactionCounts } from '@/hooks/usePitchReactionCounts';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useAuth } from '@/hooks/useAuth';
 import { useQueryClient } from '@tanstack/react-query';
@@ -116,7 +115,6 @@ export function PitchCard({ pitch, hideBorder = false }: PitchCardProps) {
   const sendInterestMutation = useSendInterest();
 
   const { data: existingInterest } = useHasSentInterest(pitch.id);
-  const { data: reactionCounts } = usePitchReactionCounts(String(pitch.id));
   const { data: userRole } = useUserRole(pitch.user_id);
 
   const isAdminAuthor = pitch.user_id === '006e4a3d-b4d7-4eff-a033-b795ea7b7326';
@@ -230,7 +228,7 @@ export function PitchCard({ pitch, hideBorder = false }: PitchCardProps) {
   // Comment functionality
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState('');
-  const { data: comments = [] } = useComments(pitch.id);
+  const { data: comments = [] } = useComments(pitch.id, showComments);
   const addComment = useAddComment(pitch.id);
 
   return (
@@ -371,19 +369,29 @@ export function PitchCard({ pitch, hideBorder = false }: PitchCardProps) {
 
         {/* ── Action Bar ───────────────────────────────────────── */}
         <div className="flex items-center justify-between">
-          <Button
-            variant="ghost"
-            size="sm"
-            className={cn(
-              "h-10 px-4 gap-2 text-muted-foreground  rounded-lg",
-              pitch.user_reaction === 'fire' && "text-blue-500"
-            )}
-            onClick={() => handleReaction('fire')}
-            disabled={!user || isOwner}
-          >
-            <ThumbsUp className={cn("h-5 w-5", pitch.user_reaction === 'fire' && "fill-current")} />
-            <span className="text-sm">{(reactionCounts?.fire || 0) > 0 ? reactionCounts?.fire : ''}</span>
-          </Button>
+          <motion.div whileTap={{ scale: 0.85 }}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "h-10 px-4 gap-2 text-muted-foreground  rounded-lg",
+                pitch.user_reaction === 'fire' && "text-blue-500"
+              )}
+              onClick={() => handleReaction('fire')}
+              disabled={!user || isOwner}
+            >
+              <motion.span
+                key={pitch.user_reaction === 'fire' ? 'liked' : 'unliked'}
+                initial={pitch.user_reaction === 'fire' ? { scale: 0.6 } : false}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+                className="inline-flex"
+              >
+                <ThumbsUp className={cn("h-5 w-5", pitch.user_reaction === 'fire' && "fill-current")} />
+              </motion.span>
+              <span className="text-sm">{(pitch.like_count || 0) > 0 ? pitch.like_count : ''}</span>
+            </Button>
+          </motion.div>
 
           <Button
             variant="ghost"

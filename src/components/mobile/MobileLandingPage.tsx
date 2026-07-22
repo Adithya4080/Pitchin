@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import TheProblem from '../landing/the-problem';
 import { SiteFooter } from '../landing/footer';
 import WhoWeAre from '../landing/who-we-are';
-import illustration from '@/assets/hero-illustration.webp';
+import illustration from '@/assets/hero-illusration.png';
 import icon from '@/assets/pitchin-logo-text.webp';
 
 function LoadingSkeleton() {
@@ -78,7 +78,7 @@ export function MobileLandingPage() {
         {/* Hero section */}
         <div className="relative w-full overflow-hidden">
           {/* Content */}
-          <div className="relative z-10 px-5 sm:px-8 pt-6 pb-10">
+          <div className="relative z-10 px-5 bg-[#f3f3f3] sm:px-8 pt-6 pb-10">
             {/* Logo */}
             <motion.div
               className="flex justify-center pt-2"
@@ -217,7 +217,7 @@ export function MobileLandingPage() {
         {/* Features */}
         <section className="py-10 sm:py-14">
           <div className="container">
-            <div className="grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-12">
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-12">
               {[
               {
                 title: "Structured Profile Creation",
@@ -233,13 +233,14 @@ export function MobileLandingPage() {
               },
               ].map((f) => (
                 <div key={f.title} className="max-w-sm">
-                  <h3 className="text-xl font-medium tracking-tight text-foreground">{f.title}</h3>
+                  <h3 className="text-lg font-medium tracking-tight text-foreground">{f.title}</h3>
                   <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
+        <WhoWeAre />
         {/* Footer */}
         <div className="w-full overflow-hidden">
           <SiteFooter />

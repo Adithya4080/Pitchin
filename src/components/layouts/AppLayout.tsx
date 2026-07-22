@@ -1,5 +1,5 @@
 import { Header } from '@/components/Header';
-import { MobileHeader } from '@/components/mobile/MobileHeader';
+import { MobileSearchHeader } from '@/components/mobile/MobileSearchHeader';
 import { BottomNavigation } from '@/components/mobile/BottomNavigation';
 
 interface AppLayoutProps {
@@ -8,12 +8,14 @@ interface AppLayoutProps {
   showMobileHeader?: boolean;
   showDesktopHeader?: boolean;
   showBottomNav?: boolean;
+  /** 'default' = existing MobileHeader (avatar + title + bell).
+   *  'search' = new logo + animated search bar header (Feed/Network/Alerts). */
+  mobileHeaderVariant?: 'default' | 'search';
 }
 
 export function AppLayout({
   children,
   title,
-  showMobileHeader = false,
   showDesktopHeader = true,
   showBottomNav = true,
 }: AppLayoutProps) {
@@ -27,7 +29,7 @@ export function AppLayout({
       )}
 
       {/* Mobile Header */}
-      {showMobileHeader && <MobileHeader title={title} />}
+      {<MobileSearchHeader />}
 
       {/* Main Content */}
       <main className={`md:pt-16 min-h-screen ${showBottomNav ? "pb-20 md:pb-0" : ""}`}>

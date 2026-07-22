@@ -188,7 +188,7 @@ export function FeedLeftSidebar() {
           {roleSpecificItems.length > 0 && (
             <>
               <Separator className="my-3" />
-              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider px-2 mb-1 capitalize">
+              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider px-2 mb-1">
                 {currentRole.replace('_', ' ')}
               </p>
               <nav className="space-y-0.5">

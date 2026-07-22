@@ -1,6 +1,6 @@
 export { BottomNavigation } from './BottomNavigation';
+export { MobileSearchHeader } from './MobileSearchHeader';
 export { MobileNotificationsPage } from './MobileNotificationsPage';
-export { MobileHeader } from './MobileHeader';
 export { MobileMenuSheet } from './MobileMenuSheet';
 export { MobileLandingPage } from './MobileLandingPage';
 export { MobileProfileView } from './MobileProfileView';

@@ -12,14 +12,14 @@ function unwrapPaginated<T>(response: T[] | PaginatedResponse<T>): T[] {
   return Array.isArray(response) ? response : (response?.results ?? []);
 }
 
-export function useComments(pitchId: string | number) {
+export function useComments(pitchId: string | number, enabled: boolean = true) {
   return useQuery({
     queryKey: ['comments', pitchId],
     queryFn: async () => {
       const response = await apiFetch<any[] | PaginatedResponse<any>>(`/feed/${pitchId}/comments/`);
       return unwrapPaginated(response);
     },
-    enabled: !!pitchId,
+    enabled: !!pitchId && enabled,
   });
 }
 

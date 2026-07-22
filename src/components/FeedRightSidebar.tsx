@@ -191,12 +191,13 @@ export function FeedRightSidebar() {
   const [activeTab, setActiveTab] = useState<RecTab>('people');
   const [dismissed, setDismissed] = useState<Set<number>>(new Set());
 
-  // People — load on mount, no stale cache so it always reflects real data
+  // People — cached for a minute; still feels fresh to users but avoids
+  // refetching from scratch every single time they navigate back here.
   const { data: peopleData = [], isLoading: peopleLoading } = useQuery({
     queryKey: ['recommended-people', user?.id],
     queryFn: () => apiFetch<PublicProfile[]>('/profiles/public/'),
     enabled: !!user,
-    staleTime: 0,           // always fresh — fixes "worked once then empty" bug
+    staleTime: 60_000,
     gcTime: 2 * 60_000,
   });
 

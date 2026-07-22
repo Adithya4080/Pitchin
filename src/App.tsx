@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { lazy, Suspense } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { ProtectedRoute } from "@/components/Protectedroute";
 
 const Index = lazy(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
@@ -32,74 +33,80 @@ const NetworkServices = lazy(() => import("./pages/NetworkServices"));
 const ServiceCategoryPage = lazy(() => import("./pages/ServiceCategoryPage"));
 const ProviderDetail = lazy(() => import("./pages/ProviderDetail"));
 const ProviderDashboard = lazy(() => import("./pages/ProviderDashboard"));
+const Terms = lazy(() => import("./pages/Terms"))
+const Privacy = lazy(() => import("./pages/Privacy"))
 
 const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5,
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      retry: 1,
-    },
-  },
+	defaultOptions: {
+		queries: {
+		staleTime: 1000 * 60 * 5,
+		refetchOnWindowFocus: false,
+		refetchOnMount: false,
+		retry: 1,
+		},
+	},
 });
 
 const App = () => (
-  <ErrorBoundary
-    fallback={
-      <div className="flex items-center justify-center min-h-screen text-center p-6">
-        <div>
-          <p className="text-lg font-medium mb-2">Something went wrong.</p>
-          <button className="text-primary underline" onClick={() => window.location.reload()}>
-            Reload the page
-          </button>
-        </div>
-      </div>
-    }
-    >
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Suspense fallback={null}>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/feed" element={<Feed />} />
-                <Route path="/profile/:userId" element={<UserProfile />} />
-                <Route path="/pitch/:pitchId" element={<PitchDetail />} />
-                <Route path="/onboarding" element={<Onboarding />} />
-                <Route path="/notifications" element={<Notifications />} />
-                <Route path="/search" element={<Search />} />
-                <Route path="/coming-soon" element={<ComingSoon />} />
-                <Route path="/edit-section" element={<EditSection />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/shared/:userId" element={<SharedProfile />} />
-                <Route path="/shared/:userId/pitch/:pitchId" element={<SharedPitchDetail />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/news" element={<News />} />
-                <Route path="/messages" element={<Messages />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/contact" element={<ContactUs />} />
-                <Route path="/network" element={<Network />} />
-                {/* <Route path="/network/services" element={<NetworkServices />} /> */}
-                <Route path="/network/services/:slug" element={<ServiceCategoryPage />} />
-                <Route path="/network/provider/:slug" element={<ProviderDetail />} />
+	<ErrorBoundary
+		fallback={
+		<div className="flex items-center justify-center min-h-screen text-center p-6">
+			<div>
+				<p className="text-lg font-medium mb-2">Something went wrong.</p>
+				<button className="text-primary underline" onClick={() => window.location.reload()}>
+					Reload the page
+				</button>
+			</div>
+		</div>
+		}
+		>
+		<QueryClientProvider client={queryClient}>
+			<AuthProvider>
+				<TooltipProvider>
+					<Toaster />
+					<Sonner />
+					<BrowserRouter>
+						<Suspense fallback={null}>
+						<Routes> 
+							<Route path="/auth" element={<Auth />} />
+							<Route path="/admin" element={<Admin />} />
+							<Route path="/reset-password" element={<ResetPassword />} />
+							<Route path="/shared/:userId" element={<SharedProfile />} />
+							<Route path="/terms" element={<Terms />} />
+							<Route path="/privacy" element={<Privacy />} />
+							<Route path="/shared/:userId/pitch/:pitchId" element={<SharedPitchDetail />} />
+							{/* <Route element={<ProtectedRoute />}> */}
+								<Route path="/" element={<Index />} />
+								<Route path="/dashboard" element={<Dashboard />} />
+								<Route path="/feed" element={<Feed />} />
+								<Route path="/profile/:userId" element={<UserProfile />} />
+								<Route path="/pitch/:pitchId" element={<PitchDetail />} />
+								<Route path="/onboarding" element={<Onboarding />} />
+								<Route path="/notifications" element={<Notifications />} />
+								<Route path="/search" element={<Search />} />
+								<Route path="/coming-soon" element={<ComingSoon />} />
+								<Route path="/edit-section" element={<EditSection />} />
+								<Route path="/settings" element={<Settings />} />
+								<Route path="/news" element={<News />} />
+								<Route path="/messages" element={<Messages />} />
+								<Route path="/contact" element={<ContactUs />} />
+								<Route path="/network" element={<Network />} />
+								{/* <Route path="/network/services" element={<NetworkServices />} /> */}
+								<Route path="/network/services/:slug" element={<ServiceCategoryPage />} />
+								<Route path="/network/provider/:slug" element={<ProviderDetail />} />
                 <Route path="/provider/dashboard" element={<ProviderDashboard />} />
-                <Route path="/network/provider/:slug/pitch/:pitchId" element={<PitchDetail />} />
-                <Route path="/network/services" element={<NetworkServices />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </QueryClientProvider>
-  </ErrorBoundary>
+								<Route path="/network/provider/:slug/pitch/:pitchId" element={<PitchDetail />} />
+								<Route path="/network/services" element={<NetworkServices />} />
+							{/* </Route> */}
+							{/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+							<Route path="*" element={<NotFound />} />
+						</Routes>
+						</Suspense>
+					</BrowserRouter>
+				</TooltipProvider>
+			</AuthProvider>
+		</QueryClientProvider>
+	</ErrorBoundary>
 );
 
 export default App;

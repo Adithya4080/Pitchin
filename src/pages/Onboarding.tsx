@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Store, CandlestickChart, Share2, Users, Lightbulb,
   Clock, Check, ArrowRight, ArrowLeft, Rocket,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -21,7 +20,6 @@ const roles: {
   id: UserRole;
   title: string;
   description: string;
-  icon: React.ReactNode;
   color: string;
   available: boolean;
 }[] = [
@@ -29,15 +27,20 @@ const roles: {
     id: 'startup',
     title: 'Startup / Business',
     description: "I'm building or running a business venture",
-    icon: <Store className="h-5 w-5" />,
     color: 'bg-blue-50 text-blue-700',
+    available: true,
+  },
+    {
+    id: 'ecosystem_partner',
+    title: 'Ecosystem Service Provider',
+    description: 'I provide services related to the startup ecosystem',
+    color: 'bg-teal-50 text-teal-700',
     available: true,
   },
   {
     id: 'innovator',
     title: 'Innovator',
     description: 'I have ideas and want to share them with the world',
-    icon: <Lightbulb className="h-5 w-5" />,
     color: 'bg-amber-50 text-amber-700',
     available: false,
   },
@@ -45,7 +48,6 @@ const roles: {
     id: 'investor',
     title: 'Investor',
     description: "I'm looking to invest in promising ideas",
-    icon: <CandlestickChart className="h-5 w-5" />,
     color: 'bg-green-50 text-green-700',
     available: false,
   },
@@ -53,18 +55,10 @@ const roles: {
     id: 'consultant',
     title: 'Consultant',
     description: 'I offer expertise and advisory services',
-    icon: <Share2 className="h-5 w-5" />,
     color: 'bg-purple-50 text-purple-700',
     available: false,
   },
-  {
-    id: 'ecosystem_partner',
-    title: 'Ecosystem Partner',
-    description: 'I represent an accelerator, incubator, or support organization',
-    icon: <Users className="h-5 w-5" />,
-    color: 'bg-teal-50 text-teal-700',
-    available: false,
-  },
+
 ];
 
 export default function Onboarding() {
@@ -153,11 +147,8 @@ export default function Onboarding() {
                       onClick={() => role.available && setSelectedRole(role.id)}
                     >
                       <CardContent className="p-4 flex flex-col gap-2">
-                        {/* Icon + checkmark row */}
-                        <div className="flex items-start justify-between">
-                          <div className={`inline-flex p-2 rounded-lg ${role.color}`}>
-                            {role.icon}
-                          </div>
+                        {/* Checkmark / Soon badge row */}
+                        <div className="flex items-start justify-end">
                           {selectedRole === role.id && (
                             <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
                               <Check className="h-3 w-3 text-white" />
@@ -292,7 +283,6 @@ export default function Onboarding() {
                         <div
                           className={`inline-flex items-center gap-1.5 mt-1 px-2 py-0.5 rounded-full text-xs font-medium ${selectedRoleData.color}`}
                         >
-                          {selectedRoleData.icon}
                           <span>{selectedRoleData.title}</span>
                         </div>
                       </div>

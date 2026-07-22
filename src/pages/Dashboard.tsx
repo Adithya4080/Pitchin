@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Save, Loader2, Twitter, Globe, Linkedin, User, FileText, Link2, MapPin, FolderOpen, Briefcase, X, Flame, Bookmark, Mail, Users, MessageCircle, Video, Edit2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -34,14 +34,14 @@ import { ContentTransition } from '@/components/transitions';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserReactionStats } from '@/hooks/useUserReactionStats';
 import { useFollowers, useFollowing } from '@/hooks/useFollow';
-import { InnovatorProfile, StartupProfile, InvestorProfile, ConsultantProfile, EcosystemPartnerProfile as EcosystemPartnerProfileType } from '@/api/profiles';
-import { useRoleProfile } from '@/hooks/useRoleProfile';
+import { InnovatorProfile, StartupProfile, InvestorProfile, ConsultantProfile, EcosystemPartnerProfile as EcosystemPartnerProfileType, updateMyProfile } from '@/api/profiles';
 import { useProfilePitches, useCreateProfilePitch, useUpdateProfilePitch, useDeleteProfilePitch } from '@/hooks/useProfilePitches';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { PaywallGate } from '@/components/PaywallGate';
 import { ShareDashboardButton } from '@/components/ShareDashboardButton';
+import { isProviderRole } from '@/hooks/useRoleProfile';
 
 // Wrapper component for ProfilePitchSection with hooks
 function ProfilePitchSectionWrapper({ 
@@ -107,7 +107,7 @@ function ProfilePitchSectionWrapper({
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { user, loading: authLoading, isOnboarded, isOnboardingChecked } = useAuth();
+  const { user, loading: authLoading, isOnboarded, isOnboardingChecked, refreshUser } = useAuth();
   const queryClient = useQueryClient();
   const isMobile = useIsMobile();
 
@@ -120,6 +120,14 @@ export default function Dashboard() {
       navigate('/onboarding');
     }
   }, [user, isOnboarded, isOnboardingChecked, navigate]);
+
+  // Provider-type roles (consultant, ecosystem service provider) are onboarded
+  // by an admin and always use the Provider Dashboard, never this page.
+  useEffect(() => {
+    if (user && isProviderRole(user.role)) {
+      navigate('/provider/dashboard', { replace: true });
+    }
+  }, [user, navigate]);
 
   const [fullName, setFullName] = useState('');
   const [bio, setBio] = useState('');
@@ -137,10 +145,10 @@ export default function Dashboard() {
   const [isDeleting, setIsDeleting] = useState(false);
 
 
-  // Role profile state
-  const { role: hookRole, roleProfile, saveRoleProfile } = useRoleProfile(user?.id);
-  // Fall back to user.role from auth context so sections show immediately on load
-  const role = hookRole || (user as any)?.role || null;
+  // Role profile state — derived from `profile` below instead of a second
+  // network call. useRoleProfile(user.id) used to hit GET /profiles/{id}/,
+  // which returns the same underlying profile as GET /profiles/me/ for the
+  // signed-in user's own dashboard, so it was a pure duplicate fetch.
   const [roleProfileData, setRoleProfileData] = useState<any>(null);
 
   // Derived: whether the Company Portfolio section has any content
@@ -157,7 +165,27 @@ export default function Dashboard() {
     (roleProfileData?.company_journey_timeline && (roleProfileData.company_journey_timeline as any[]).length > 0)
   );
 
+  const { data: profile, isLoading: profileLoading } = useQuery({
+    queryKey: ['profile', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const data = await (await import('@/api/profiles')).getMyProfile();
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
+  // role/roleProfile derived from the single `profile` fetch above — this
+  // used to be its own useRoleProfile(user.id) call hitting GET
+  // /profiles/{id}/, which returns the same data as GET /profiles/me/ for
+  // your own dashboard. Removing it cuts a redundant round trip.
+  const role = (profile as any)?.role || (user as any)?.role || null;
+  const roleProfile = profile ?? null;
+
+  
+
   // Update role profile data when loaded - ensure team_members is always an array
+  // (moved below the roleProfile declaration above — it depends on it)
   useEffect(() => {
     if (roleProfile) {
       const profileWithTeam = roleProfile as any;
@@ -169,35 +197,38 @@ export default function Dashboard() {
     }
   }, [roleProfile]);
 
-  const { data: profile, isLoading: profileLoading } = useQuery({
-    queryKey: ['profile', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      const data = await (await import('@/api/profiles')).getMyProfile();
-      return data;
+  const saveRoleProfile = useMutation({
+    mutationFn: (profileData: any) => updateMyProfile(profileData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile', user?.id] });
+      toast.success('Profile saved!');
     },
-    enabled: !!user?.id,
+    onError: (e: Error) => toast.error(e.message),
   });
 
-  // Fetch all user pitches (not just active)
-  const { data: userPitches, isLoading: pitchLoading } = useQuery({
+  // Fetch all user pitches (not just active). Author name/avatar are taken
+  // from `profile` above instead of calling getMyProfile() a second time.
+  const { data: rawUserPitches, isLoading: pitchLoading } = useQuery({
     queryKey: ['my-pitches', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
       const { getMyPosts } = await import('@/api/feed');
-      const posts = await getMyPosts();
-      const profileData = await (await import('@/api/profiles')).getMyProfile();
-      return posts.map(post => ({
-        ...post,
-        profiles: { full_name: String((profileData as any).bio ? profileData.user_name : post.author_name), avatar_url: profileData.avatar_url },
-        is_active: true,
-        expires_at: new Date(Date.now() + 86400000 * 30).toISOString(),
-        reaction_count: post.like_count,
-        save_count: 0,
-      }));
+      return getMyPosts();
     },
     enabled: !!user?.id,
   });
+
+  const userPitches = useMemo(() => rawUserPitches?.map(post => ({
+    ...post,
+    profiles: {
+      full_name: String((profile as any)?.bio ? (profile as any)?.user_name : post.author_name),
+      avatar_url: (profile as any)?.avatar_url,
+    },
+    is_active: true,
+    expires_at: new Date(Date.now() + 86400000 * 30).toISOString(),
+    reaction_count: post.like_count,
+    save_count: 0,
+  })), [rawUserPitches, profile]);
 
   // Get the active pitch from the list
   const activePitch = userPitches?.find(p => p.is_active && new Date(p.expires_at) > new Date());
@@ -219,17 +250,13 @@ export default function Dashboard() {
   const { data: followers = [] } = useFollowers(user?.id);
   const { data: following = [] } = useFollowing(user?.id);
 
-  const { data: userStats } = useQuery({
-    queryKey: ['profile-stats', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      const { getMyPosts } = await import('@/api/feed');
-      const pitches = await getMyPosts();
-      const totalReactions = pitches.reduce((sum, p) => sum + (p.like_count || 0), 0);
-      return { totalReactions, totalSaves: 0, pitchCount: pitches.length, total: 0 };
-    },
-    enabled: !!user?.id,
-  });
+  // Derived from rawUserPitches (already fetched above) instead of a third
+  // getMyPosts() network call.
+  const userStats = useMemo(() => {
+    if (!rawUserPitches) return null;
+    const totalReactions = rawUserPitches.reduce((sum, p) => sum + (p.like_count || 0), 0);
+    return { totalReactions, totalSaves: 0, pitchCount: rawUserPitches.length, total: 0 };
+  }, [rawUserPitches]);
 
   const handleDeletePitch = async () => {
     if (!activePitch?.id) return;
@@ -346,13 +373,25 @@ export default function Dashboard() {
         ...(!avatarFile && avatarPreview === null ? { avatar: null } : {}),
         ...(!bannerFile && bannerPreview === null ? { banner: null } : {}),
       } as any);
-
-      // Save role-specific profile if data exists
       if (roleProfileData && role) {
-        await saveRoleProfile.mutateAsync(roleProfileData);
+        const {
+          user_name,
+          bio: _roleBio,
+          location: _roleLocation,
+          contact_email,
+          linkedin,
+          twitter,
+          website,
+          avatar,
+          banner,
+          ...roleOnlyData
+        } = roleProfileData as any;
+
+        await saveRoleProfile.mutateAsync(roleOnlyData);
       }
 
       queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+      await refreshUser();
       toast.success('Profile updated successfully!');
       setAvatarFile(null);
       setBannerFile(null);
@@ -502,7 +541,7 @@ export default function Dashboard() {
     return (
       <AppLayout showBottomNav={true}>
         <MobileProfileView
-          fullName={user?.full_name || 'Your Name'}
+          fullName={fullName || user?.full_name || 'Your Name'}
           email={user?.email}
           avatarUrl={avatarPreview}
           bannerUrl={bannerPreview}
@@ -673,7 +712,7 @@ export default function Dashboard() {
           {/* Profile Header */}
           <ProfileHeader
             userId={String(user?.id) || ''}
-            fullName={user?.full_name || 'Your Name'}
+            fullName={fullName || user?.full_name || 'Your Name'}
             email={user?.email}
             avatarUrl={avatarPreview}
             bannerUrl={bannerPreview}
@@ -776,14 +815,6 @@ export default function Dashboard() {
                 portfolioUrl={portfolioUrl}
                 contactEmail={contactEmail}
               />
-
-              {/* Role Section (Skills & Portfolio) in View Mode */}
-              {role && (
-                <div className="space-y-2">
-                  <h3 className="text-sm font-semibold text-foreground px-1">{getRoleTabLabel()}</h3>
-                  {renderRoleSection(false)}
-                </div>
-              )}
 
               {/* Profile Strength Card - only for owner */}
               <ProfileStrengthCard

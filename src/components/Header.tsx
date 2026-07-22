@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Bell, LogOut, User, HelpCircle, Home, Search, Users, Newspaper, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useQuery } from '@tanstack/react-query';
 import pitchinLogo from '@/assets/pitchin-logo-text.webp';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -11,19 +10,18 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Input } from '@/components/ui/input';
 import { NotificationList } from './NotificationList';
 import { CreatePitchModal } from './CreatePitchModal';
+import { SignOutDialog } from './SignOutDialog';
 import { useAuth } from '@/hooks/useAuth';
 import { useUnreadCount } from '@/hooks/useNotifications';
 import { useUserActivePitch } from '@/hooks/usePitches';
+import { useMyProfile } from '@/hooks/useRoleProfile';
 
 
 export function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const isFeedPage = location.pathname === '/feed';
-  const {
-    user,
-    signOut
-  } = useAuth();
+  const { user } = useAuth();
   const {
     data: unreadCount = 0
   } = useUnreadCount();
@@ -32,26 +30,16 @@ export function Header() {
   } = useUserActivePitch();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [showSignOutDialog, setShowSignOutDialog] = useState(false);
 
-  // Fetch profile from Django API
-  const { data: profile } = useQuery({
-    queryKey: ['header-profile', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      const { getMyProfile } = await import('@/api/profiles');
-      return getMyProfile();
-    },
-    enabled: !!user?.id,
-    staleTime: 0,
-  });
+  // Shared with FeedLeftSidebar.tsx (same ['my-profile', user?.id]
+  // queryKey) — avoids fetching two separate profile endpoints for the
+  // same user on the same page load.
+  const { data: profile } = useMyProfile();
 
   const displayName = profile?.full_name || user?.full_name || user?.email || '?';
   const avatarUrl = profile?.avatar || user?.avatar_url;
   const initials = displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
-  };
   const actions = (
     <>
       <Button
@@ -119,10 +107,10 @@ export function Header() {
                 }}
               >
                 <User className="mr-2 h-4 w-4" />
-                {user.email === 'pitchin.admn@gmail.com' ? 'Admin Panel' : 'My Pitches'}
+                {user.email === 'pitchin.admn@gmail.com' ? 'Admin Panel' : 'Profile'}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
+              <DropdownMenuItem onClick={() => setShowSignOutDialog(true)} className="text-destructive">
                 <LogOut className="mr-2 h-4 w-4" />
                 Sign out
               </DropdownMenuItem>
@@ -206,6 +194,7 @@ export function Header() {
       </header>
 
       <CreatePitchModal open={showCreateModal} onOpenChange={setShowCreateModal} />
+      <SignOutDialog open={showSignOutDialog} onOpenChange={setShowSignOutDialog} />
       
       {/* Tutorial Overlay */}
     </>

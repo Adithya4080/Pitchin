@@ -13,6 +13,9 @@ type Props = {
  * Trust snapshot row — every stat here comes straight from real provider
  * fields (rating, reviews, verification status, member-since year). Nothing
  * here is fabricated placeholder copy.
+ *
+ * Standard proportional layout: icon + value/label inline, divided by a thin
+ * top border — no individual boxed/card tiles.
  */
 export function TrustSnapshot({ provider, accent }: Props) {
   const memberSince = provider.created_at ? new Date(provider.created_at).getFullYear() : null;
@@ -45,9 +48,13 @@ export function TrustSnapshot({ provider, accent }: Props) {
           const Icon = s.icon;
           return (
             <div key={i} className="pd-trust-item">
-              <Icon size={16} style={{ color: accent }} />
-              <p className="pd-trust-val">{s.value}</p>
-              <p className="pd-trust-label">{s.label}</p>
+              <span className="pd-trust-icon">
+                <Icon size={15} style={{ color: accent }} />
+              </span>
+              <div>
+                <p className="pd-trust-val">{s.value}</p>
+                <p className="pd-trust-label">{s.label}</p>
+              </div>
             </div>
           );
         })}

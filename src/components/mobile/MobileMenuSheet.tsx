@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Settings, User, Zap } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -12,6 +13,7 @@ import {
 } from '@/components/ui/drawer';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/hooks/useAuth';
+import { SignOutDialog } from '@/components/SignOutDialog';
 
 interface MobileMenuSheetProps {
   trigger: React.ReactNode;
@@ -19,18 +21,14 @@ interface MobileMenuSheetProps {
 
 export function MobileMenuSheet({ trigger }: MobileMenuSheetProps) {
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
+  const [showSignOutDialog, setShowSignOutDialog] = useState(false);
 const initials = (user.full_name || user.email || '?')
   .split(' ')
   .map((n: string) => n[0])
   .join('')
   .toUpperCase()
   .slice(0, 2);
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
-  };
 
   if (!user) return null;
 
@@ -76,7 +74,7 @@ const initials = (user.full_name || user.email || '?')
             <Button
               variant="ghost"
               className="w-full justify-start h-12 text-base text-destructive hover:text-destructive"
-              onClick={handleSignOut}
+              onClick={() => setShowSignOutDialog(true)}
             >
               <LogOut className="mr-3 h-5 w-5" />
               Sign Out
@@ -84,6 +82,7 @@ const initials = (user.full_name || user.email || '?')
           </DrawerClose>
         </div>
       </DrawerContent>
+      <SignOutDialog open={showSignOutDialog} onOpenChange={setShowSignOutDialog} />
     </Drawer>
   );
 }
