@@ -180,6 +180,11 @@ export type MyProviderInput = Partial<{
   stage_focus: string;
   logo: File;
   banner: File;
+  instagram_url?: string;
+  facebook_url?: string;
+  linkedin_url?: string;
+  twitter_url?: string;
+  youtube_url?: string;
 }>;
 
 function buildProviderFormData(input: MyProviderInput): FormData {
