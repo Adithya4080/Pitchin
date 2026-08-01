@@ -47,7 +47,7 @@ export default function Auth() {
         const data = await loginWithGoogle(response.access_token);
         setTokens(data.access, data.refresh);
         const refreshedUser = await refreshUser();
-        navigate(isProviderRole(refreshedUser?.role) ? '/provider/dashboard' : '/network');
+        navigate('/network');
       } catch {
         toast({ title: 'Google sign-in failed', description: 'Please try again.', variant: 'destructive' });
       } finally {
@@ -66,8 +66,6 @@ export default function Auth() {
     setLoading(false);
     if (error) {
       toast({ title: 'Sign in failed', description: error.message, variant: 'destructive' });
-    } else if (isProviderRole(user?.role)) {
-      navigate('/provider/dashboard');
     } else {
       navigate('/network');
     }

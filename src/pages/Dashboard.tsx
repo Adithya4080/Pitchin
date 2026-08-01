@@ -122,10 +122,12 @@ export default function Dashboard() {
   }, [user, isOnboarded, isOnboardingChecked, navigate]);
 
   // Provider-type roles (consultant, ecosystem service provider) are onboarded
-  // by an admin and always use the Provider Dashboard, never this page.
+  // by an admin and land on the Network page rather than this page, which is
+  // built around pitches and doesn't apply to them. They can still reach
+  // /provider/dashboard from the nav if they need it.
   useEffect(() => {
     if (user && isProviderRole(user.role)) {
-      navigate('/provider/dashboard', { replace: true });
+      navigate('/network', { replace: true });
     }
   }, [user, navigate]);
 

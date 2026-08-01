@@ -94,7 +94,7 @@ const App = () => (
 								{/* <Route path="/network/services" element={<NetworkServices />} /> */}
 								<Route path="/network/services/:slug" element={<ServiceCategoryPage />} />
 								<Route path="/network/provider/:slug" element={<ProviderDetail />} />
-                <Route path="/provider/dashboard" element={<ProviderDashboard />} />
+								<Route path="/provider/dashboard" element={<ProviderDashboard />} />
 								<Route path="/network/provider/:slug/pitch/:pitchId" element={<PitchDetail />} />
 								<Route path="/network/services" element={<NetworkServices />} />
 							{/* </Route> */}

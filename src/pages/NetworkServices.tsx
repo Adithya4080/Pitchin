@@ -17,6 +17,7 @@ import { useMyProfile } from '@/hooks/useRoleProfile';
 import { useUserPitches } from '@/hooks/usePitches';
 import { NetworkingForOpportunitySection } from '@/components/network/OpportunitiesAndSurveysSection';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { ProfileReminderPopup } from '@/components/network/ProfileReminderPopup';
 
 // ─── Quick Actions ─────────────────────────────────────────────────────────────
 const QUICK_ACTIONS = [
@@ -442,6 +443,7 @@ export default function NetworkServices() {
 
   return (
     <AppLayout showMobileHeader title="Services" showBottomNav mobileHeaderVariant="search">
+      <ProfileReminderPopup />
       <div className="max-w-[1400px] mx-auto">
         {/* Mobile/tablet sticky nav bar — lives above the flex row, full width */}
         <ServicesTopBar />

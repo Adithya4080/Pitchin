@@ -14,7 +14,7 @@ import { SignOutDialog } from './SignOutDialog';
 import { useAuth } from '@/hooks/useAuth';
 import { useUnreadCount } from '@/hooks/useNotifications';
 import { useUserActivePitch } from '@/hooks/usePitches';
-import { useMyProfile } from '@/hooks/useRoleProfile';
+import { useMyProfile, isProviderRole } from '@/hooks/useRoleProfile';
 
 
 export function Header() {
@@ -40,6 +40,16 @@ export function Header() {
   const displayName = profile?.full_name || user?.full_name || user?.email || '?';
   const avatarUrl = profile?.avatar || user?.avatar_url;
   const initials = displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
+  const goToProfile = () => {
+    if (user?.email === 'pitchin.admn@gmail.com') {
+      navigate('/admin');
+    } else if (isProviderRole(user?.role)) {
+      navigate('/provider/dashboard');
+    } else {
+      navigate('/dashboard');
+    }
+  };
+
   const actions = (
     <>
       <Button
@@ -97,15 +107,7 @@ export function Header() {
                 </div>
               </div>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => {
-                  if (user.email === 'pitchin.admn@gmail.com') {
-                    navigate('/admin');
-                  } else {
-                    navigate('/dashboard');
-                  }
-                }}
-              >
+              <DropdownMenuItem onClick={goToProfile}>
                 <User className="mr-2 h-4 w-4" />
                 {user.email === 'pitchin.admn@gmail.com' ? 'Admin Panel' : 'Profile'}
               </DropdownMenuItem>

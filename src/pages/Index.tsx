@@ -98,7 +98,7 @@ function DesktopLanding() {
                   </div>
                   <div className="overflow-hidden">
                     <span className="typing-animation typing-animation-2 block">
-                      Ecosystem for Ideas,
+                      Platform for Ideas,
                     </span>
                   </div>
                   <div className="overflow-hidden">
