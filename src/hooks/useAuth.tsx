@@ -10,6 +10,7 @@ import {
 } from '@/api/auth';
 import { getAccessToken, getRefreshToken, clearTokens } from '@/api/client';
 import { useToast } from '@/hooks/use-toast';
+import { queryClient } from '@/lib/Queryclient';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -84,6 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signInWithEmail = async (email: string, password: string) => {
     try {
       const data = await apiLogin(email, password);
+      queryClient.clear();
       setUser(data.user);
       checkOnboarding(data.user);
       return { error: null, user: data.user };
@@ -95,6 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUpWithEmail = async (email: string, password: string, password2: string, fullName: string) => {
     try {
       const data = await apiRegister({ email, password, password2, full_name: fullName });
+      
       setUser(data.user);
       checkOnboarding(data.user);
       return { error: null, user: data.user };
@@ -106,9 +109,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     const refresh = getRefreshToken() ?? '';
     await apiLogout(refresh).catch(() => {});
+    queryClient.clear();
     setUser(null);
     setIsOnboarded(null);
     setIsOnboardingChecked(false);
+    queryClient.clear();
   };
 
   const googleLogin = useGoogleLogin({
@@ -117,6 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const data = await loginWithGoogle(response.access_token);
         localStorage.setItem('access_token', data.access);
         localStorage.setItem('refresh_token', data.refresh);
+        queryClient.clear();
         setUser(data.user);
         checkOnboarding(data.user);
       } catch (e) {

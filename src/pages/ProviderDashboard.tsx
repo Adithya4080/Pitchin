@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, Upload, X, Plus, Building2, ImageIcon, ArrowLeft, HelpCircle, Pencil, Trash2, Link2, Users, Tags, Wallet, Sparkles, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Loader2, Upload, X, Plus, Building2, ImageIcon, ArrowLeft, HelpCircle, Pencil, Trash2, Link2, Users, Tags, Wallet, Sparkles, AlertTriangle, CheckCircle2, Instagram, Facebook, Linkedin, Twitter, Youtube } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -131,6 +131,11 @@ export default function ProviderDashboard() {
         tags: myProvider.tags,
         sub_categories: myProvider.sub_categories,
         stage_focus: myProvider.stage_focus,
+        instagram_url: myProvider.instagram_url,
+        facebook_url: myProvider.facebook_url,
+        linkedin_url: myProvider.linkedin_url,
+        twitter_url: myProvider.twitter_url,
+        youtube_url: myProvider.youtube_url,
       });
       prevSubCategoryCount.current = myProvider.sub_categories?.length || 0;
     }
@@ -851,6 +856,41 @@ export default function ProviderDashboard() {
                 ))}
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Social media links */}
+        <Card className="rounded-2xl border-border/60 shadow-sm">
+          <CardHeader className="flex flex-row items-center gap-3 space-y-0 pb-4">
+            <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+              <Link2 className="h-4 w-4 text-primary" />
+            </div>
+            <div>
+              <CardTitle className="text-base font-semibold">Social links</CardTitle>
+              <CardDescription>Shown as icons on your public bio</CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-1.5">
+              <Label className="flex items-center gap-1.5"><Instagram className="h-3.5 w-3.5" /> Instagram</Label>
+              <Input value={form.instagram_url || ''} onChange={(e) => set('instagram_url', e.target.value)} placeholder="https://instagram.com/..." className="rounded-lg" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="flex items-center gap-1.5"><Facebook className="h-3.5 w-3.5" /> Facebook</Label>
+              <Input value={form.facebook_url || ''} onChange={(e) => set('facebook_url', e.target.value)} placeholder="https://facebook.com/..." className="rounded-lg" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="flex items-center gap-1.5"><Linkedin className="h-3.5 w-3.5" /> LinkedIn</Label>
+              <Input value={form.linkedin_url || ''} onChange={(e) => set('linkedin_url', e.target.value)} placeholder="https://linkedin.com/..." className="rounded-lg" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="flex items-center gap-1.5"><Twitter className="h-3.5 w-3.5" /> Twitter / X</Label>
+              <Input value={form.twitter_url || ''} onChange={(e) => set('twitter_url', e.target.value)} placeholder="https://x.com/..." className="rounded-lg" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="flex items-center gap-1.5"><Youtube className="h-3.5 w-3.5" /> YouTube</Label>
+              <Input value={form.youtube_url || ''} onChange={(e) => set('youtube_url', e.target.value)} placeholder="https://youtube.com/..." className="rounded-lg" />
+            </div>
           </CardContent>
         </Card>
       </div>
