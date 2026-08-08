@@ -3,14 +3,14 @@ import { Link, useSearchParams } from 'react-router-dom';
 import {
   LayoutGrid, Phone, ClipboardList, Heart,
   ArrowRight, Star, Search, ShieldCheck,
-  MapPin, Bookmark, Zap, TrendingUp, SlidersHorizontal, Check,
+  MapPin, Bookmark, Zap, TrendingUp, SlidersHorizontal, Check, Users,
 } from 'lucide-react';
 import { AppLayout } from '@/components/layouts/AppLayout';
 import { ServicesLeftSidebar, ServicesTopBar } from '@/components/network/ServicesLeftSidebar';
 import { ServiceHeroBanner } from '@/components/network/ServiceHeroBanner';
 import { ServiceCategoryGrid } from '@/components/network/ServiceCategoryGrid';
 import { NetworkingOpportunitiesSection } from '@/components/network/NetworkingOpportunitiesSection';
-import { useServiceProviders, useServiceCategories } from '@/hooks/useServices';
+import { useServiceProviders, useServiceCategories, useSendServiceInquiry } from '@/hooks/useServices';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { ProfileStrengthCard } from '@/components/profile/ProfileStrengthCard';
 import { useMyProfile } from '@/hooks/useRoleProfile';
@@ -18,6 +18,7 @@ import { useUserPitches } from '@/hooks/usePitches';
 import { NetworkingForOpportunitySection } from '@/components/network/OpportunitiesAndSurveysSection';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ProfileReminderPopup } from '@/components/network/ProfileReminderPopup';
+import { toast } from 'sonner';
 
 // ─── Quick Actions ─────────────────────────────────────────────────────────────
 const QUICK_ACTIONS = [
@@ -162,6 +163,144 @@ type ProviderItem = {
   tagline: string | null; rating: string | number; review_count: number; website: string | null;
 };
 
+// ─── Verified badge (solid blue circle + white tick) — matches ServiceCategoryPage ──
+function VerifiedBadge() {
+  return (
+    <svg viewBox="0 0 16 16" className="h-4 w-4 shrink-0" fill="none">
+      <circle cx="8" cy="8" r="7" fill="#2563EB" />
+      <path d="M5 8l2 2 4-4" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+// ─── Provider logo / initials avatar — matches ServiceCategoryPage ─────────
+function ProviderLogo({ name, logoUrl }: { name: string; logoUrl: string | null }) {
+  const initials = name.split(' ').slice(0, 2).map(w => w[0]?.toUpperCase() ?? '').join('');
+  const colors = [
+    'bg-indigo-700', 'bg-gray-800', 'bg-blue-700', 'bg-violet-700',
+    'bg-emerald-700', 'bg-rose-700', 'bg-amber-600',
+  ];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  const bg = colors[Math.abs(hash) % colors.length];
+
+  if (logoUrl) {
+    return (
+      <img src={logoUrl} alt={name}
+        loading="lazy"
+        decoding="async"
+        width={72}
+        height={72}
+        className="w-12 h-12 sm:w-[72px] sm:h-[72px] rounded-xl object-cover shrink-0 border border-gray-200"
+      />
+    );
+  }
+  return (
+    <div className={`w-12 h-12 sm:w-[72px] sm:h-[72px] rounded-xl ${bg} flex items-center justify-center text-white text-sm sm:text-lg font-bold shrink-0`}>
+      {initials}
+    </div>
+  );
+}
+
+// ─── ProviderListRow — full-width row card, same model as ServiceCategoryPage ──
+function ProviderListRow({ provider }: { provider: ProviderItem }) {
+  const sendInquiry = useSendServiceInquiry();
+  const [hovered, setHovered] = useState(false);
+
+  const handleBook = () => {
+    sendInquiry.mutate(
+      { providerId: provider.id, message: 'I would like to book a consultation.' },
+      {
+        onSuccess: () => toast.success(`Consultation request sent to ${provider.name}`),
+        onError:   () => toast.error('Failed to send. Please try again.'),
+      }
+    );
+  };
+
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="relative bg-white overflow-hidden border-r border-b border-gray-200 rounded-none"
+      style={{
+        boxShadow: hovered
+          ? '0 12px 32px -8px rgba(0,0,0,0.12), 0 4px 12px -4px rgba(0,0,0,0.06)'
+          : '0 1px 3px rgba(0,0,0,0.05)',
+        transition: 'box-shadow 0.2s ease-out',
+        zIndex: hovered ? 1 : 0,
+      }}
+    >
+      <div className="p-4 sm:p-5">
+        <div className="flex gap-3 sm:gap-4">
+          <ProviderLogo name={provider.name} logoUrl={provider.logo_url} />
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <h3 className="text-[14px] font-semibold text-gray-900 leading-snug truncate max-w-[180px]">
+                {provider.name}
+              </h3>
+              {provider.is_verified && <VerifiedBadge />}
+            </div>
+
+            {Number(provider.rating) > 0 && (
+              <div className="flex items-center whitespace-nowrap gap-1.5 mt-1">
+                <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                <span className="text-[12px] font-medium text-gray-700">{provider.rating}</span>
+                <span className="text-[12px] text-gray-400">({provider.review_count} reviews)</span>
+              </div>
+            )}
+
+            {provider.tagline && (
+              <p className="hidden sm:block text-[12px] text-gray-500 mt-1 leading-relaxed truncate">{provider.tagline}</p>
+            )}
+
+            <div className="hidden sm:flex flex-wrap items-center gap-x-3 gap-y-1.5 mt-1.5">
+              <span className="inline-flex items-center gap-1 text-[11px] text-gray-500">
+                <Users className="h-3 w-3" />{provider.category_name}
+              </span>
+              {provider.location && (
+                <span className="inline-flex items-center gap-1 text-[11px] text-gray-500">
+                  <MapPin className="h-3 w-3" />{provider.location}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="hidden sm:flex flex-col items-end shrink-0 gap-2 min-w-[130px]">
+            <div className="flex flex-col gap-1.5 w-full mt-auto">
+              <Link to={`/network/services/${provider.category_slug}`}
+                className="w-full justify-center text-center bg-blue-600 hover:bg-blue-500 text-white text-[12px] font-medium py-2 rounded-xl transition-colors">
+                View Profile
+              </Link>
+              <button
+                onClick={handleBook}
+                disabled={sendInquiry.isPending}
+                className="w-full text-center border border-gray-300 hover:bg-gray-50 text-gray-700 text-[12px] font-medium py-2 rounded-xl transition-colors disabled:opacity-60">
+                Book Consultation
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="sm:hidden mt-4 pt-3 border-t border-gray-100">
+          <div className="flex gap-2">
+            <Link to={`/network/services/${provider.category_slug}`}
+              className="flex-1 justify-center text-center bg-blue-600 hover:bg-blue-500 text-white text-[12px] font-medium py-2.5 rounded-xl transition-colors">
+              View Profile
+            </Link>
+            <button
+              onClick={handleBook}
+              disabled={sendInquiry.isPending}
+              className="flex-1 text-center border border-gray-300 hover:bg-gray-50 text-gray-700 text-[12px] font-medium py-2.5 rounded-xl transition-colors disabled:opacity-60">
+              Book Consultation
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ProviderMiniCard({ provider: p }: { provider: ProviderItem }) {
   const [hovered, setHovered] = useState(false);
   const initials = p.name.split(' ').slice(0, 2).map((w: string) => w[0]?.toUpperCase()).join('');
@@ -170,13 +309,12 @@ function ProviderMiniCard({ provider: p }: { provider: ProviderItem }) {
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="relative bg-white border border-gray-200 rounded-sm overflow-hidden h-[196px] flex flex-col"
+      className="relative bg-white border-r border-b border-gray-200 rounded-none overflow-hidden h-[196px] flex flex-col"
       style={{
-        border: hovered ? '1px solid #d1d5db' : '1px solid #e5e7eb',
         boxShadow: hovered
           ? '0 12px 32px -8px rgba(0,0,0,0.12), 0 4px 12px -4px rgba(0,0,0,0.06)'
           : '0 1px 3px rgba(0,0,0,0.05)',
-        transition: 'border-color 0.2s ease-out, box-shadow 0.2s ease-out',
+        transition: 'box-shadow 0.2s ease-out',
       }}
     >
       <div className="p-3.5 flex flex-col gap-2 flex-1 min-h-0">
@@ -198,6 +336,9 @@ function ProviderMiniCard({ provider: p }: { provider: ProviderItem }) {
               </span>
             )}
           </div>
+          <Link to={`/network/services/${p.category_slug}`}
+            className="shrink-0 text-[11px] font-bold bg-primary hover:bg-primary/90 text-primary-foreground px-3 py-1.5 rounded-lg transition-colors"
+          >View Profile</Link>
         </div>
 
         {/* Description */}
@@ -215,11 +356,6 @@ function ProviderMiniCard({ provider: p }: { provider: ProviderItem }) {
             </>
           )}
         </div>
-
-        {/* Button */}
-        <Link to={`/network/services/${p.category_slug}`}
-          className="mt-auto block text-center text-[11.5px] font-bold bg-primary hover:bg-primary/90 text-primary-foreground py-2 rounded-xl transition-colors"
-        >View Profile</Link>
       </div>
     </div>
   );
@@ -391,8 +527,10 @@ function AllProvidersView() {
       )}
 
       {!showSkeleton && providers.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1">
-          {providers.map(p => <ProviderMiniCard key={p.id} provider={p} />)}
+        <div className="flex flex-col border-t border-l border-gray-200">
+          {providers.map(p => (
+            <ProviderListRow key={p.id} provider={p} />
+          ))}
         </div>
       )}
     </div>
