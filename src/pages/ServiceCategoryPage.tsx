@@ -372,9 +372,8 @@ function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProv
         onMouseMove={handleMouseMove}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={handleMouseLeave}
-        className="relative bg-white rounded-xl overflow-hidden sm:h-[156px]"
+        className="relative bg-white rounded-none overflow-hidden sm:h-[156px] border-r border-b border-gray-200"
         style={{
-          border: '1px solid #e5e7eb',
           // transform: hovered
           //   ? `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateZ(14px) scale(1.015)`
           //   : 'rotateX(0deg) rotateY(0deg) translateZ(0px) scale(1)',
@@ -385,20 +384,19 @@ function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProv
             ? '0 20px 60px -8px rgba(0,0,0,0.16), 0 8px 20px -4px rgba(0,0,0,0.09), 0 0 0 1px rgba(0,0,0,0.04)'
             : '0 1px 3px rgba(0,0,0,0.05)',
           willChange: 'transform',
+          zIndex: hovered ? 1 : 0,
         }}
       >
         {/* macOS liquid glow */}
         {hovered && (
           <div
-            className="absolute inset-0 pointer-events-none rounded-xl z-10"
+            className="absolute inset-0 pointer-events-none rounded-none z-10"
             style={{
               background: `radial-gradient(300px circle at ${glowPos.x}% ${glowPos.y}%, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.05) 50%, transparent 100%)`,
               mixBlendMode: 'screen',
             }}
           />
         )}
-
-        <div className="h-px w-full bg-gray-200" />
 
         <div className="p-4 sm:p-5 sm:h-full sm:flex sm:flex-col sm:justify-center">
 
@@ -537,7 +535,7 @@ function ProviderCard({ provider }: { provider: ReturnType<typeof useServiceProv
 
 function CardSkeleton() {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 animate-pulse sm:h-[156px]">
+    <div className="bg-white border-r border-b border-gray-200 rounded-none p-4 sm:p-5 animate-pulse sm:h-[156px]">
       <div className="flex gap-3 sm:gap-4">
         <div className="w-12 h-12 sm:w-[72px] sm:h-[72px] rounded-xl bg-gray-200 shrink-0" />
         <div className="flex-1 space-y-2">
@@ -703,8 +701,8 @@ export default function ServiceCategoryPage() {
 
               {/* Cards */}
               <div className={viewMode === 'list'
-                ? 'space-y-0'
-                : 'grid grid-cols-1 sm:grid-cols-2 gap-'
+                ? 'flex flex-col border-t border-l border-gray-200'
+                : 'grid grid-cols-1 sm:grid-cols-2 border-t border-l border-gray-200'
               }>
                 {showSkeleton
                   ? Array.from({ length: 3 }).map((_, i) => <CardSkeleton key={i} />)

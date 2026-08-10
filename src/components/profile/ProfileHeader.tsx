@@ -330,7 +330,7 @@ export function ProfileHeader({
         {/* Name, role, location - Below avatar, left-aligned */}
         <div className="mt-4">
           <div className="flex items-center gap-2.5 flex-wrap">
-            <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground leading-tight">
+            <h1 className=" text-2xl sm:text-3xl font-bold text-foreground leading-tight">
               {fullName || 'Anonymous User'}
             </h1>
             {userRole?.role && (
