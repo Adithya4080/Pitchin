@@ -371,7 +371,7 @@ export function MobileProfileView({
             className="mt-3"
           >
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="font-display text-lg font-bold text-foreground leading-tight break-words">
+              <h1 className="text-lg font-bold text-foreground leading-tight break-words">
                 {fullName || 'Your Name'}
               </h1>
               {role && <RoleBadge role={role} size="sm" />}
