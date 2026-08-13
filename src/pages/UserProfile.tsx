@@ -448,6 +448,12 @@ export default function UserProfile() {
               profileViews: (profile as any)?.profile_views || 0,
             }}
             isEditable={false}
+            // Social icons render directly under the name/location row —
+            // same component used on the owner's Dashboard, kept in sync here.
+            linkedinUrl={profile?.linkedin_url}
+            twitterUrl={(profile as any)?.twitter_url}
+            websiteUrl={(profile as any)?.website_url}
+            portfolioUrl={(profile as any)?.portfolio_url}
           />
 
           {/* Role-Based About Card - shown right after header */}
@@ -480,14 +486,12 @@ export default function UserProfile() {
             </CardContent>
           </Card>
 
-          {/* Links & Contact Card */}
-          <SocialLinksCard
-            linkedinUrl={profile?.linkedin_url}
-            twitterUrl={(profile as any)?.twitter_url}
-            websiteUrl={(profile as any)?.website_url}
-            portfolioUrl={(profile as any)?.portfolio_url}
-            contactEmail={(profile as any)?.contact_email}
-          />
+          {/* Links & Contact Card — social icons (LinkedIn, Twitter/X, Website,
+              Portfolio) now render inside <ProfileHeader> above. Only the
+              contact email remains here, since that's separate from social links. */}
+          {(profile as any)?.contact_email && (
+            <SocialLinksCard contactEmail={(profile as any)?.contact_email} />
+          )}
 
           {/* Role-Specific Section - skip for ecosystem_partner (handled below) */}
           {role !== 'ecosystem_partner' && renderRoleSection()}
