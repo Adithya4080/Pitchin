@@ -7,11 +7,19 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { useFollowStatus, useFollowRequest } from '@/hooks/useFollow';
 
-interface VideoItem {
-  id: string;
+const CURATED_VIDEOS: { id: string; description?: string }[] = [
+  { id: 'Th8JoIan4dg' },
+  { id: 'z1iF1c8w5Lg' },
+  { id: 'QRZ_l7cVzzU' },
+  { id: 'hyYCn_kAngI' },
+  { id: 'u36A-YTxiOw' },
+  { id: 'zBUhQPPS9AY' },
+];
+
+interface YoutubeOEmbed {
   title: string;
-  thumbnailUrl: string;
-  duration: string;
+  author_name: string;
+  thumbnail_url: string;
 }
 
 function RecommendedUserCard({ 
@@ -76,21 +84,54 @@ function RecommendedUserCard({
   );
 }
 
-function VideoCard({ video }: { video: VideoItem }) {
+function VideoCard({ id, description }: { id: string; description?: string }) {
+  // Pull title/thumbnail/channel straight from YouTube — no API key needed.
+  const { data, isLoading } = useQuery({
+    queryKey: ['youtube-oembed', id],
+    queryFn: async (): Promise<YoutubeOEmbed> => {
+      const res = await fetch(
+        `https://www.youtube.com/oembed?url=${encodeURIComponent(`https://www.youtube.com/watch?v=${id}`)}&format=json`
+      );
+      if (!res.ok) throw new Error('Failed to load video info');
+      return res.json();
+    },
+    staleTime: 1000 * 60 * 60 * 24, // titles/thumbnails don't change often — cache for a day
+  });
+
+  const handleOpen = () => {
+    window.open(`https://www.youtube.com/watch?v=${id}`, '_blank', 'noopener,noreferrer');
+  };
+
   return (
-    <div className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
+    <div
+      className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+      onClick={handleOpen}
+    >
       <div className="relative w-24 h-14 rounded-md overflow-hidden bg-muted shrink-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-primary/60 flex items-center justify-center">
-          <Play className="h-6 w-6 text-white" fill="white" />
+        {data?.thumbnail_url ? (
+          <img
+            src={data.thumbnail_url}
+            alt={data.title}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-primary/60 flex items-center justify-center">
+            <Play className="h-6 w-6 text-white" fill="white" />
+          </div>
+        )}
+        <div className="absolute inset-0 flex items-center justify-center bg-black/0 hover:bg-black/20 transition-colors">
+          <Play className="h-5 w-5 text-white drop-shadow" fill="white" />
         </div>
-        <span className="absolute bottom-1 right-1 text-[10px] bg-black/70 text-white px-1 rounded">
-          {video.duration}
-        </span>
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-foreground line-clamp-2 leading-tight">
-          {video.title}
+          {isLoading ? 'Loading…' : data?.title || 'Untitled video'}
         </p>
+        {(description || data?.author_name) && (
+          <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
+            {description || data?.author_name}
+          </p>
+        )}
       </div>
     </div>
   );
@@ -109,15 +150,6 @@ const { data: recommendedUsers = [] } = useQuery({
   enabled: !!user,
 });
 
-  // Placeholder videos for now - these can be connected to actual data later
-  const placeholderVideos: VideoItem[] = [
-    { id: '1', title: 'How to create a compelling pitch', thumbnailUrl: '', duration: '3:45' },
-    { id: '2', title: 'Top 10 tips for startup founders', thumbnailUrl: '', duration: '5:20' },
-    { id: '3', title: 'Understanding investor expectations', thumbnailUrl: '', duration: '4:15' },
-    { id: '4', title: 'Building your MVP in 30 days', thumbnailUrl: '', duration: '6:30' },
-    { id: '5', title: 'Networking strategies for startups', thumbnailUrl: '', duration: '4:00' },
-  ];
-
   return (
     <aside className="w-72 shrink-0 space-y-4 sticky top-20 h-fit">
       {/* Videos Section */}
@@ -129,8 +161,8 @@ const { data: recommendedUsers = [] } = useQuery({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-1 p-2">
-          {placeholderVideos.map((video) => (
-            <VideoCard key={video.id} video={video} />
+          {CURATED_VIDEOS.map((video) => (
+            <VideoCard key={video.id} id={video.id} description={video.description} />
           ))}
         </CardContent>
       </Card>

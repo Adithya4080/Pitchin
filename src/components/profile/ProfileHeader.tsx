@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, Trash2, MapPin, Eye, Users, ImagePlus, Pencil, UserPlus, UserCheck, Clock, UserMinus, MoreVertical, Settings, Redo, Loader2 } from 'lucide-react';
+import { Camera, Trash2, MapPin, Eye, Users, ImagePlus, Pencil, UserPlus, UserCheck, Clock, UserMinus, MoreVertical, Settings, Redo, Loader2, Linkedin, Twitter, Globe, FolderOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -41,6 +41,12 @@ interface ProfileHeaderProps {
   onAvatarRemove?: () => void;
   onBannerSelect?: (file: File) => void;
   onBannerRemove?: () => void;
+  // Social links — rendered as small clickable icons under the name/location row.
+  // Only icons for links that are actually set are shown.
+  linkedinUrl?: string | null;
+  twitterUrl?: string | null;
+  websiteUrl?: string | null;
+  portfolioUrl?: string | null;
 }
 
 export function ProfileHeader({
@@ -61,6 +67,10 @@ export function ProfileHeader({
   onAvatarRemove,
   onBannerSelect,
   onBannerRemove,
+  linkedinUrl,
+  twitterUrl,
+  websiteUrl,
+  portfolioUrl,
 }: ProfileHeaderProps) {
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
@@ -348,6 +358,58 @@ export function ProfileHeader({
           )}
           {!isEditable && !email && !userRole?.role && !location && (
             <p className="text-sm sm:text-base text-muted-foreground mt-1.5">Public Profile</p>
+          )}
+
+          {/* Social icons row — moved here from the old standalone "Links" card.
+              Only an icon for a link that's actually set is rendered; each icon
+              is clickable and opens that link in a new tab. */}
+          {(linkedinUrl || twitterUrl || websiteUrl || portfolioUrl) && (
+            <div className="flex items-center gap-2 mt-2.5">
+              {linkedinUrl && (
+                <a
+                  href={linkedinUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="LinkedIn"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card hover:bg-muted transition-colors"
+                >
+                  <Linkedin className="h-4 w-4 text-[#0A66C2]" />
+                </a>
+              )}
+              {twitterUrl && (
+                <a
+                  href={twitterUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Twitter / X"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card hover:bg-muted transition-colors"
+                >
+                  <Twitter className="h-4 w-4 text-foreground" />
+                </a>
+              )}
+              {websiteUrl && (
+                <a
+                  href={websiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Website"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card hover:bg-muted transition-colors"
+                >
+                  <Globe className="h-4 w-4 text-primary" />
+                </a>
+              )}
+              {portfolioUrl && (
+                <a
+                  href={portfolioUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Portfolio"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card hover:bg-muted transition-colors"
+                >
+                  <FolderOpen className="h-4 w-4 text-primary" />
+                </a>
+              )}
+            </div>
           )}
         </div>
 

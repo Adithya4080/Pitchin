@@ -735,6 +735,12 @@ export default function Dashboard() {
             onAvatarRemove={handleAvatarRemove}
             onBannerSelect={handleBannerSelect}
             onBannerRemove={handleBannerRemove}
+            // Social icons now render directly under the name/location row above
+            // (moved out of the old standalone "Links" card further down the page).
+            linkedinUrl={linkedinUrl}
+            twitterUrl={twitterUrl}
+            websiteUrl={websiteUrl}
+            portfolioUrl={portfolioUrl}
           />
 
           {/* Role-Based About Card - shown right after header */}
@@ -809,14 +815,14 @@ export default function Dashboard() {
                 />
               </div>
 
-              {/* Links & Contact Card */}
-              <SocialLinksCard
-                linkedinUrl={linkedinUrl}
-                twitterUrl={twitterUrl}
-                websiteUrl={websiteUrl}
-                portfolioUrl={portfolioUrl}
-                contactEmail={contactEmail}
-              />
+              {/* Links & Contact Card removed from here — social icons (LinkedIn,
+                  Twitter/X, Website, Portfolio) now show directly under the name/
+                  location in <ProfileHeader> above. Contact email is still shown
+                  via SocialLinksCard when set, since that wasn't part of the
+                  "Links" block being moved. */}
+              {contactEmail && (
+                <SocialLinksCard contactEmail={contactEmail} />
+              )}
 
               {/* Profile Strength Card - only for owner */}
               <ProfileStrengthCard
