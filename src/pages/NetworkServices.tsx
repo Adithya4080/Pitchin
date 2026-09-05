@@ -19,6 +19,11 @@ import { NetworkingForOpportunitySection } from '@/components/network/Opportunit
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ProfileReminderPopup } from '@/components/network/ProfileReminderPopup';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
+import { InvestmentCTACard } from '@/components/InvestmentCTACard';
+
+// Roles for whom "looking for investment" is a relevant next step.
+const INVESTMENT_SEEKING_ROLES = ['innovator', 'startup'];
 
 // ─── Quick Actions ─────────────────────────────────────────────────────────────
 const QUICK_ACTIONS = [
@@ -565,10 +570,13 @@ function MyProfileStrengthWidget() {
 
 // ─── Right sidebar ─────────────────────────────────────────────────────────────
 function RightSidebar() {
+  const { user } = useAuth();
+
   return (
     <aside className="w-[240px] shrink-0 hidden xl:flex flex-col gap-3 sticky top-20 self-start">
       <QuickActionsPanel />
-      <ProviderCTACard />
+      {/* <ProviderCTACard /> */}
+      {user && INVESTMENT_SEEKING_ROLES.includes(user.role) && <InvestmentCTACard />}
       <MyProfileStrengthWidget />
     </aside>
   );

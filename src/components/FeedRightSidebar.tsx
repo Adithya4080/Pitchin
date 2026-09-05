@@ -10,6 +10,10 @@ import { useAuth } from '@/hooks/useAuth';
 import { useFollowStatus, useFollowRequest } from '@/hooks/useFollow';
 import { apiFetch } from '@/api/client';
 import { cn } from '@/lib/utils';
+import { InvestmentCTACard } from '@/components/InvestmentCTACard';
+
+// Roles for whom "looking for investment" is a relevant next step.
+const INVESTMENT_SEEKING_ROLES = ['innovator', 'startup'];
 
 type RecTab = 'opportunities' | 'people' | 'insights';
 
@@ -316,6 +320,8 @@ export function FeedRightSidebar() {
           )}
         </Card>
       )}
+
+      {user && INVESTMENT_SEEKING_ROLES.includes(user.role) && <InvestmentCTACard />}
 
       {/* About Pitch In */}
       <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-0 shadow-none rounded-2xl p-4">

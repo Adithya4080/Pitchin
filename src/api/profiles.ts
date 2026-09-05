@@ -349,3 +349,47 @@ export async function getNetworkDiscover(params: {
   if (params.page_size) q.set('page_size', String(params.page_size));
   return apiFetch(`/profiles/network/discover/?${q.toString()}`);
 }
+
+// ─── Investment Application ("Are you looking for investment?" widget) ────────
+
+export interface InvestmentApplicationAnswers {
+  funding_stage: string;
+  amount_seeking: string;
+  investment_purpose: string;
+  has_raised_previously: boolean;
+  previous_funding_stage?: string;
+  previous_amount_raised?: string;
+  previous_investors?: string;
+  previous_investment_purpose?: string;
+}
+
+export interface InvestmentApplicationStatus {
+  has_applied: boolean;
+  application: {
+    id: number;
+    status: 'pending' | 'reviewing' | 'accepted' | 'rejected';
+    note: string;
+    funding_stage: string;
+    amount_seeking: string;
+    investment_purpose: string;
+    has_raised_previously: boolean;
+    previous_funding_stage: string;
+    previous_amount_raised: string;
+    previous_investors: string;
+    previous_investment_purpose: string;
+    created_at: string;
+    updated_at: string;
+  } | null;
+}
+
+export async function getInvestmentApplicationStatus(): Promise<InvestmentApplicationStatus> {
+  return apiFetch<InvestmentApplicationStatus>('/profiles/investment/apply/');
+}
+
+export async function applyForInvestment(answers: InvestmentApplicationAnswers): Promise<InvestmentApplicationStatus> {
+  return apiFetch<InvestmentApplicationStatus>('/profiles/investment/apply/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(answers),
+  });
+}
