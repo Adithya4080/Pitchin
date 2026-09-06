@@ -47,7 +47,7 @@ export default function Auth() {
         const data = await loginWithGoogle(response.access_token);
         setTokens(data.access, data.refresh);
         const refreshedUser = await refreshUser();
-        navigate('/network');
+        navigate('/feed');
       } catch {
         toast({ title: 'Google sign-in failed', description: 'Please try again.', variant: 'destructive' });
       } finally {
@@ -67,7 +67,7 @@ export default function Auth() {
     if (error) {
       toast({ title: 'Sign in failed', description: error.message, variant: 'destructive' });
     } else {
-      navigate('/network');
+      navigate('/feed');
     }
   };
 
